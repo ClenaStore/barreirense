@@ -12,7 +12,7 @@ body{font-family:system-ui,Segoe UI,Roboto,Arial,sans-serif;background:linear-gr
 .card{background:rgba(17,24,39,.9);border:1px solid var(--line);border-radius:16px;padding:16px}
 .grid{display:grid;gap:12px}.cols-3{grid-template-columns:2fr 1fr 1fr}
 label{display:block;font-size:.85rem;color:var(--muted);margin-bottom:6px}
-input,select,button{width:100%;padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:#0c1322;color:var(--text)}
+input,select,button{width:100%;padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:#0c1322;color:#e5e7eb}
 button{background:var(--ok);color:#052012;font-weight:700;cursor:pointer}
 table{width:100%;border-collapse:separate;border-spacing:0 8px;margin-top:10px}
 thead th{color:var(--muted);text-align:left;padding:8px 10px}
@@ -30,9 +30,7 @@ tbody td:first-child{border-radius:12px 0 0 12px}tbody td:last-child{border-radi
     <div class="grid cols-3">
       <div>
         <label>Empresa</label>
-        <select id="EMPRESA">
-          <option value="">Todas as empresas</option>
-        </select>
+        <select id="EMPRESA"><option value="">Todas as empresas</option></select>
       </div>
       <div>
         <label>Janela de dias</label>
@@ -66,27 +64,27 @@ tbody td:first-child{border-radius:12px 0 0 12px}tbody td:last-child{border-radi
 </div>
 
 <script>
-/* ===== URL FIXA (oculta e bloqueada) ===== */
-const GAS_URL_FIXED = 'https://script.google.com/macros/s/AKfycbyRtz4acIYRaAXXd5HtIn--reSQeki811LAxdgnGecsezn5dnhj-wEBn2u--f-KP5vj0w/exec';
+/* ===== USA O GAS DIRETO ===== */
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbyFeV77c6mMO_28t3nXGi641IbPbTFRvzboNaNexo73tCsJ96X78u1B5F9GzZnwyUyA/exec';
 
 const $ = id => document.getElementById(id);
 function esc(s){return (s||'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]))}
 function setStatus(t){ $('status').textContent = t; }
 
-/* Carrega lista de empresas para o dropdown */
+/* Carrega empresas direto do GAS */
 async function loadCompanies(){
   setStatus('carregando empresas…');
   try{
-    const r = await fetch(`${GAS_URL_FIXED}?action=companies`);
-    if (!r.ok) throw new Error('HTTP '+r.status);
-    const { empresas } = await r.json();
+    const url = `${GAS_URL}?action=companies`;
+    const r = await fetch(url, { method:'GET', cache:'no-store' });
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    const { empresas, error } = await r.json();
+    if (error) throw new Error(error);
     const sel = $('EMPRESA');
-    // limpa e repopula
     sel.innerHTML = '<option value="">Todas as empresas</option>';
     (empresas||[]).forEach(emp=>{
       const opt = document.createElement('option');
-      opt.value = emp;  // mandaremos como está; o servidor normaliza
-      opt.textContent = emp;
+      opt.value = emp; opt.textContent = emp;
       sel.appendChild(opt);
     });
     setStatus('empresas carregadas');
@@ -96,22 +94,23 @@ async function loadCompanies(){
   }
 }
 
-/* Busca os aniversários conforme seleção */
+/* Lista aniversários direto do GAS */
 async function load(){
   const empresa = $('EMPRESA').value.trim();
   const dias = Number($('DIAS').value || 20);
 
-  setStatus('carregando aniversários…');
-  $('msg').textContent = '';
+  setStatus('carregando aniversários…'); $('msg').textContent='';
 
   const qs = new URLSearchParams({ action:'list', days:String(dias) });
   if (empresa) qs.append('empresa', empresa);
 
   try{
-    const r = await fetch(`${GAS_URL_FIXED}?${qs.toString()}`);
-    if (!r.ok) throw new Error('HTTP '+r.status);
-    const data = await r.json();
-    render(data.data || []);
+    const url = `${GAS_URL}?${qs.toString()}`;
+    const r = await fetch(url, { method:'GET', cache:'no-store' });
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    const { data, error } = await r.json();
+    if (error) throw new Error(error);
+    render(data || []);
     setStatus('pronto');
   }catch(e){
     setStatus('erro');
@@ -122,10 +121,7 @@ async function load(){
 function render(rows){
   const tb = $('tbody'); tb.innerHTML='';
   $('kpi').textContent = `${rows.length} registro(s)`;
-  if (!rows.length) {
-    $('msg').textContent = 'Nenhum registro dentro da janela selecionada.';
-    return;
-  }
+  if (!rows.length) { $('msg').textContent='Nenhum registro na janela selecionada.'; return; }
   rows.forEach(item=>{
     const tr = document.createElement('tr');
     tr.innerHTML = `
@@ -137,7 +133,7 @@ function render(rows){
   });
 }
 
-/* inicia carregando empresas; depois você clica "Carregar" */
+/* inicia carregando empresas */
 document.addEventListener('DOMContentLoaded', loadCompanies);
 </script>
 </body>
