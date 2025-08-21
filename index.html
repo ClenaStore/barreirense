@@ -3,266 +3,114 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Painel • Aniversários WhatsApp</title>
+<title>Painel de Aniversários</title>
 <style>
-:root{
-  --bg:#0b1220; --panel:#111827; --line:#1f2937; --text:#e5e7eb; --muted:#9ca3af;
-  --brand:#22c55e; --accent:#60a5fa; --danger:#ef4444; --warn:#f59e0b; --ok:#10b981;
-}
-*{box-sizing:border-box} html,body{margin:0}
+:root{--bg:#0b1220;--panel:#111827;--line:#1f2937;--text:#e5e7eb;--muted:#9ca3af;--accent:#60a5fa}
+*{box-sizing:border-box}html,body{margin:0}
 body{font-family:system-ui,Segoe UI,Roboto,Arial,sans-serif;background:linear-gradient(180deg,#0b1220,#060a14);color:var(--text)}
-.container{max-width:1100px;margin:24px auto;padding:0 16px}
-h1{margin:0 0 8px 0;font-size:1.5rem}
+.container{max-width:1000px;margin:24px auto;padding:0 16px}
 .card{background:rgba(17,24,39,.9);border:1px solid var(--line);border-radius:16px;padding:16px}
-.grid{display:grid;gap:12px} .cols-2{grid-template-columns:1fr 1fr} .cols-3{grid-template-columns:1fr 1fr 1fr}
+.grid{display:grid;gap:12px}.cols-3{grid-template-columns:2fr 1fr 1fr}
 label{display:block;font-size:.85rem;color:var(--muted);margin-bottom:6px}
-input,select,button{width:100%;padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:#0c1322;color:var(--text);outline:none}
-input:focus,select:focus{border-color:#3b82f6}
-button{background:var(--brand);border-color:transparent;color:#031a0c;font-weight:700;cursor:pointer}
-button.secondary{background:#0c1322;color:var(--text)}
-button.warn{background:var(--warn);color:#1b1305}
-button.danger{background:var(--danger);color:#1d0404}
-.badge{display:inline-block;padding:4px 10px;border-radius:999px;background:#122032;border:1px solid var(--line);font-size:.8rem;color:var(--muted)}
-table{width:100%;border-collapse:separate;border-spacing:0 8px}
-thead th{font-size:.85rem;color:var(--muted);text-align:left;padding:8px 10px}
+input,button{width:100%;padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:#0c1322;color:var(--text)}
+button{background:#22c55e;color:#052012;font-weight:700;cursor:pointer}
+table{width:100%;border-collapse:separate;border-spacing:0 8px;margin-top:10px}
+thead th{color:var(--muted);text-align:left;padding:8px 10px}
 tbody td{padding:10px;border:1px solid var(--line);background:#0c1322}
-tbody td:first-child{border-radius:12px 0 0 12px}
-tbody td:last-child{border-radius:0 12px 12px 0}
-.small{font-size:.85rem;color:var(--muted)} .tag{border:1px solid var(--line);padding:2px 8px;border-radius:999px}
-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+tbody td:first-child{border-radius:12px 0 0 12px}tbody td:last-child{border-radius:0 12px 12px 0}
+.badge{display:inline-block;padding:4px 10px;border:1px solid var(--line);border-radius:999px;color:var(--muted);font-size:.8rem}
+.small{font-size:.85rem;color:var(--muted)}
 </style>
 </head>
 <body>
 <div class="container">
-  <header>
-    <h1>🎉 Aniversários • WhatsApp</h1>
-    <span id="appStatus" class="badge">carregando…</span>
-  </header>
+  <h1 style="margin:0 0 8px 0;font-size:1.5rem">🎉 Painel de Aniversários</h1>
 
-  <!-- ===== Conexões ===== -->
   <section class="card">
-    <h2 style="margin:0 0 12px 0;font-size:1.1rem">Conexões</h2>
-    <div class="grid cols-2">
-      <div>
-        <label>Endpoint Apps Script (planilha)</label>
-        <input id="GAS_API_URL" placeholder="https://script.google.com/macros/s/XXX/exec">
-      </div>
-      <div>
-        <label>Endpoint Vercel (WhatsApp)</label>
-        <input id="VERCEL_API_URL" placeholder="https://aniversarios-three.vercel.app/">
-      </div>
-    </div>
-    <div class="small" style="margin-top:8px">O Apps Script lê/escreve na planilha e agenda o envio. O Vercel guarda as credenciais do WhatsApp.</div>
-  </section>
-
-  <!-- ===== Configurações ===== -->
-  <section class="card" style="margin-top:14px">
-    <h2 style="margin:0 0 12px 0;font-size:1.1rem">Configurações de Envio</h2>
     <div class="grid cols-3">
       <div>
-        <label>Status</label>
-        <select id="active"><option value="true">Ativo</option><option value="false">Inativo</option></select>
-      </div>
-      <div>
-        <label>Hora diária (0–23)</label>
-        <input type="number" id="send_hour" min="0" max="23">
-      </div>
-      <div>
-        <label>Fuso horário</label>
-        <input id="timezone" placeholder="America/Bahia">
-      </div>
-    </div>
-    <div class="grid cols-3" style="margin-top:12px">
-      <div>
-        <label>Dias antes do aniversário</label>
-        <input type="number" id="days_before" min="0" max="60">
-      </div>
-      <div>
-        <label>Janela de visualização (dias)</label>
-        <input type="number" id="preview_window_days" min="1" max="120">
+        <label>Endpoint Apps Script (WebApp /exec)</label>
+        <input id="GAS_URL" placeholder="https://script.google.com/macros/s/XXXXX/exec">
       </div>
       <div>
         <label>Filtro de empresa (opcional)</label>
-        <input id="company_filter" placeholder="MERCATTO DELÍCIA">
-      </div>
-    </div>
-    <div class="grid cols-2" style="margin-top:12px">
-      <div>
-        <label>URL de Reserva (botão)</label>
-        <input id="reserva_url" placeholder="https://seu-site.com/reservas">
+        <input id="EMPRESA" placeholder="MERCATTO DELICIA">
       </div>
       <div>
-        <label>URL de Informações (botão)</label>
-        <input id="info_url" placeholder="https://seu-site.com/aniversarios">
-      </div>
-    </div>
-    <div class="grid cols-2" style="margin-top:12px">
-      <div>
-        <label>Última execução</label>
-        <input id="last_run" disabled>
-      </div>
-      <div>
-        <label>Gatilho diário</label>
-        <input id="trigger_status" disabled>
+        <label>Janela de dias</label>
+        <input id="DIAS" type="number" min="1" max="365" value="60">
       </div>
     </div>
     <div style="display:flex;gap:10px;margin-top:12px">
-      <button onclick="saveConfig()">💾 Salvar</button>
-      <button class="secondary" onclick="syncTrigger()">🔁 Sincronizar gatilho</button>
-      <button class="warn" onclick="runNow()">▶️ Rodar agora</button>
+      <button onclick="load()">Carregar</button>
+      <span id="status" class="badge">aguardando…</span>
     </div>
-    <div id="cfgMsg" class="small" style="margin-top:8px"></div>
   </section>
 
-  <!-- ===== Teste rápido ===== -->
   <section class="card" style="margin-top:14px">
-    <h2 style="margin:0 0 12px 0;font-size:1.1rem">Envio de Teste (via Vercel)</h2>
-    <div class="grid cols-3">
-      <div><label>Telefone</label><input id="test_phone" placeholder="5599999999999 ou 77 99999-9999"></div>
-      <div><label>Nome</label><input id="test_name" placeholder="Cliente Teste"></div>
-      <div><label>&nbsp;</label><button onclick="sendTest()">Enviar teste</button></div>
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <h2 style="margin:0;font-size:1.1rem">Próximos Aniversários</h2>
+      <span id="kpi" class="badge">—</span>
     </div>
-    <div id="testMsg" class="small" style="margin-top:8px"></div>
-  </section>
-
-  <!-- ===== Próximos aniversários ===== -->
-  <section class="card" style="margin-top:14px">
-    <div style="display:flex;align-items:center;justify-content:space-between">
-      <h2 style="margin:0;font-size:1.1rem">Próximos aniversários</h2>
-      <span class="badge" id="countBadge">—</span>
-    </div>
-    <div style="overflow:auto;margin-top:8px">
+    <div style="overflow:auto">
       <table>
         <thead><tr>
-          <th>Nome</th><th>Empresa</th><th>Telefone</th>
-          <th>Aniversário</th><th>Faltam</th><th>Enviado ano?</th><th>Ações</th>
+          <th>Nome</th><th>Empresa</th><th>Aniversário</th><th>Faltam (dias)</th>
         </tr></thead>
         <tbody id="tbody"></tbody>
       </table>
     </div>
+    <div id="msg" class="small" style="margin-top:8px"></div>
   </section>
-
-  <p class="small" style="opacity:.8;margin-top:16px">Dica: deixe o Apps Script com CORS liberado apenas para o domínio deste painel.</p>
 </div>
 
 <script>
-/* ========= CONFIGURE AQUI ========= */
-let GAS_API_URL    = 'https://SEU-APPS-SCRIPT/exec';        // << cole seu Web App do Google Apps Script
-let VERCEL_API_URL = 'https://seu-app.vercel.app/api/send-birthday'; // << seu endpoint Vercel
-/* ================================== */
+const $ = id => document.getElementById(id);
+function esc(s){return (s||'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]))}
+function setStatus(t){ $('status').textContent = t; }
 
-const $ = (id)=>document.getElementById(id);
-function setStatus(msg){ $('appStatus').textContent = msg; }
-
-/* ----- helpers ----- */
-function esc(s){ return (s||'').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m])); }
-function toJSON(res){ if(!res.ok) throw new Error('HTTP '+res.status); return res.json(); }
-function gas(action, body={}){
-  return fetch(`${GAS_API_URL}?action=${encodeURIComponent(action)}`,{
-    method:'POST', headers:{'Content-Type':'application/json'},
-    body: JSON.stringify(body)
-  }).then(toJSON);
-}
-
-/* ----- load UI ----- */
 async function load(){
-  $('GAS_API_URL').value = GAS_API_URL;
-  $('VERCEL_API_URL').value = VERCEL_API_URL;
+  const url = $('GAS_URL').value.trim();
+  const empresa = $('EMPRESA').value.trim();
+  const dias = Number($('DIAS').value || 60);
+
+  if (!url) { alert('Informe a URL do WebApp (termina em /exec)'); return; }
 
   setStatus('carregando…');
-  try{
-    const data = await gas('ui-data');
-    const cfg = data.config || {};
-    $('active').value = cfg.active ? 'true' : 'false';
-    $('send_hour').value = cfg.send_hour ?? 9;
-    $('timezone').value = cfg.timezone || 'America/Bahia';
-    $('days_before').value = cfg.days_before ?? 0;
-    $('preview_window_days').value = cfg.preview_window_days ?? 30;
-    $('company_filter').value = cfg.company_filter || '';
-    $('reserva_url').value = cfg.reserva_url || '';
-    $('info_url').value = cfg.info_url || '';
-    $('last_run').value = cfg.last_run ? new Date(cfg.last_run).toLocaleString() : '—';
-    $('trigger_status').value = data.haveTrigger ? 'Ativo' : 'Inexistente';
+  $('msg').textContent = '';
 
-    renderTable(data.upcoming || []);
+  const qs = new URLSearchParams({ action:'list', days:String(dias) });
+  if (empresa) qs.append('empresa', empresa);
+
+  try{
+    const r = await fetch(`${url}?${qs.toString()}`);
+    if (!r.ok) throw new Error('HTTP '+r.status);
+    const data = await r.json();
+    render(data.data || []);
     setStatus('pronto');
   }catch(e){
-    setStatus('erro ao carregar');
-    console.error(e);
-    alert('Erro ao carregar: '+e.message);
+    setStatus('erro');
+    $('msg').textContent = 'Falha ao carregar: ' + e.message;
   }
 }
 
-/* ----- actions ----- */
-async function saveConfig(){
-  $('cfgMsg').textContent = 'salvando…';
-  // permite trocar URLs diretamente no topo
-  GAS_API_URL = $('GAS_API_URL').value.trim();
-  VERCEL_API_URL = $('VERCEL_API_URL').value.trim();
-
-  try{
-    const cfg = {
-      active: $('active').value === 'true',
-      send_hour: Number($('send_hour').value || 9),
-      timezone: $('timezone').value || 'America/Bahia',
-      days_before: Number($('days_before').value || 0),
-      preview_window_days: Number($('preview_window_days').value || 30),
-      company_filter: $('company_filter').value || '',
-      reserva_url: $('reserva_url').value || '',
-      info_url: $('info_url').value || '',
-      vercel_endpoint: VERCEL_API_URL
-    };
-    await gas('save-config', { config: cfg });
-    $('cfgMsg').textContent = 'Configurações salvas e gatilho sincronizado.';
-    load();
-  }catch(e){
-    $('cfgMsg').textContent = 'Erro: '+e.message;
-  }
-}
-async function syncTrigger(){
-  $('cfgMsg').textContent = 'sincronizando gatilho…';
-  try{ await gas('sync-trigger'); $('cfgMsg').textContent = 'Gatilho sincronizado.'; load(); }
-  catch(e){ $('cfgMsg').textContent = 'Erro: '+e.message; }
-}
-async function runNow(){
-  $('cfgMsg').textContent = 'executando…';
-  try{ const r = await gas('run-now'); $('cfgMsg').textContent = 'Concluído: '+JSON.stringify(r); load(); }
-  catch(e){ $('cfgMsg').textContent = 'Erro: '+e.message; }
-}
-async function sendOne(rowIndex, btn){
-  const old = btn.textContent; btn.disabled = true; btn.textContent = 'Enviando…';
-  try{ await gas('send-one', { rowIndex }); btn.textContent = 'Enviado ✅'; setTimeout(load, 600); }
-  catch(e){ btn.disabled = false; btn.textContent = old; alert('Erro: '+e.message); }
-}
-async function sendTest(){
-  const phone = $('test_phone').value.trim();
-  const name  = $('test_name').value.trim() || 'Cliente Teste';
-  $('testMsg').textContent = 'enviando…';
-  try{
-    const r = await fetch(VERCEL_API_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({to:phone,name,reservaUrl:$('reserva_url').value,infoUrl:$('info_url').value})}).then(toJSON);
-    $('testMsg').textContent = 'OK: '+(r?.ok?'enviado':'verifique o log');
-  }catch(e){ $('testMsg').textContent = 'Erro: '+e.message; }
-}
-
-/* ----- table ----- */
-function renderTable(rows){
-  $('countBadge').textContent = rows.length + ' itens';
+function render(rows){
   const tb = $('tbody'); tb.innerHTML='';
-  rows.forEach(r=>{
+  $('kpi').textContent = `${rows.length} registro(s)`;
+  rows.forEach(item=>{
     const tr = document.createElement('tr');
     tr.innerHTML = `
-      <td>${esc(r.name)}</td>
-      <td>${esc(r.empresa||'')}</td>
-      <td><span class="tag">${esc(r.phoneE164||r.phoneRaw||'')}</span></td>
-      <td>${esc(r.birthday)}</td>
-      <td>${r.daysToBirthday}</td>
-      <td>${r.sentThisYear?'✅':'—'}</td>
-      <td><button class="secondary" onclick="sendOne(${r.rowIndex}, this)">Enviar agora</button></td>`;
+      <td>${esc(item.nome)}</td>
+      <td>${esc(item.empresa||'')}</td>
+      <td>${esc(item.aniversario)}</td>
+      <td>${item.dias}</td>
+    `;
     tb.appendChild(tr);
   });
 }
 
-document.addEventListener('DOMContentLoaded', load);
+// opcional: deixe pré-preenchido para você
+// $('GAS_URL').value = 'https://script.google.com/macros/s/AKfycbwHwNixmjn9pB_pKIBuONuHpssEfs5mza-sT9CQDaIZP2vlLNw269pbdNPAyZoPzVkcYA/exec';
 </script>
 </body>
 </html>
