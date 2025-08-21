@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Painel • Aniversários WhatsApp</title>
+<style>
+:root{
+  --bg:#0f172a; --panel:#111827; --line:#1f2937; --text:#e5e7eb; --muted:#9ca3af;
+  --brand:#22c55e; --accent:#38bdf8; --danger:#ef4444; --warn:#f59e0b;
+  --ok:#10b981; --card:#0b1220; --shadow:0 10px 30px rgba(0,0,0,.25);
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{font-family:system-ui,Segoe UI,Roboto,Arial,sans-serif;background:linear-gradient(180deg,#0b1220,#060a14);color:var(--text)}
+a{color:var(--accent);text-decoration:none}
+.container{max-width:1100px;margin:24px auto;padding:0 16px}
+header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+h1{font-size:1.4rem;margin:0;font-weight:700;letter-spacing:.2px}
+.badge{padding:4px 10px;border-radius:999px;font-size:.78rem;background:var(--line);color:var(--muted)}
+.card{background:rgba(17,24,39,.8);border:1px solid var(--line);border-radius:16px;padding:16px;box-shadow:var(--shadow)}
+.grid{display:grid;gap:16px}
+.grid.cols-2{grid-template-columns:1fr 1fr}
+.grid.cols-3{grid-template-columns:2fr 1fr 1fr}
+label{display:block;font-size:.85rem;color:var(--muted);margin-bottom:6px}
+input,select,button,textarea{
+  width:100%;padding:10px 12px;border-radius:12px;border:1px solid var(--line);
+  background:#0c1322;color:var(--text);outline:none
+}
+input:focus,select:focus,textarea:focus{border-color:#3b82f6}
+button{background:var(--brand);border-color:transparent;color:#052014;font-weight:700;cursor:pointer}
+button.secondary{background:#0c1322;border-color:var(--line);color:var(--text)}
+button.warn{background:var(--warn);color:#1b1305}
+button.danger{background:var(--danger);color:#1d0404}
+.row{display:flex;gap:10px;align-items:center}
+table{width:100%;border-collapse:separate;border-spacing:0 8px}
+th,td{padding:10px 12px;text-align:left;font-size:.92rem}
+thead th{color:var(--muted);font-weight:600}
+tbody tr{background:#0c1322;border:1px solid var(--line)}
+tbody tr td:first-child{border-radius:12px 0 0 12px}
+tbody tr td:last-child{border-radius:0 12px 12px 0}
+.kpi{display:flex;gap:12px}
+.kpi .pill{background:#0c1322;border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+.small{font-size:.85rem;color:var(--muted)}
+hr{border:none;border-top:1px solid var(--line);margin:16px 0}
+footer{margin:20px 0 40px;color:var(--muted);font-size:.85rem;text-align:center}
+.spinner{width:16px;height:16px;border:3px solid #1f2937;border-top-color:#60a5fa;border-radius:50%;animation:spin 1s linear infinite;display:inline-block}
+@keyframes spin{to{transform:rotate(360deg)}}
+.tag{display:inline-block;padding:2px 8px;border:1px solid var(--line);border-radius:999px;font-size:.75rem;color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>🎉 Aniversários WhatsApp</h1>
+    <div id="status" class="badge">carregando…</div>
+  </header>
+
+  <!-- Configurações -->
+  <section class="card">
+    <h2 style="margin:0 0 12px 0;font-size:1.1rem">Configurações de Envio</h2>
+    <div class="grid cols-3">
+      <div>
+        <label>Ativar disparos automáticos</label>
+        <select id="active">
+          <option value="true">Ativo</option>
+          <option value="false">Inativo</option>
+        </select>
+      </div>
+      <div>
+        <label>Hora do envio diário (0–23)</label>
+        <input type="number" id="send_hour" min="0" max="23" step="1" placeholder="9">
+      </div>
+      <div>
+        <label>Fuso horário</label>
+        <input type="text" id="timezone" placeholder="America/Bahia">
+      </div>
+    </div>
+
+    <div class="grid cols-3" style="margin-top:12px">
+      <div>
+        <label>Dias antes do aniversário (0 = no dia)</label>
+        <input type="number" id="days_before" min="0" max="60" step="1">
+      </div>
+      <div>
+        <label>Janela de visualização (dias)</label>
+        <input type="number" id="preview_window_days" min="1" max="120" step="1">
+      </div>
+      <div>
+        <label>Filtro de empresa (opcional)</label>
+        <input type="text" id="company_filter" placeholder="MERCATTO DELÍCIA">
+      </div>
+    </div>
+
+    <div class="grid cols-2" style="margin-top:12px">
+      <div>
+        <label>Endpoint Vercel (sem credenciais)</label>
+        <input type="url" id="vercel_endpoint" placeholder="https://seu-app.vercel.app/api/send-birthday">
+      </div>
+      <div>
+        <label>URL de Reserva</label>
+        <input type="url" id="reserva_url" placeholder="https://seu-site.com/reservas">
+      </div>
+    </div>
+    <div class="grid cols-2" style="margin-top:12px">
+      <div>
+        <label>URL de Informações</label>
+        <input type="url" id="info_url" placeholder="https://seu-site.com/aniversarios">
+      </div>
+      <div>
+        <label>Última execução</label>
+        <input id="last_run" disabled>
+      </div>
+    </div>
+
+    <div class="row" style="gap:12px;margin-top:14px">
+      <button onclick="saveConfig()">💾 Salvar configurações</button>
+      <button class="secondary" onclick="syncTrigger()">🔁 Sincronizar gatilho</button>
+      <button class="warn" onclick="runNow()">▶️ Rodar agora</button>
+    </div>
+    <div id="cfgMsg" class="small" style="margin-top:8px"></div>
+  </section>
+
+  <!-- Envio de teste -->
+  <section class="card" style="margin-top:16px">
+    <h2 style="margin:0 0 12px 0;font-size:1.1rem">Envio de Teste</h2>
+    <div class="grid cols-3">
+      <div>
+        <label>Telefone (DDI+DDD+número ou BR normal)</label>
+        <input type="text" id="test_phone" placeholder="5599999999999 ou 77 99999-9999">
+      </div>
+      <div>
+        <label>Nome</label>
+        <input type="text" id="test_name" placeholder="Cliente Teste">
+      </div>
+      <div>
+        <label>&nbsp;</label>
+        <button onclick="sendTest()">Enviar teste</button>
+      </div>
+    </div>
+    <div id="testMsg" class="small" style="margin-top:8px"></div>
+  </section>
+
+  <!-- Lista de próximos aniversários -->
+  <section class="card" style="margin-top:16px">
+    <div class="row" style="justify-content:space-between">
+      <h2 style="margin:0;font-size:1.1rem">Próximos aniversários (janela)</h2>
+      <div class="kpi">
+        <div class="pill"><span class="small">Gatilho</span><br><b id="kpiTrigger">-</b></div>
+        <div class="pill"><span class="small">Itens</span><br><b id="kpiCount">-</b></div>
+        <div class="pill"><span class="small">Hoje + Dias Antes</span><br><b id="kpiRule">-</b></div>
+      </div>
+    </div>
+    <div style="overflow:auto;margin-top:8px">
+      <table>
+        <thead>
+          <tr>
+            <th>Nome</th><th>Empresa</th><th>Telefone</th><th>Aniversário</th><th>Faltam (dias)</th><th>Enviado este ano?</th><th>Ações</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <footer>Feito para integrar Google Sheets ↔️ WhatsApp Oficial via Vercel</footer>
+</div>
+
+<script>
+let STATE = null;
+
+function $(id){ return document.getElementById(id); }
+function setBadge(text, ok=true){ 
+  const el = $('status'); el.textContent = text; el.style.background = ok ? '#17321f' : '#3b1b1b';
+}
+
+function load() {
+  setBadge('carregando…');
+  google.script.run.withSuccessHandler(data => {
+    STATE = data;
+    const cfg = data.config || {};
+    // preenche form
+    $('active').value = (cfg.active ? 'true':'false');
+    $('send_hour').value = cfg.send_hour ?? 9;
+    $('timezone').value = cfg.timezone || 'America/Bahia';
+    $('days_before').value = cfg.days_before ?? 0;
+    $('preview_window_days').value = cfg.preview_window_days ?? 30;
+    $('vercel_endpoint').value = cfg.vercel_endpoint || '';
+    $('reserva_url').value = cfg.reserva_url || '';
+    $('info_url').value = cfg.info_url || '';
+    $('company_filter').value = cfg.company_filter || '';
+    $('last_run').value = cfg.last_run ? new Date(cfg.last_run).toLocaleString() : '—';
+
+    // KPIs
+    $('kpiTrigger').textContent = data.haveTrigger ? 'Ativo' : 'Inexistente';
+    $('kpiRule').textContent = `D+${cfg.days_before ?? 0}`;
+    renderTable(data.upcoming || []);
+    setBadge('pronto');
+  }).getUiData();
+}
+
+function renderTable(rows){
+  const tb = $('tbody'); tb.innerHTML = '';
+  $('kpiCount').textContent = rows.length;
+  rows.forEach(r => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${escapeHtml(r.name)}</td>
+      <td>${escapeHtml(r.empresa || '')}</td>
+      <td><span class="tag">${escapeHtml(r.phoneE164 || r.phoneRaw)}</span></td>
+      <td>${escapeHtml(r.birthday)}</td>
+      <td>${r.daysToBirthday}</td>
+      <td>${r.sentThisYear ? '✅ Sim' : '❌ Não'}</td>
+      <td><button class="secondary" onclick="sendOne(${r.rowIndex}, this)">Enviar agora</button></td>
+    `;
+    tb.appendChild(tr);
+  });
+}
+
+function saveConfig(){
+  $('cfgMsg').textContent = 'salvando…';
+  const cfg = {
+    active: $('active').value === 'true',
+    send_hour: Number($('send_hour').value || 9),
+    timezone: $('timezone').value || 'America/Bahia',
+    days_before: Number($('days_before').value || 0),
+    preview_window_days: Number($('preview_window_days').value || 30),
+    vercel_endpoint: $('vercel_endpoint').value,
+    reserva_url: $('reserva_url').value,
+    info_url: $('info_url').value,
+    company_filter: $('company_filter').value
+  };
+  google.script.run.withSuccessHandler(res=>{
+    $('cfgMsg').textContent = 'Configurações salvas e gatilho sincronizado.';
+    load();
+  }).withFailureHandler(err=>{
+    $('cfgMsg').textContent = 'Erro: ' + err.message;
+  }).saveConfig(cfg);
+}
+
+function syncTrigger(){
+  $('cfgMsg').textContent = 'sincronizando gatilho…';
+  google.script.run.withSuccessHandler(()=>{
+    $('cfgMsg').textContent = 'Gatilho sincronizado.';
+    load();
+  }).withFailureHandler(err=>{
+    $('cfgMsg').textContent = 'Erro: ' + err.message;
+  }).recreateDailyTriggerFromConfig_();
+}
+
+function runNow(){
+  setBadge('executando…');
+  google.script.run.withSuccessHandler(res=>{
+    setBadge('pronto');
+    $('cfgMsg').textContent = 'Execução concluída: ' + JSON.stringify(res);
+    load();
+  }).withFailureHandler(err=>{
+    setBadge('erro',false);
+    $('cfgMsg').textContent = 'Erro: ' + err.message;
+  }).runNow();
+}
+
+function sendOne(rowIndex, btn){
+  const old = btn.textContent;
+  btn.disabled = true; btn.textContent = 'Enviando…';
+  google.script.run.withSuccessHandler(res=>{
+    btn.textContent = 'Enviado ✅';
+    setTimeout(load, 600);
+  }).withFailureHandler(err=>{
+    btn.textContent = old; btn.disabled = false;
+    alert('Erro: ' + err.message);
+  }).sendOne(rowIndex);
+}
+
+function sendTest(){
+  const phone = $('test_phone').value.trim();
+  const name = $('test_name').value.trim() || 'Cliente Teste';
+  $('testMsg').textContent = 'enviando…';
+  google.script.run.withSuccessHandler(()=>{
+    $('testMsg').textContent = 'Teste enviado com sucesso.';
+  }).withFailureHandler(err=>{
+    $('testMsg').textContent = 'Erro: ' + err.message;
+  }).sendTest(phone, name);
+}
+
+function escapeHtml(s){ return (s||'').replace(/[&<>"']/g,m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;' }[m])); }
+
+document.addEventListener('DOMContentLoaded', load);
+</script>
+</body>
+</html>
