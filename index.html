@@ -140,4 +140,91 @@ async function load(){
   const dias = Number($('DIAS').value || 30);
   const inDays = getInDaysParam();
 
-  setSta
+  setStatus('carregando aniversários…'); $('msg').textContent='';
+
+  try{
+    const params = { action:'list', days:String(dias) };
+    if (empresa) params.empresa = empresa;
+    if (inDays) params.in = inDays;
+
+    const resp = await jsonp(GAS_URL, params);
+    if (!resp || resp.ok === false) throw new Error(resp?.error || 'erro');
+    rowsGlobal = resp.data || [];
+    render(rowsGlobal);
+    setStatus('pronto');
+  }catch(e){
+    setStatus('erro');
+    $('msg').textContent = 'Falha ao carregar: ' + e.message;
+  }
+}
+
+function render(rows){
+  const tb = $('tbody'); tb.innerHTML='';
+  $('progress').textContent = `${rows.length} registro(s)`;
+  if (!rows.length) { $('msg').textContent='Nenhum registro na seleção.'; return; }
+  rows.forEach((item, idx)=>{
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><input type="checkbox" class="rowchk" data-idx="${idx}" checked></td>
+      <td>${esc(item.nome)}</td>
+      <td>${esc(item.empresa||'')}</td>
+      <td>${esc(item.aniversario)}</td>
+      <td>${item.dias}</td>
+      <td>${esc(formatPhone(item.phoneE164 || item.phoneRaw || ''))}</td>
+      <td id="st_${idx}" class="small"></td>`;
+    tb.appendChild(tr);
+  });
+}
+
+function formatPhone(n){ return n.replace(/^55/,'+55 ').replace(/(\d{2})(\d{5})(\d{4})$/,'($1) $2-$3'); }
+
+function checkAll(master){
+  document.querySelectorAll('.rowchk').forEach(c => c.checked = master.checked);
+}
+function toggleSelectAll(){
+  const boxes = Array.from(document.querySelectorAll('.rowchk'));
+  const anyUnchecked = boxes.some(b=>!b.checked);
+  boxes.forEach(b=> b.checked = anyUnchecked);
+}
+
+/* Envio em massa via Vercel */
+async function sendSelected(){
+  const reservaUrl = $('RESERVA_URL').value.trim();
+  const infoUrl = $('INFO_URL').value.trim();
+  const selectedIdx = Array.from(document.querySelectorAll('.rowchk'))
+    .filter(c => c.checked)
+    .map(c => Number(c.getAttribute('data-idx')));
+
+  if (!selectedIdx.length) { alert('Selecione pelo menos um contato.'); return; }
+
+  let ok = 0, fail = 0;
+  for (const i of selectedIdx){
+    const r = rowsGlobal[i];
+    const el = $('st_'+i);
+    el.textContent = 'enviando…';
+    try{
+      const body = { to: r.phoneE164 || r.phoneRaw, name: r.nome, reservaUrl, infoUrl };
+      const resp = await fetch(VERCEL_API, {
+        method: 'POST',
+        headers: { 'Content-Type':'application/json' },
+        body: JSON.stringify(body),
+      });
+      const json = await resp.json().catch(()=> ({}));
+      if (!resp.ok) throw new Error(json?.error || ('HTTP '+resp.status));
+      el.textContent = '✅ enviado';
+      ok++;
+    }catch(e){
+      el.textContent = '❌ ' + (e?.message || 'erro');
+      fail++;
+    }
+    // pequeno intervalo para não saturar
+    await new Promise(res=>setTimeout(res, 350));
+  }
+  $('msg').textContent = `Concluído: ${ok} enviados, ${fail} falhas.`;
+}
+
+/* boot */
+document.addEventListener('DOMContentLoaded', loadCompanies);
+</script>
+</body>
+</html>
