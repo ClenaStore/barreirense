@@ -5,21 +5,23 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Painel de Aniversários</title>
 <style>
-:root{--bg:#0b1220;--panel:#111827;--line:#1f2937;--text:#e5e7eb;--muted:#9ca3af;--ok:#22c55e}
+:root{--bg:#0b1220;--panel:#111827;--line:#1f2937;--text:#e5e7eb;--muted:#9ca3af;--ok:#22c55e;--warn:#f59e0b}
 *{box-sizing:border-box}html,body{margin:0}
 body{font-family:system-ui,Segoe UI,Roboto,Arial,sans-serif;background:linear-gradient(180deg,#0b1220,#060a14);color:var(--text)}
-.container{max-width:1000px;margin:24px auto;padding:0 16px}
+.container{max-width:1100px;margin:24px auto;padding:0 16px}
 .card{background:rgba(17,24,39,.9);border:1px solid var(--line);border-radius:16px;padding:16px}
-.grid{display:grid;gap:12px}.cols-3{grid-template-columns:2fr 1fr 1fr}
+.grid{display:grid;gap:12px}.cols-3{grid-template-columns:2fr 1fr 1fr}.cols-4{grid-template-columns:1fr 1fr 1fr 1fr}
 label{display:block;font-size:.85rem;color:var(--muted);margin-bottom:6px}
 input,select,button{width:100%;padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:#0c1322;color:#e5e7eb}
 button{background:var(--ok);color:#052012;font-weight:700;cursor:pointer}
+button.secondary{background:#0c1322;color:#e5e7eb}
 table{width:100%;border-collapse:separate;border-spacing:0 8px;margin-top:10px}
 thead th{color:var(--muted);text-align:left;padding:8px 10px}
 tbody td{padding:10px;border:1px solid var(--line);background:#0c1322}
 tbody td:first-child{border-radius:12px 0 0 12px}tbody td:last-child{border-radius:0 12px 12px 0}
 .badge{display:inline-block;padding:4px 10px;border:1px solid var(--line);border-radius:999px;color:var(--muted);font-size:.8rem}
 .small{font-size:.85rem;color:var(--muted)}
+.right{display:flex;justify-content:flex-end;gap:10px}
 </style>
 </head>
 <body>
@@ -27,34 +29,60 @@ tbody td:first-child{border-radius:12px 0 0 12px}tbody td:last-child{border-radi
   <h1 style="margin:0 0 8px 0;font-size:1.5rem">🎉 Painel de Aniversários</h1>
 
   <section class="card">
-    <div class="grid cols-3">
+    <div class="grid cols-4">
       <div>
         <label>Empresa</label>
         <select id="EMPRESA"><option value="">Todas as empresas</option></select>
       </div>
       <div>
-        <label>Janela de dias</label>
-        <input id="DIAS" type="number" min="1" max="365" value="20">
+        <label>Janela máx. (dias)</label>
+        <input id="DIAS" type="number" min="1" max="365" value="30">
+      </div>
+      <div>
+        <label>Período exato (dias)</label>
+        <select id="IN_DAYS" multiple size="3" title="Segure Ctrl/Cmd para multi">
+          <option value="10">10 dias</option>
+          <option value="15">15 dias</option>
+          <option value="20">20 dias</option>
+        </select>
       </div>
       <div>
         <label>&nbsp;</label>
         <button id="BTN_CARREGAR" onclick="load()">Carregar</button>
       </div>
     </div>
-    <div style="margin-top:8px">
+    <div style="margin-top:12px" class="grid cols-3">
+      <div>
+        <label>URL de Reserva</label>
+        <input id="RESERVA_URL" placeholder="https://seu-site.com/reservas">
+      </div>
+      <div>
+        <label>URL de Informações</label>
+        <input id="INFO_URL" placeholder="https://seu-site.com/aniversarios">
+      </div>
+      <div>
+        <label>&nbsp;</label>
+        <button class="secondary" onclick="toggleSelectAll()">Selecionar/limpar todos</button>
+      </div>
+    </div>
+    <div style="margin-top:8px;display:flex;gap:10px;align-items:center">
       <span id="status" class="badge">carregando empresas…</span>
+      <span id="progress" class="badge"></span>
     </div>
   </section>
 
   <section class="card" style="margin-top:14px">
     <div style="display:flex;justify-content:space-between;align-items:center">
       <h2 style="margin:0;font-size:1.1rem">Próximos Aniversários</h2>
-      <span id="kpi" class="badge">—</span>
+      <div class="right">
+        <button onclick="sendSelected()">Enviar WhatsApp (selecionados)</button>
+      </div>
     </div>
     <div style="overflow:auto">
       <table>
         <thead><tr>
-          <th>Nome</th><th>Empresa</th><th>Aniversário</th><th>Faltam (dias)</th>
+          <th><input type="checkbox" id="CHK_ALL" onclick="checkAll(this)"></th>
+          <th>Nome</th><th>Empresa</th><th>Aniversário</th><th>Faltam</th><th>Telefone</th><th>Status</th>
         </tr></thead>
         <tbody id="tbody"></tbody>
       </table>
@@ -64,28 +92,21 @@ tbody td:first-child{border-radius:12px 0 0 12px}tbody td:last-child{border-radi
 </div>
 
 <script>
-/* ===== URL DO SEU WEBAPP (EXEC) ===== */
+/* ===== URLs ===== */
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbzvWv3T5RVssz_Lsj5FkaafjgeSyutpNm9w3kXLubrQF4De2B3dxC1qgIyK2eMPs6HpLw/exec';
+const VERCEL_API = 'https://aniversarios-blond.vercel.app/api/send-birthday'; // <-- ajuste se for outro domínio
 
-/* ===== Util JSONP (sem CORS) ===== */
+/* ===== JSONP util (sem CORS) ===== */
 function jsonp(url, params = {}, timeoutMs = 15000) {
   return new Promise((resolve, reject) => {
     const cb = 'cb_' + Math.random().toString(36).slice(2);
     const qs = new URLSearchParams({ ...params, callback: cb }).toString();
     const script = document.createElement('script');
     const timer = setTimeout(() => cleanup(new Error('timeout')), timeoutMs);
-
-    function cleanup(err) {
-      clearTimeout(timer);
-      delete window[cb];
-      if (script.parentNode) script.parentNode.removeChild(script);
-      if (err) reject(err);
-    }
-
-    window[cb] = (data) => { cleanup(); resolve(data); };
-
+    function cleanup(err){ clearTimeout(timer); delete window[cb]; if(script.parentNode) script.parentNode.removeChild(script); err && reject(err); }
+    window[cb] = (data)=>{ cleanup(); resolve(data); };
     script.src = `${url}?${qs}`;
-    script.onerror = () => cleanup(new Error('network_error'));
+    script.onerror = ()=>cleanup(new Error('network_error'));
     document.body.appendChild(script);
   });
 }
@@ -93,8 +114,8 @@ function jsonp(url, params = {}, timeoutMs = 15000) {
 const $ = id => document.getElementById(id);
 function esc(s){return (s||'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]))}
 function setStatus(t){ $('status').textContent = t; }
+let rowsGlobal = [];
 
-/* Carrega empresas via JSONP */
 async function loadCompanies(){
   setStatus('carregando empresas…'); $('msg').textContent='';
   try{
@@ -102,46 +123,21 @@ async function loadCompanies(){
     if (!resp || resp.ok === false) throw new Error(resp?.error || 'erro');
     const sel = $('EMPRESA'); sel.innerHTML = '<option value="">Todas as empresas</option>';
     (resp.empresas || []).forEach(emp => {
-      const opt = document.createElement('option');
-      opt.value = emp; opt.textContent = emp;
-      sel.appendChild(opt);
+      const opt = document.createElement('option'); opt.value = emp; opt.textContent = emp; sel.appendChild(opt);
     });
     setStatus('empresas carregadas');
   }catch(e){ setStatus('erro ao carregar empresas'); $('msg').textContent = 'Falha ao buscar empresas: ' + e.message; }
 }
 
-/* Carrega aniversários via JSONP */
+function getInDaysParam(){
+  const opts = Array.from($('IN_DAYS').selectedOptions).map(o=>o.value);
+  return opts.length ? opts.join(',') : '';
+}
+
+/* Busca e renderiza */
 async function load(){
   const empresa = $('EMPRESA').value.trim();
-  const dias = Number($('DIAS').value || 20);
+  const dias = Number($('DIAS').value || 30);
+  const inDays = getInDaysParam();
 
-  setStatus('carregando aniversários…'); $('msg').textContent='';
-
-  try{
-    const resp = await jsonp(GAS_URL, { action:'list', days:String(dias), ...(empresa?{empresa}: {}) });
-    if (!resp || resp.ok === false) throw new Error(resp?.error || 'erro');
-    render(resp.data || []);
-    setStatus('pronto');
-  }catch(e){ setStatus('erro'); $('msg').textContent = 'Falha ao carregar: ' + e.message; }
-}
-
-function render(rows){
-  const tb = $('tbody'); tb.innerHTML='';
-  $('kpi').textContent = `${rows.length} registro(s)`;
-  if (!rows.length) { $('msg').textContent='Nenhum registro na janela selecionada.'; return; }
-  rows.forEach(item=>{
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td>${esc(item.nome)}</td>
-      <td>${esc(item.empresa||'')}</td>
-      <td>${esc(item.aniversario)}</td>
-      <td>${item.dias}</td>`;
-    tb.appendChild(tr);
-  });
-}
-
-/* inicia carregando empresas */
-document.addEventListener('DOMContentLoaded', loadCompanies);
-</script>
-</body>
-</html>
+  setSta
