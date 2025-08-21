@@ -64,58 +64,65 @@ tbody td:first-child{border-radius:12px 0 0 12px}tbody td:last-child{border-radi
 </div>
 
 <script>
-/* ===== USA O GAS DIRETO ===== */
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbyFeV77c6mMO_28t3nXGi641IbPbTFRvzboNaNexo73tCsJ96X78u1B5F9GzZnwyUyA/exec';
+/* ===== URL DO SEU WEBAPP (EXEC) ===== */
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbzvWv3T5RVssz_Lsj5FkaafjgeSyutpNm9w3kXLubrQF4De2B3dxC1qgIyK2eMPs6HpLw/exec';
+
+/* ===== Util JSONP (sem CORS) ===== */
+function jsonp(url, params = {}, timeoutMs = 15000) {
+  return new Promise((resolve, reject) => {
+    const cb = 'cb_' + Math.random().toString(36).slice(2);
+    const qs = new URLSearchParams({ ...params, callback: cb }).toString();
+    const script = document.createElement('script');
+    const timer = setTimeout(() => cleanup(new Error('timeout')), timeoutMs);
+
+    function cleanup(err) {
+      clearTimeout(timer);
+      delete window[cb];
+      if (script.parentNode) script.parentNode.removeChild(script);
+      if (err) reject(err);
+    }
+
+    window[cb] = (data) => { cleanup(); resolve(data); };
+
+    script.src = `${url}?${qs}`;
+    script.onerror = () => cleanup(new Error('network_error'));
+    document.body.appendChild(script);
+  });
+}
 
 const $ = id => document.getElementById(id);
 function esc(s){return (s||'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]))}
 function setStatus(t){ $('status').textContent = t; }
 
-/* Carrega empresas direto do GAS */
+/* Carrega empresas via JSONP */
 async function loadCompanies(){
-  setStatus('carregando empresas…');
+  setStatus('carregando empresas…'); $('msg').textContent='';
   try{
-    const url = `${GAS_URL}?action=companies`;
-    const r = await fetch(url, { method:'GET', cache:'no-store' });
-    if (!r.ok) throw new Error(`HTTP ${r.status}`);
-    const { empresas, error } = await r.json();
-    if (error) throw new Error(error);
-    const sel = $('EMPRESA');
-    sel.innerHTML = '<option value="">Todas as empresas</option>';
-    (empresas||[]).forEach(emp=>{
+    const resp = await jsonp(GAS_URL, { action:'companies' });
+    if (!resp || resp.ok === false) throw new Error(resp?.error || 'erro');
+    const sel = $('EMPRESA'); sel.innerHTML = '<option value="">Todas as empresas</option>';
+    (resp.empresas || []).forEach(emp => {
       const opt = document.createElement('option');
       opt.value = emp; opt.textContent = emp;
       sel.appendChild(opt);
     });
     setStatus('empresas carregadas');
-  }catch(e){
-    setStatus('erro ao carregar empresas');
-    $('msg').textContent = 'Falha ao buscar empresas: ' + e.message;
-  }
+  }catch(e){ setStatus('erro ao carregar empresas'); $('msg').textContent = 'Falha ao buscar empresas: ' + e.message; }
 }
 
-/* Lista aniversários direto do GAS */
+/* Carrega aniversários via JSONP */
 async function load(){
   const empresa = $('EMPRESA').value.trim();
   const dias = Number($('DIAS').value || 20);
 
   setStatus('carregando aniversários…'); $('msg').textContent='';
 
-  const qs = new URLSearchParams({ action:'list', days:String(dias) });
-  if (empresa) qs.append('empresa', empresa);
-
   try{
-    const url = `${GAS_URL}?${qs.toString()}`;
-    const r = await fetch(url, { method:'GET', cache:'no-store' });
-    if (!r.ok) throw new Error(`HTTP ${r.status}`);
-    const { data, error } = await r.json();
-    if (error) throw new Error(error);
-    render(data || []);
+    const resp = await jsonp(GAS_URL, { action:'list', days:String(dias), ...(empresa?{empresa}: {}) });
+    if (!resp || resp.ok === false) throw new Error(resp?.error || 'erro');
+    render(resp.data || []);
     setStatus('pronto');
-  }catch(e){
-    setStatus('erro');
-    $('msg').textContent = 'Falha ao carregar: ' + e.message;
-  }
+  }catch(e){ setStatus('erro'); $('msg').textContent = 'Falha ao carregar: ' + e.message; }
 }
 
 function render(rows){
