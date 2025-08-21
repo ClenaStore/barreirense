@@ -5,15 +5,15 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Painel de Aniversários</title>
 <style>
-:root{--bg:#0b1220;--panel:#111827;--line:#1f2937;--text:#e5e7eb;--muted:#9ca3af;--accent:#60a5fa}
+:root{--bg:#0b1220;--panel:#111827;--line:#1f2937;--text:#e5e7eb;--muted:#9ca3af;--accent:#60a5fa;--ok:#22c55e}
 *{box-sizing:border-box}html,body{margin:0}
 body{font-family:system-ui,Segoe UI,Roboto,Arial,sans-serif;background:linear-gradient(180deg,#0b1220,#060a14);color:var(--text)}
 .container{max-width:1000px;margin:24px auto;padding:0 16px}
 .card{background:rgba(17,24,39,.9);border:1px solid var(--line);border-radius:16px;padding:16px}
-.grid{display:grid;gap:12px}.cols-3{grid-template-columns:2fr 1fr 1fr}
+.grid{display:grid;gap:12px}.cols-2{grid-template-columns:2fr 1fr}
 label{display:block;font-size:.85rem;color:var(--muted);margin-bottom:6px}
 input,button{width:100%;padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:#0c1322;color:var(--text)}
-button{background:#22c55e;color:#052012;font-weight:700;cursor:pointer}
+button{background:var(--ok);color:#052012;font-weight:700;cursor:pointer}
 table{width:100%;border-collapse:separate;border-spacing:0 8px;margin-top:10px}
 thead th{color:var(--muted);text-align:left;padding:8px 10px}
 tbody td{padding:10px;border:1px solid var(--line);background:#0c1322}
@@ -26,19 +26,16 @@ tbody td:first-child{border-radius:12px 0 0 12px}tbody td:last-child{border-radi
 <div class="container">
   <h1 style="margin:0 0 8px 0;font-size:1.5rem">🎉 Painel de Aniversários</h1>
 
+  <!-- Endpoint do Apps Script oculto/imutável (fixado no JS) -->
   <section class="card">
-    <div class="grid cols-3">
-      <div>
-        <label>Endpoint Apps Script (WebApp /exec)</label>
-        <input id="GAS_URL" placeholder="https://script.google.com/macros/s/XXXXX/exec">
-      </div>
+    <div class="grid cols-2">
       <div>
         <label>Filtro de empresa (opcional)</label>
         <input id="EMPRESA" placeholder="MERCATTO DELICIA">
       </div>
       <div>
         <label>Janela de dias</label>
-        <input id="DIAS" type="number" min="1" max="365" value="60">
+        <input id="DIAS" type="number" min="1" max="365" value="20">
       </div>
     </div>
     <div style="display:flex;gap:10px;margin-top:12px">
@@ -65,16 +62,16 @@ tbody td:first-child{border-radius:12px 0 0 12px}tbody td:last-child{border-radi
 </div>
 
 <script>
+/* ===== URL FIXA (oculta e bloqueada para edição) ===== */
+const GAS_URL_FIXED = 'https://script.google.com/macros/s/AKfycbwHwNixmjn9pB_pKIBuONuHpssEfs5mza-sT9CQDaIZP2vlLNw269pbdNPAyZoPzVkcYA/exec';
+
 const $ = id => document.getElementById(id);
 function esc(s){return (s||'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]))}
 function setStatus(t){ $('status').textContent = t; }
 
 async function load(){
-  const url = $('GAS_URL').value.trim();
   const empresa = $('EMPRESA').value.trim();
-  const dias = Number($('DIAS').value || 60);
-
-  if (!url) { alert('Informe a URL do WebApp (termina em /exec)'); return; }
+  const dias = Number($('DIAS').value || 20);
 
   setStatus('carregando…');
   $('msg').textContent = '';
@@ -83,7 +80,7 @@ async function load(){
   if (empresa) qs.append('empresa', empresa);
 
   try{
-    const r = await fetch(`${url}?${qs.toString()}`);
+    const r = await fetch(`${GAS_URL_FIXED}?${qs.toString()}`);
     if (!r.ok) throw new Error('HTTP '+r.status);
     const data = await r.json();
     render(data.data || []);
@@ -103,14 +100,10 @@ function render(rows){
       <td>${esc(item.nome)}</td>
       <td>${esc(item.empresa||'')}</td>
       <td>${esc(item.aniversario)}</td>
-      <td>${item.dias}</td>
-    `;
+      <td>${item.dias}</td>`;
     tb.appendChild(tr);
   });
 }
-
-// opcional: deixe pré-preenchido para você
-// $('GAS_URL').value = 'https://script.google.com/macros/s/AKfycbwHwNixmjn9pB_pKIBuONuHpssEfs5mza-sT9CQDaIZP2vlLNw269pbdNPAyZoPzVkcYA/exec';
 </script>
 </body>
 </html>
