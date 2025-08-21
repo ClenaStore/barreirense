@@ -10,9 +10,9 @@
 body{font-family:system-ui,Segoe UI,Roboto,Arial,sans-serif;background:linear-gradient(180deg,#0b1220,#060a14);color:var(--text)}
 .container{max-width:1000px;margin:24px auto;padding:0 16px}
 .card{background:rgba(17,24,39,.9);border:1px solid var(--line);border-radius:16px;padding:16px}
-.grid{display:grid;gap:12px}.cols-2{grid-template-columns:2fr 1fr}
+.grid{display:grid;gap:12px}.cols-3{grid-template-columns:2fr 1fr 1fr}
 label{display:block;font-size:.85rem;color:var(--muted);margin-bottom:6px}
-input,button{width:100%;padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:#0c1322;color:var(--text)}
+input,select,button{width:100%;padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:#0c1322;color:var(--text)}
 button{background:var(--ok);color:#052012;font-weight:700;cursor:pointer}
 table{width:100%;border-collapse:separate;border-spacing:0 8px;margin-top:10px}
 thead th{color:var(--muted);text-align:left;padding:8px 10px}
@@ -27,19 +27,24 @@ tbody td:first-child{border-radius:12px 0 0 12px}tbody td:last-child{border-radi
   <h1 style="margin:0 0 8px 0;font-size:1.5rem">🎉 Painel de Aniversários</h1>
 
   <section class="card">
-    <div class="grid cols-2">
+    <div class="grid cols-3">
       <div>
-        <label>Filtro de empresa (opcional)</label>
-        <input id="EMPRESA" placeholder="ex.: MERCATTO DELICIA">
+        <label>Empresa</label>
+        <select id="EMPRESA">
+          <option value="">Todas as empresas</option>
+        </select>
       </div>
       <div>
         <label>Janela de dias</label>
         <input id="DIAS" type="number" min="1" max="365" value="20">
       </div>
+      <div>
+        <label>&nbsp;</label>
+        <button id="BTN_CARREGAR" onclick="load()">Carregar</button>
+      </div>
     </div>
-    <div style="display:flex;gap:10px;margin-top:12px">
-      <button onclick="load()">Carregar</button>
-      <span id="status" class="badge">aguardando…</span>
+    <div style="margin-top:8px">
+      <span id="status" class="badge">carregando empresas…</span>
     </div>
   </section>
 
@@ -62,17 +67,41 @@ tbody td:first-child{border-radius:12px 0 0 12px}tbody td:last-child{border-radi
 
 <script>
 /* ===== URL FIXA (oculta e bloqueada) ===== */
-const GAS_URL_FIXED = 'https://script.google.com/macros/s/AKfycbxDK1cNqHtsti42F4HgLXZYg9_qW0oXRrUjqzXpeKzveGQ9cDkQAgHz6fCKiOWPtF2WZw/exec';
+const GAS_URL_FIXED = 'https://script.google.com/macros/s/AKfycbyRtz4acIYRaAXXd5HtIn--reSQeki811LAxdgnGecsezn5dnhj-wEBn2u--f-KP5vj0w/exec';
 
 const $ = id => document.getElementById(id);
 function esc(s){return (s||'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]))}
 function setStatus(t){ $('status').textContent = t; }
 
+/* Carrega lista de empresas para o dropdown */
+async function loadCompanies(){
+  setStatus('carregando empresas…');
+  try{
+    const r = await fetch(`${GAS_URL_FIXED}?action=companies`);
+    if (!r.ok) throw new Error('HTTP '+r.status);
+    const { empresas } = await r.json();
+    const sel = $('EMPRESA');
+    // limpa e repopula
+    sel.innerHTML = '<option value="">Todas as empresas</option>';
+    (empresas||[]).forEach(emp=>{
+      const opt = document.createElement('option');
+      opt.value = emp;  // mandaremos como está; o servidor normaliza
+      opt.textContent = emp;
+      sel.appendChild(opt);
+    });
+    setStatus('empresas carregadas');
+  }catch(e){
+    setStatus('erro ao carregar empresas');
+    $('msg').textContent = 'Falha ao buscar empresas: ' + e.message;
+  }
+}
+
+/* Busca os aniversários conforme seleção */
 async function load(){
   const empresa = $('EMPRESA').value.trim();
   const dias = Number($('DIAS').value || 20);
 
-  setStatus('carregando…');
+  setStatus('carregando aniversários…');
   $('msg').textContent = '';
 
   const qs = new URLSearchParams({ action:'list', days:String(dias) });
@@ -107,6 +136,9 @@ function render(rows){
     tb.appendChild(tr);
   });
 }
+
+/* inicia carregando empresas; depois você clica "Carregar" */
+document.addEventListener('DOMContentLoaded', loadCompanies);
 </script>
 </body>
 </html>
