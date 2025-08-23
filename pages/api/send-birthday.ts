@@ -1,8 +1,7 @@
 // api/whatsapp/send.js
 const ALLOWED_ORIGINS = [
-  'https://SEU_USUARIO.github.io',            // 🔁 troque para o seu GitHub Pages
-  'https://SEU_USUARIO.github.io/aniversarios-frontend',
-  'http://localhost:5500',                    // opcional p/ testes locais
+  'https://SEU_USUARIO.github.io', // 🔁 troque para seu GitHub Pages
+  'http://localhost:5500'          // opcional p/ testes locais
 ];
 
 function allow(origin) {
@@ -22,7 +21,9 @@ export default async function handler(req, res) {
 
   try {
     const { to, text, template } = req.body || {};
-    if (!to || (!text && !template)) return res.status(400).json({ error: 'Missing `to` or `text/template`' });
+    if (!to || (!text && !template)) {
+      return res.status(400).json({ error: 'Missing `to` or `text/template`' });
+    }
 
     const phoneId = process.env.WHATSAPP_PHONE_ID;
     const token   = process.env.WHATSAPP_TOKEN;
@@ -43,7 +44,9 @@ export default async function handler(req, res) {
     });
 
     const data = await r.json();
-    if (!r.ok) return res.status(r.status).json({ error: 'WhatsApp API error', details: data });
+    if (!r.ok) {
+      return res.status(r.status).json({ error: 'WhatsApp API error', details: data });
+    }
 
     return res.status(200).json({ ok: true, data });
   } catch (err) {
