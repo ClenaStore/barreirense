@@ -4,6 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Painel • Aniversários (WhatsApp Oficial)</title>
+  <meta name="description" content="Painel que lê planilha do Google e envia felicitações via WhatsApp Cloud API">
   <style>
     :root{ --bg:#0f0f10; --card:#151515; --line:#2a2a2a; --text:#f6f6f6; --muted:#cfcfcf; --brand:#22c55e; --danger:#ef4444 }
     *{ box-sizing:border-box }
@@ -42,10 +43,13 @@
         <select id="empresa">
           <option value="">(todas)</option>
           <option>MERCATTO DELICIA</option>
+          <option>MERCATTO DELÍCIA</option>
           <option>VILLA GOURMET</option>
           <option>PADARIA DELICIA</option>
+          <option>PADARIA DELÍCIA</option>
           <option>M. KIDS</option>
           <option>DELICIA GOURMET</option>
+          <option>DELICÍA GOURMET</option>
         </select>
       </label>
 
@@ -85,10 +89,10 @@
   </div>
 
 <script>
-// ========= CONFIG =========
-const GAS_URL = "https://script.google.com/macros/s/AKfycbyGIvsOOCOJMpZHSop5ZzLoNTFutuaz5amXAdvyLoSovjMMXwgkBJWvIFFuiG5RcFKBHQ/exec";
+// ========= CONFIG (ajuste se precisar) =========
+const GAS_URL = "https://script.google.com/macros/s/AKfycbwqJypN425q5w6Zz-xBc00zFpPycFNfsnvElWX1sUtt16BEx6I7_1kR4hOWI2g0jKZ0bw/exec";
 const WHATSAPP_ENDPOINT = "https://aniversarios-three.vercel.app/api/whatsapp/send";
-// =========================
+// ==============================================
 
 const tblBody = document.querySelector('#tbl tbody');
 const statusEl = document.getElementById('status');
@@ -111,6 +115,7 @@ function toDateBRorISO(v){
   const d = new Date(yyyy ? +yyyy : new Date().getFullYear(), (+mm)-1, +dd);
   return isNaN(d) ? null : d;
 }
+
 function isBirthdayNextDays(d, dias){
   if (!d) return false;
   const hoje = new Date();
@@ -120,7 +125,13 @@ function isBirthdayNextDays(d, dias){
   const diff = (alvo - baseHoje) / (1000*60*60*24);
   return diff >= 0 && diff <= Number(dias);
 }
-function normPhoneBR(p){ const digits = (p||'').replace(/\D+/g,''); if (!digits) return ''; const num = digits.startsWith('55')?digits:'55'+digits; return '+'+num; }
+
+function normPhoneBR(p){
+  const digits = (p||'').replace(/\D+/g,'');
+  if (!digits) return '';
+  const num = digits.startsWith('55') ? digits : '55' + digits;
+  return '+' + num;
+}
 
 window.addEventListener('load', loadRows);
 empresaSel.addEventListener('change', loadRows);
@@ -193,9 +204,19 @@ async function sendOne(row, nome, phone){
       headers: { 'Content-Type':'application/json' },
       body: JSON.stringify({ to: phone, text })
     });
-    const data = await r.json();
-    if (!r.ok){ console.error('WhatsApp error:', data); setStatus('Falha no envio', 'bad'); return; }
 
+    // Lê o corpo mesmo quando a resposta for erro
+    let data = {};
+    try { data = await r.json(); } catch {}
+
+    if (!r.ok){
+      console.error('Erro WhatsApp:', data);
+      const msg = data?.error || data?.details?.error?.message || 'Falha no envio';
+      setStatus(msg, 'bad');
+      return;
+    }
+
+    // Marca horário na planilha
     await fetch(GAS_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
