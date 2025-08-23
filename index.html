@@ -4,8 +4,6 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Painel • Aniversários (WhatsApp Oficial)</title>
-  <meta name="description" content="Painel que lê planilha do Google e envia felicitações via WhatsApp Cloud API">
-  <link rel="icon" href="assets/favicon.png">
   <style>
     :root{ --bg:#0f0f10; --card:#151515; --line:#2a2a2a; --text:#f6f6f6; --muted:#cfcfcf; --brand:#22c55e; --danger:#ef4444 }
     *{ box-sizing:border-box }
@@ -44,13 +42,10 @@
         <select id="empresa">
           <option value="">(todas)</option>
           <option>MERCATTO DELICIA</option>
-          <option>MERCATTO DELÍCIA</option>
           <option>VILLA GOURMET</option>
           <option>PADARIA DELICIA</option>
-          <option>PADARIA DELÍCIA</option>
           <option>M. KIDS</option>
           <option>DELICIA GOURMET</option>
-          <option>DELICÍA GOURMET</option>
         </select>
       </label>
 
@@ -91,9 +86,7 @@
 
 <script>
 // ========= CONFIG =========
-// GAS (Web App publicado)
 const GAS_URL = "https://script.google.com/macros/s/AKfycbyGIvsOOCOJMpZHSop5ZzLoNTFutuaz5amXAdvyLoSovjMMXwgkBJWvIFFuiG5RcFKBHQ/exec";
-// Endpoint público da Vercel (API)
 const WHATSAPP_ENDPOINT = "https://aniversarios-three.vercel.app/api/whatsapp/send";
 // =========================
 
