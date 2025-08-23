@@ -89,10 +89,10 @@
   </div>
 
 <script>
-// ========= CONFIG (se precisar, ajuste) =========
+// ========= CONFIG =========
 const GAS_URL = "https://script.google.com/macros/s/AKfycbwqJypN425q5w6Zz-xBc00zFpPycFNfsnvElWX1sUtt16BEx6I7_1kR4hOWI2g0jKZ0bw/exec";
 const WHATSAPP_ENDPOINT = "https://aniversarios-three.vercel.app/api/whatsapp/send";
-// ===============================================
+// =========================
 
 const tblBody = document.querySelector('#tbl tbody');
 const statusEl = document.getElementById('status');
@@ -136,7 +136,6 @@ window.addEventListener('load', loadRows);
 empresaSel.addEventListener('change', loadRows);
 diasSel.addEventListener('change', loadRows);
 
-// Enviar todos com progress + disable
 btnSendAll.addEventListener('click', async () => {
   const buttons = [...document.querySelectorAll('button[data-phone]')];
   if (!buttons.length){ setStatus('Nada para enviar', 'bad'); return; }
@@ -148,7 +147,7 @@ btnSendAll.addEventListener('click', async () => {
     setStatus(`Enviando (${i+1}/${total})…`);
     const sent = await sendOne(b.dataset.row, b.dataset.name, b.dataset.phone, true);
     sent ? ok++ : fail++;
-    await sleep(700); // evita rate-limit
+    await sleep(700);
   }
   setStatus(`Concluído: ${ok} enviado(s), ${fail} falha(s)`, fail ? 'bad' : 'ok');
   btnSendAll.disabled = false;
@@ -206,21 +205,22 @@ async function loadRows(){
 }
 
 // ===== Envio com TEMPLATE "hello_world" (en_US) =====
-// retorna true/false para o botão "Enviar todos"
+// removido Content-Type para evitar preflight CORS
 async function sendOne(row, nome, phone, silent=false){
   try{
     if (!silent) setStatus(`Enviando para ${nome}…`);
 
+    const payload = {
+      to: phone,
+      template: { name: 'hello_world', language: { code: 'en_US' } }
+    };
+
     const resp = await fetch(WHATSAPP_ENDPOINT, {
       method: 'POST',
-      headers: { 'Content-Type':'application/json' },
-      body: JSON.stringify({
-        to: phone,
-        template: { name: 'hello_world', language: { code: 'en_US' } }
-      })
+      // ❗ sem headers → request simples (sem OPTIONS)
+      body: JSON.stringify(payload)
     });
 
-    // tenta json mesmo em erro
     let data = {};
     try { data = await resp.json(); } catch { data = { raw: 'non-JSON response' }; }
 
@@ -236,7 +236,7 @@ async function sendOne(row, nome, phone, silent=false){
       return false;
     }
 
-    // Marca horário na planilha (não bloqueia em caso de falha)
+    // Marca horário na planilha
     try {
       await fetch(GAS_URL, {
         method: 'POST',
