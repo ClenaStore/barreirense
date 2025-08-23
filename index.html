@@ -22,18 +22,20 @@
     .ok{ color:#22c55e }
     .bad{ color:var(--danger) }
     input,select{ background:#0d0d0d; color:var(--text); border:1px solid var(--line); border-radius:10px; padding:10px }
-    .grid{ display:grid; gap:12px; grid-template-columns:repeat(2, minmax(0,1fr)) }
-    @media (max-width:800px){ .grid{ grid-template-columns:1fr } }
+    .grid{ display:grid; gap:12px; grid-template-columns:repeat(3, minmax(0,1fr)) }
+    @media (max-width:900px){ .grid{ grid-template-columns:1fr } }
+    .hint{ font-size:12px; color:var(--muted); margin-top:6px }
   </style>
 </head>
 <body>
   <header>
     <h1>🎂 Painel de Aniversários → WhatsApp</h1>
     <div class="toolbar">
-      <button id="btnSendAll" class="btn">Enviar para todos de hoje</button>
+      <button id="btnSendAll" class="btn">Enviar para todos listados</button>
       <span id="status" class="chip">Pronto</span>
     </div>
   </header>
+
   <div class="wrap">
     <div class="card grid">
       <label>
@@ -41,15 +43,31 @@
         <select id="empresa">
           <option value="">(todas)</option>
           <option>MERCATTO DELICIA</option>
+          <option>MERCATTO DELÍCIA</option>
           <option>VILLA GOURMET</option>
           <option>PADARIA DELICIA</option>
+          <option>PADARIA DELÍCIA</option>
           <option>M. KIDS</option>
           <option>DELICIA GOURMET</option>
+          <option>DELICÍA GOURMET</option>
         </select>
       </label>
+
+      <label>
+        Janela de dias
+        <select id="dias">
+          <option value="0">Somente hoje</option>
+          <option value="3">Próximos 3 dias</option>
+          <option value="7" selected>Próximos 7 dias</option>
+          <option value="14">Próximos 14 dias</option>
+        </select>
+        <div class="hint">Inclui o dia de hoje</div>
+      </label>
+
       <label style="grid-column:1/-1">
         Mensagem (texto simples)
         <input id="msgTemplate" value="Olá, {{NOME}}! Parabéns pelo seu aniversário 🎉 A equipe Mercatto deseja muitas felicidades!" />
+        <div class="hint">Use {{NOME}} para inserir automaticamente o nome do aniversariante.</div>
       </label>
     </div>
 
@@ -74,78 +92,117 @@
 const tblBody = document.querySelector('#tbl tbody');
 const statusEl = document.getElementById('status');
 const empresaSel = document.getElementById('empresa');
+const diasSel = document.getElementById('dias');
 const msgTemplateInput = document.getElementById('msgTemplate');
 const btnSendAll = document.getElementById('btnSendAll');
 
-// 🔗 SUA URL DO GAS FIXA
-const GAS_URL = "https://script.google.com/macros/s/AKfycbyGIvsOOCOJMpZHSop5ZzLoNTFutuaz5amXAdvyLoSovjMMXwgkBJWvIFFuiG5RcFKBHQ/exec";
+// 🔗 SUA URL DO GAS FIXA (Web App publicado)
+const GAS_URL = "https://script.google.com/macros/s/AKfycbwqJypN425q5w6Zz-xBc00zFpPycFNfsnvElWX1sUtt16BEx6I7_1kR4hOWI2g0jKZ0bw/exec";
 
-window.addEventListener('load', () => {
-  loadRows();
-});
+/* ----------------- Utils ----------------- */
+function sleep(ms){ return new Promise(r => setTimeout(r, ms)); }
+function setStatus(t, cls){ statusEl.textContent = t; statusEl.className = 'chip ' + (cls||''); }
+
+function removeAcentos(s){
+  return (s || '')
+    .toString()
+    .normalize('NFD')
+    .replace(/\p{Diacritic}/gu,'')
+    .toUpperCase()
+    .trim();
+}
+
+function toDateBRorISO(v){
+  // Já veio como Date (Apps Script pode enviar)?
+  if (Object.prototype.toString.call(v) === '[object Date]' && !isNaN(v)) return v;
+
+  if (!v) return null;
+  const str = String(v).trim();
+
+  // ISO (yyyy-mm-dd ou com T)
+  if (/^\d{4}-\d{2}-\d{2}/.test(str) || str.includes('T')) {
+    const d = new Date(str);
+    return isNaN(d) ? null : d;
+  }
+
+  // BR (dd/mm/yyyy ou dd/m/yyyy)
+  const s = str.replaceAll('-', '/');
+  const parts = s.split('/').map(x => x.trim());
+  if (parts.length < 2) return null;
+  let [dd, mm, yyyy] = parts;
+  const day = parseInt(dd, 10);
+  const mon = parseInt(mm, 10) - 1;
+  const year = yyyy ? parseInt(yyyy, 10) : new Date().getFullYear();
+  const d = new Date(year, mon, day);
+  return isNaN(d) ? null : d;
+}
+
+function isBirthdayNextDays(d, dias){
+  if (!d) return false;
+  const hoje = new Date();
+  const baseHoje = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate());
+  const alvo = new Date(baseHoje.getFullYear(), d.getMonth(), d.getDate());
+  if (alvo < baseHoje) alvo.setFullYear(baseHoje.getFullYear() + 1);
+  const diff = (alvo - baseHoje) / (1000*60*60*24);
+  return diff >= 0 && diff <= Number(dias);
+}
+
+function normPhoneBR(p){
+  const digits = (p||'').replace(/\D+/g,'');
+  if (!digits) return '';
+  const num = digits.startsWith('55') ? digits : '55' + digits;
+  return '+' + num;
+}
+
+/* --------------- Carregar dados --------------- */
+window.addEventListener('load', () => loadRows());
 empresaSel.addEventListener('change', loadRows);
-msgTemplateInput.addEventListener('change', loadRows);
+diasSel.addEventListener('change', loadRows);
+msgTemplateInput.addEventListener('change', () => { /* só salva se quiser futuramente */ });
 
 btnSendAll.addEventListener('click', async () => {
   const buttons = [...document.querySelectorAll('button[data-phone]')];
+  if (!buttons.length){ setStatus('Nada para enviar', 'bad'); return; }
   for (const b of buttons) {
     await sendOne(b.dataset.row, b.dataset.name, b.dataset.phone);
     await sleep(700); // evita rate-limit
   }
 });
 
-function sleep(ms){ return new Promise(r => setTimeout(r, ms)); }
-
-function setStatus(t, cls){ statusEl.textContent = t; statusEl.className = 'chip ' + (cls||''); }
-
-function parseDateBrazil(d){
-  if (!d) return null;
-  const s = String(d).replaceAll('-', '/');
-  const parts = s.split('/').map(x => x.trim());
-  if (parts.length < 2) return null;
-  let [dd, mm, yyyy] = parts;
-  if (dd.length <= 2 && mm.length <= 2 && (!yyyy || yyyy.length === 4)) {
-    const day = parseInt(dd, 10);
-    const mon = parseInt(mm, 10) - 1;
-    const year = yyyy ? parseInt(yyyy, 10) : new Date().getFullYear();
-    const date = new Date(year, mon, day);
-    return isNaN(date) ? null : date;
-  }
-  return null;
-}
-
-function isBirthdayToday(d){
-  if (!d) return false;
-  const today = new Date();
-  return d.getDate() === today.getDate() && d.getMonth() === today.getMonth();
-}
-
-function normPhoneBR(p){
-  const digits = (p||'').replace(/\D+/g,'');
-  let num = digits;
-  if (num.startsWith('55')) num = num;
-  else num = '55' + num;
-  return '+' + num;
-}
-
 async function loadRows(){
   try{
     setStatus('Carregando…');
     tblBody.innerHTML = '';
 
-    const r = await fetch(GAS_URL);
+    // Tenta usar o filtro do próprio GAS se suportar ?days e ?empresa
+    const empresaParam = encodeURIComponent(empresaSel.value || '');
+    const url = GAS_URL + `?days=${encodeURIComponent(diasSel.value)}${empresaSel.value ? `&empresa=${empresaParam}` : ''}`;
+
+    const r = await fetch(url);
     const data = await r.json();
 
-    const rows = (data.rows||[]).filter(r => {
-      const okEmp = !empresaSel.value || String(r.empresa).toUpperCase() === empresaSel.value;
-      const d = parseDateBrazil(r.aniversario);
-      return okEmp && isBirthdayToday(d);
+    // Compatibilidade: alguns scripts retornam {rows:[...]} sem meta; outros {meta, rows}
+    const list = Array.isArray(data) ? data : (data.rows || []);
+
+    // Se o GAS não filtrar por dias/empresa, filtramos no cliente também:
+    const empresaFiltro = removeAcentos(empresaSel.value);
+    const rows = list.filter(item => {
+      const emp = removeAcentos(item.empresa);
+      const okEmp = !empresaFiltro || emp === empresaFiltro;
+
+      const d = toDateBRorISO(item.aniversario);
+      const okDia = isBirthdayNextDays(d, Number(diasSel.value));
+
+      return okEmp && okDia;
     });
 
-    if (!rows.length){ setStatus('Sem aniversariantes hoje'); return; }
+    if (!rows.length){ 
+      setStatus(`Sem aniversariantes (próx. ${diasSel.value} dia(s))`);
+      return; 
+    }
 
     for (const row of rows){
-      const d = parseDateBrazil(row.aniversario);
+      const d = toDateBRorISO(row.aniversario);
       const phone = normPhoneBR(row.telefone);
       const sent = row.horarioEnvio ? '✅' : '—';
       const tr = document.createElement('tr');
@@ -165,13 +222,14 @@ async function loadRows(){
       await sendOne(b.dataset.row, decodeURIComponent(b.dataset.name), b.dataset.phone);
     }));
 
-    setStatus(`${rows.length} aniversariante(s) encontrado(s)`);
+    setStatus(`${rows.length} aniversariante(s) – próximos ${diasSel.value} dia(s)`);
   }catch(err){
     console.error(err);
     setStatus('Erro ao carregar', 'bad');
   }
 }
 
+/* --------------- Enviar WhatsApp + marcar planilha --------------- */
 async function sendOne(row, nome, phone){
   try{
     setStatus(`Enviando para ${nome}…`);
@@ -185,12 +243,12 @@ async function sendOne(row, nome, phone){
     });
     const data = await r.json();
     if (!r.ok){
-      console.error(data);
+      console.error('WhatsApp error:', data);
       setStatus('Falha no envio', 'bad');
       return;
     }
 
-    // Atualizar planilha com horário
+    // Marca horário na planilha
     await fetch(GAS_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
