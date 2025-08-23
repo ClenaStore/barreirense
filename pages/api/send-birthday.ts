@@ -1,85 +1,57 @@
-import type { NextApiRequest, NextApiResponse } from 'next';
+// api/whatsapp/send.js
+export default async function handler(req, res) {
+if (req.method !== 'POST') {
+return res.status(405).json({ error: 'Method not allowed' });
+}
 
-const TOKEN  = process.env.WHATSAPP_TOKEN!;
-const PHONE  = process.env.WHATSAPP_PHONE_ID!;
-const TPL    = process.env.WHATSAPP_TEMPLATE_NAME; // ex.: "aniversario_reserva"
-const LANG   = process.env.WHATSAPP_TEMPLATE_LANG || 'pt_BR';
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
+try {
+const { to, text, template } = req.body || {};
+if (!to || (!text && !template)) {
+return res.status(400).json({ error: 'Missing `to` or `text/template`' });
+}
 
-  try {
-    const { to, name, reservaUrl, infoUrl } = req.body || {};
-    if (!to || !name) {
-      return res.status(400).json({ error: 'to and name are required' });
-    }
 
-    const url = `https://graph.facebook.com/v20.0/${PHONE}/messages`;
-    const headers = {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${TOKEN}`
-    };
+const phoneId = process.env.WHATSAPP_PHONE_ID;
+const token = process.env.WHATSAPP_TOKEN;
 
-    let body: any;
 
-    if (TPL) {
-      // usando template aprovado
-      body = {
-        messaging_product: 'whatsapp',
-        to,
-        type: 'template',
-        template: {
-          name: TPL,
-          language: { code: LANG },
-          components: [
-            {
-              type: 'body',
-              parameters: [{ type: 'text', text: name }]
-            },
-            {
-              type: 'button',
-              sub_type: 'url',
-              index: '0',
-              parameters: [{ type: 'text', text: reservaUrl || 'https://seu-site.com/reservas' }]
-            },
-            {
-              type: 'button',
-              sub_type: 'url',
-              index: '1',
-              parameters: [{ type: 'text', text: infoUrl || 'https://seu-site.com/aniversarios' }]
-            }
-          ]
-        }
-      };
-    } else {
-      // fallback simples em texto
-      const text = `🎉 *Feliz aniversário, ${name}!*  
-Reservas: ${reservaUrl || ''}  
-Mais informações: ${infoUrl || ''}`;
+const url = `https://graph.facebook.com/v20.0/${phoneId}/messages`;
 
-      body = {
-        messaging_product: 'whatsapp',
-        to,
-        type: 'text',
-        text: { body: text, preview_url: true }
-      };
-    }
 
-    const r = await fetch(url, {
-      method: 'POST',
-      headers,
-      body: JSON.stringify(body)
-    });
+// Monta o payload (texto simples por padrão; aceita template opcional)
+const payload = template ? {
+messaging_product: 'whatsapp',
+to,
+type: 'template',
+template
+} : {
+messaging_product: 'whatsapp',
+to,
+type: 'text',
+text: { body: text }
+};
 
-    const json = await r.json();
-    if (!r.ok) {
-      return res.status(r.status).json({ error: 'whatsapp_error', details: json });
-    }
 
-    return res.status(200).json({ ok: true, wa: json });
-  } catch (e: any) {
-    return res.status(500).json({ error: 'internal_error', message: e?.message });
-  }
+const r = await fetch(url, {
+method: 'POST',
+headers: {
+'Content-Type': 'application/json',
+Authorization: `Bearer ${token}`,
+},
+body: JSON.stringify(payload),
+});
+
+
+const data = await r.json();
+if (!r.ok) {
+return res.status(r.status).json({ error: 'WhatsApp API error', details: data });
+}
+
+
+return res.status(200).json({ ok: true, data });
+} catch (err) {
+console.error(err);
+return res.status(500).json({ error: 'Server error', details: String(err) });
+}
 }
