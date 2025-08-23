@@ -18,6 +18,7 @@
     th,td{ padding:10px; border-bottom:1px solid var(--line); font-size:14px }
     th{ text-align:left; color:var(--muted) }
     .btn{ background:var(--brand); border:0; color:#000; padding:10px 14px; border-radius:10px; cursor:pointer; font-weight:600 }
+    .btn[disabled]{ opacity:.6; cursor:not-allowed }
     .btn-outline{ background:transparent; color:var(--text); border:1px solid var(--line) }
     .chip{ padding:4px 8px; border:1px solid var(--line); border-radius:999px; font-size:12px; color:var(--muted) }
     .ok{ color:#22c55e }.bad{ color:var(--danger) }
@@ -88,10 +89,10 @@
   </div>
 
 <script>
-// ========= CONFIG =========
+// ========= CONFIG (se precisar, ajuste) =========
 const GAS_URL = "https://script.google.com/macros/s/AKfycbwqJypN425q5w6Zz-xBc00zFpPycFNfsnvElWX1sUtt16BEx6I7_1kR4hOWI2g0jKZ0bw/exec";
 const WHATSAPP_ENDPOINT = "https://aniversarios-three.vercel.app/api/whatsapp/send";
-// =========================
+// ===============================================
 
 const tblBody = document.querySelector('#tbl tbody');
 const statusEl = document.getElementById('status');
@@ -135,13 +136,22 @@ window.addEventListener('load', loadRows);
 empresaSel.addEventListener('change', loadRows);
 diasSel.addEventListener('change', loadRows);
 
+// Enviar todos com progress + disable
 btnSendAll.addEventListener('click', async () => {
   const buttons = [...document.querySelectorAll('button[data-phone]')];
   if (!buttons.length){ setStatus('Nada para enviar', 'bad'); return; }
-  for (const b of buttons) {
-    await sendOne(b.dataset.row, b.dataset.name, b.dataset.phone);
-    await sleep(700);
+  btnSendAll.disabled = true;
+  const total = buttons.length;
+  let ok = 0, fail = 0;
+  for (let i = 0; i < total; i++) {
+    const b = buttons[i];
+    setStatus(`Enviando (${i+1}/${total})…`);
+    const sent = await sendOne(b.dataset.row, b.dataset.name, b.dataset.phone, true);
+    sent ? ok++ : fail++;
+    await sleep(700); // evita rate-limit
   }
+  setStatus(`Concluído: ${ok} enviado(s), ${fail} falha(s)`, fail ? 'bad' : 'ok');
+  btnSendAll.disabled = false;
 });
 
 async function loadRows(){
@@ -152,7 +162,10 @@ async function loadRows(){
     const empresaParam = encodeURIComponent(empresaSel.value || '');
     const url = GAS_URL + `?days=${encodeURIComponent(diasSel.value)}${empresaSel.value ? `&empresa=${empresaParam}` : ''}`;
     const r = await fetch(url);
-    const data = await r.json();
+    let data;
+    try { data = await r.json(); }
+    catch { setStatus('Erro ao ler JSON do GAS', 'bad'); return; }
+
     const list = Array.isArray(data) ? data : (data.rows || []);
 
     const empresaFiltro = removeAcentos(empresaSel.value);
@@ -193,43 +206,53 @@ async function loadRows(){
 }
 
 // ===== Envio com TEMPLATE "hello_world" (en_US) =====
-async function sendOne(row, nome, phone){
+// retorna true/false para o botão "Enviar todos"
+async function sendOne(row, nome, phone, silent=false){
   try{
-    setStatus(`Enviando para ${nome}…`);
+    if (!silent) setStatus(`Enviando para ${nome}…`);
 
-    const r = await fetch(WHATSAPP_ENDPOINT, {
+    const resp = await fetch(WHATSAPP_ENDPOINT, {
       method: 'POST',
       headers: { 'Content-Type':'application/json' },
       body: JSON.stringify({
         to: phone,
-        template: {
-          name: 'hello_world',
-          language: { code: 'en_US' }
-        }
+        template: { name: 'hello_world', language: { code: 'en_US' } }
       })
     });
 
+    // tenta json mesmo em erro
     let data = {};
-    try { data = await r.json(); } catch {}
+    try { data = await resp.json(); } catch { data = { raw: 'non-JSON response' }; }
 
-    if (!r.ok){
-      console.error('Erro WhatsApp:', data);
-      const msg = data?.error || data?.details?.error?.message || 'Falha no envio';
-      setStatus(msg, 'bad');
-      return;
+    if (!resp.ok){
+      console.error('Erro WhatsApp →', data);
+      const upstream = data?.upstream;
+      const msg =
+        data?.error ||
+        upstream?.error?.message ||
+        upstream?.message ||
+        `HTTP ${resp.status}`;
+      if (!silent) setStatus(`Falha: ${msg}`, 'bad');
+      return false;
     }
 
-    await fetch(GAS_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ row: Number(row), horario: new Date().toISOString() })
-    });
+    // Marca horário na planilha (não bloqueia em caso de falha)
+    try {
+      await fetch(GAS_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ row: Number(row), horario: new Date().toISOString() })
+      });
+    } catch(e) {
+      console.warn('Falha ao marcar na planilha:', e);
+    }
 
-    setStatus('Enviado ✔️', 'ok');
-    loadRows();
+    if (!silent) { setStatus('Enviado ✔️', 'ok'); loadRows(); }
+    return true;
   }catch(err){
     console.error(err);
-    setStatus('Erro ao enviar', 'bad');
+    if (!silent) setStatus(`Erro ao enviar: ${String(err)}`, 'bad');
+    return false;
   }
 }
 </script>
