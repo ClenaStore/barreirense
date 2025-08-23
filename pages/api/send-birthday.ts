@@ -1,7 +1,7 @@
 // api/whatsapp/send.js
 const ALLOWED_ORIGINS = [
-  'https://clenastore.github.io',       // seu GitHub Pages
-  'http://localhost:5500'               // opcional p/ testes locais
+  'https://clenastore.github.io', // seu GitHub Pages (domínio base)
+  'http://localhost:5500'         // opcional para testes locais
 ];
 
 function allow(origin) {
@@ -22,11 +22,12 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   try {
-    // 🔧 Body pode vir como string em funções Vercel
+    // Body pode chegar string
     let body = req.body;
     if (typeof body === 'string') {
       try { body = JSON.parse(body || '{}'); } catch { body = {}; }
     }
+
     const { to, text, template } = body || {};
     if (!to || (!text && !template)) {
       return res.status(400).json({ error: 'Missing `to` or `text/template`', received: body });
@@ -39,27 +40,33 @@ export default async function handler(req, res) {
     }
 
     const url = `https://graph.facebook.com/v20.0/${phoneId}/messages`;
-
     const payload = template ? {
-      messaging_product: 'whatsapp',
-      to, type: 'template', template
+      messaging_product: 'whatsapp', to, type: 'template', template
     } : {
-      messaging_product: 'whatsapp',
-      to, type: 'text', text: { body: text }
+      messaging_product: 'whatsapp', to, type: 'text', text: { body: text }
     };
 
-    const r = await fetch(url, {
+    const upstream = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type':'application/json', Authorization: `Bearer ${token}` },
       body: JSON.stringify(payload)
     });
 
-    const data = await r.json();
-    if (!r.ok) {
-      return res.status(r.status).json({ error: 'WhatsApp API error', details: data });
+    // tenta JSON; se falhar, pega texto bruto
+    let upstreamBody;
+    try { upstreamBody = await upstream.json(); }
+    catch { upstreamBody = { raw: await upstream.text() }; }
+
+    if (!upstream.ok) {
+      // devolve o status e o corpo da Meta pra depurar no front
+      return res.status(upstream.status).json({
+        error: 'WhatsApp API error',
+        upstream_status: upstream.status,
+        upstream: upstreamBody
+      });
     }
 
-    return res.status(200).json({ ok: true, data });
+    return res.status(200).json({ ok: true, data: upstreamBody });
   } catch (err) {
     console.error(err);
     return res.status(500).json({ error: 'Server error', details: String(err) });
