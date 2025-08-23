@@ -1,6 +1,6 @@
 // api/whatsapp/send.js
 const ALLOWED_ORIGINS = [
-  'https://SEU_USUARIO.github.io', // 🔁 troque para seu GitHub Pages
+  'https://clenastore.github.io', // 🔁 troque para seu GitHub Pages
   'http://localhost:5500'          // opcional p/ testes locais
 ];
 
