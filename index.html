@@ -1,230 +1,209 @@
 <!doctype html>
 <html lang="pt-br">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Painel de Aniversários</title>
-<style>
-:root{--bg:#0b1220;--panel:#111827;--line:#1f2937;--text:#e5e7eb;--muted:#9ca3af;--ok:#22c55e;--warn:#f59e0b}
-*{box-sizing:border-box}html,body{margin:0}
-body{font-family:system-ui,Segoe UI,Roboto,Arial,sans-serif;background:linear-gradient(180deg,#0b1220,#060a14);color:var(--text)}
-.container{max-width:1100px;margin:24px auto;padding:0 16px}
-.card{background:rgba(17,24,39,.9);border:1px solid var(--line);border-radius:16px;padding:16px}
-.grid{display:grid;gap:12px}.cols-3{grid-template-columns:2fr 1fr 1fr}.cols-4{grid-template-columns:1fr 1fr 1fr 1fr}
-label{display:block;font-size:.85rem;color:var(--muted);margin-bottom:6px}
-input,select,button{width:100%;padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:#0c1322;color:#e5e7eb}
-button{background:var(--ok);color:#052012;font-weight:700;cursor:pointer}
-button.secondary{background:#0c1322;color:#e5e7eb}
-table{width:100%;border-collapse:separate;border-spacing:0 8px;margin-top:10px}
-thead th{color:var(--muted);text-align:left;padding:8px 10px}
-tbody td{padding:10px;border:1px solid var(--line);background:#0c1322}
-tbody td:first-child{border-radius:12px 0 0 12px}tbody td:last-child{border-radius:0 12px 12px 0}
-.badge{display:inline-block;padding:4px 10px;border:1px solid var(--line);border-radius:999px;color:var(--muted);font-size:.8rem}
-.small{font-size:.85rem;color:var(--muted)}
-.right{display:flex;justify-content:flex-end;gap:10px}
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Painel • Aniversários (WhatsApp Oficial)</title>
+  <style>
+    :root{ --bg:#0f0f10; --card:#151515; --line:#2a2a2a; --text:#f6f6f6; --muted:#cfcfcf; --brand:#22c55e; --danger:#ef4444 }
+    *{ box-sizing:border-box }
+    body{ margin:0; font-family:system-ui, Arial, sans-serif; background:var(--bg); color:var(--text) }
+    header{ padding:20px 24px; border-bottom:1px solid var(--line); display:flex; gap:12px; align-items:center; justify-content:space-between }
+    h1{ margin:0; font-size:20px }
+    .wrap{ padding:20px; display:grid; gap:16px }
+    .toolbar{ display:flex; gap:8px; flex-wrap:wrap }
+    .card{ background:var(--card); border:1px solid var(--line); border-radius:14px; padding:16px }
+    table{ width:100%; border-collapse:collapse }
+    th,td{ padding:10px; border-bottom:1px solid var(--line); font-size:14px }
+    th{ text-align:left; color:var(--muted) }
+    .btn{ background:var(--brand); border:0; color:#000; padding:10px 14px; border-radius:10px; cursor:pointer; font-weight:600 }
+    .btn-outline{ background:transparent; color:var(--text); border:1px solid var(--line) }
+    .chip{ padding:4px 8px; border:1px solid var(--line); border-radius:999px; font-size:12px; color:var(--muted) }
+    .ok{ color:#22c55e }
+    .bad{ color:var(--danger) }
+    input,select{ background:#0d0d0d; color:var(--text); border:1px solid var(--line); border-radius:10px; padding:10px }
+    .grid{ display:grid; gap:12px; grid-template-columns:repeat(2, minmax(0,1fr)) }
+    @media (max-width:800px){ .grid{ grid-template-columns:1fr } }
+  </style>
 </head>
 <body>
-<div class="container">
-  <h1 style="margin:0 0 8px 0;font-size:1.5rem">🎉 Painel de Aniversários</h1>
-
-  <section class="card">
-    <div class="grid cols-4">
-      <div>
-        <label>Empresa</label>
-        <select id="EMPRESA"><option value="">Todas as empresas</option></select>
-      </div>
-      <div>
-        <label>Janela máx. (dias)</label>
-        <input id="DIAS" type="number" min="1" max="365" value="30">
-      </div>
-      <div>
-        <label>Período exato (dias)</label>
-        <select id="IN_DAYS" multiple size="3" title="Segure Ctrl/Cmd para multi">
-          <option value="10">10 dias</option>
-          <option value="15">15 dias</option>
-          <option value="20">20 dias</option>
+  <header>
+    <h1>🎂 Painel de Aniversários → WhatsApp</h1>
+    <div class="toolbar">
+      <button id="btnSendAll" class="btn">Enviar para todos de hoje</button>
+      <span id="status" class="chip">Pronto</span>
+    </div>
+  </header>
+  <div class="wrap">
+    <div class="card grid">
+      <label>
+        Empresa
+        <select id="empresa">
+          <option value="">(todas)</option>
+          <option>MERCATTO DELICIA</option>
+          <option>VILLA GOURMET</option>
+          <option>PADARIA DELICIA</option>
+          <option>M. KIDS</option>
+          <option>DELICIA GOURMET</option>
         </select>
-      </div>
-      <div>
-        <label>&nbsp;</label>
-        <button id="BTN_CARREGAR" onclick="load()">Carregar</button>
-      </div>
+      </label>
+      <label style="grid-column:1/-1">
+        Mensagem (texto simples)
+        <input id="msgTemplate" value="Olá, {{NOME}}! Parabéns pelo seu aniversário 🎉 A equipe Mercatto deseja muitas felicidades!" />
+      </label>
     </div>
-    <div style="margin-top:12px" class="grid cols-3">
-      <div>
-        <label>URL de Reserva</label>
-        <input id="RESERVA_URL" placeholder="https://seu-site.com/reservas">
-      </div>
-      <div>
-        <label>URL de Informações</label>
-        <input id="INFO_URL" placeholder="https://seu-site.com/aniversarios">
-      </div>
-      <div>
-        <label>&nbsp;</label>
-        <button class="secondary" onclick="toggleSelectAll()">Selecionar/limpar todos</button>
-      </div>
-    </div>
-    <div style="margin-top:8px;display:flex;gap:10px;align-items:center">
-      <span id="status" class="badge">carregando empresas…</span>
-      <span id="progress" class="badge"></span>
-    </div>
-  </section>
 
-  <section class="card" style="margin-top:14px">
-    <div style="display:flex;justify-content:space-between;align-items:center">
-      <h2 style="margin:0;font-size:1.1rem">Próximos Aniversários</h2>
-      <div class="right">
-        <button onclick="sendSelected()">Enviar WhatsApp (selecionados)</button>
-      </div>
-    </div>
-    <div style="overflow:auto">
-      <table>
-        <thead><tr>
-          <th><input type="checkbox" id="CHK_ALL" onclick="checkAll(this)"></th>
-          <th>Nome</th><th>Empresa</th><th>Aniversário</th><th>Faltam</th><th>Telefone</th><th>Status</th>
-        </tr></thead>
-        <tbody id="tbody"></tbody>
+    <div class="card">
+      <table id="tbl">
+        <thead>
+          <tr>
+            <th>Empresa</th>
+            <th>Nome</th>
+            <th>Aniversário</th>
+            <th>Telefone</th>
+            <th>Enviado</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
       </table>
     </div>
-    <div id="msg" class="small" style="margin-top:8px"></div>
-  </section>
-</div>
+  </div>
 
 <script>
-/* ===== URLs ===== */
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbwGu3TQ89rJFpkIUWECGnWkn2Q9Qraz4OOj0a7_AdBAkcaCk12Zn0n0J-EjpViYGmASug/exec';
-const VERCEL_API = 'https://aniversarios-three.vercel.app/whatsapp'; // <-- ajuste se for outro domínio
+const tblBody = document.querySelector('#tbl tbody');
+const statusEl = document.getElementById('status');
+const empresaSel = document.getElementById('empresa');
+const msgTemplateInput = document.getElementById('msgTemplate');
+const btnSendAll = document.getElementById('btnSendAll');
 
-/* ===== JSONP util (sem CORS) ===== */
-function jsonp(url, params = {}, timeoutMs = 15000) {
-  return new Promise((resolve, reject) => {
-    const cb = 'cb_' + Math.random().toString(36).slice(2);
-    const qs = new URLSearchParams({ ...params, callback: cb }).toString();
-    const script = document.createElement('script');
-    const timer = setTimeout(() => cleanup(new Error('timeout')), timeoutMs);
-    function cleanup(err){ clearTimeout(timer); delete window[cb]; if(script.parentNode) script.parentNode.removeChild(script); err && reject(err); }
-    window[cb] = (data)=>{ cleanup(); resolve(data); };
-    script.src = `${url}?${qs}`;
-    script.onerror = ()=>cleanup(new Error('network_error'));
-    document.body.appendChild(script);
-  });
+// 🔗 SUA URL DO GAS FIXA
+const GAS_URL = "https://script.google.com/macros/s/AKfycbwiqz02bO-t0kuoJ7LpLOaiXbGzcBgkMHe5jkcCFd8vTEydI_54vDZEqlVFJiT2IgqW8A/exec";
+
+window.addEventListener('load', () => {
+  loadRows();
+});
+empresaSel.addEventListener('change', loadRows);
+msgTemplateInput.addEventListener('change', loadRows);
+
+btnSendAll.addEventListener('click', async () => {
+  const buttons = [...document.querySelectorAll('button[data-phone]')];
+  for (const b of buttons) {
+    await sendOne(b.dataset.row, b.dataset.name, b.dataset.phone);
+    await sleep(700); // evita rate-limit
+  }
+});
+
+function sleep(ms){ return new Promise(r => setTimeout(r, ms)); }
+
+function setStatus(t, cls){ statusEl.textContent = t; statusEl.className = 'chip ' + (cls||''); }
+
+function parseDateBrazil(d){
+  if (!d) return null;
+  const s = String(d).replaceAll('-', '/');
+  const parts = s.split('/').map(x => x.trim());
+  if (parts.length < 2) return null;
+  let [dd, mm, yyyy] = parts;
+  if (dd.length <= 2 && mm.length <= 2 && (!yyyy || yyyy.length === 4)) {
+    const day = parseInt(dd, 10);
+    const mon = parseInt(mm, 10) - 1;
+    const year = yyyy ? parseInt(yyyy, 10) : new Date().getFullYear();
+    const date = new Date(year, mon, day);
+    return isNaN(date) ? null : date;
+  }
+  return null;
 }
 
-const $ = id => document.getElementById(id);
-function esc(s){return (s||'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]))}
-function setStatus(t){ $('status').textContent = t; }
-let rowsGlobal = [];
+function isBirthdayToday(d){
+  if (!d) return false;
+  const today = new Date();
+  return d.getDate() === today.getDate() && d.getMonth() === today.getMonth();
+}
 
-async function loadCompanies(){
-  setStatus('carregando empresas…'); $('msg').textContent='';
+function normPhoneBR(p){
+  const digits = (p||'').replace(/\D+/g,'');
+  let num = digits;
+  if (num.startsWith('55')) num = num;
+  else num = '55' + num;
+  return '+' + num;
+}
+
+async function loadRows(){
   try{
-    const resp = await jsonp(GAS_URL, { action:'companies' });
-    if (!resp || resp.ok === false) throw new Error(resp?.error || 'erro');
-    const sel = $('EMPRESA'); sel.innerHTML = '<option value="">Todas as empresas</option>';
-    (resp.empresas || []).forEach(emp => {
-      const opt = document.createElement('option'); opt.value = emp; opt.textContent = emp; sel.appendChild(opt);
+    setStatus('Carregando…');
+    tblBody.innerHTML = '';
+
+    const r = await fetch(GAS_URL);
+    const data = await r.json();
+
+    const rows = (data.rows||[]).filter(r => {
+      const okEmp = !empresaSel.value || String(r.empresa).toUpperCase() === empresaSel.value;
+      const d = parseDateBrazil(r.aniversario);
+      return okEmp && isBirthdayToday(d);
     });
-    setStatus('empresas carregadas');
-  }catch(e){ setStatus('erro ao carregar empresas'); $('msg').textContent = 'Falha ao buscar empresas: ' + e.message; }
-}
 
-function getInDaysParam(){
-  const opts = Array.from($('IN_DAYS').selectedOptions).map(o=>o.value);
-  return opts.length ? opts.join(',') : '';
-}
+    if (!rows.length){ setStatus('Sem aniversariantes hoje'); return; }
 
-/* Busca e renderiza */
-async function load(){
-  const empresa = $('EMPRESA').value.trim();
-  const dias = Number($('DIAS').value || 30);
-  const inDays = getInDaysParam();
-
-  setStatus('carregando aniversários…'); $('msg').textContent='';
-
-  try{
-    const params = { action:'list', days:String(dias) };
-    if (empresa) params.empresa = empresa;
-    if (inDays) params.in = inDays;
-
-    const resp = await jsonp(GAS_URL, params);
-    if (!resp || resp.ok === false) throw new Error(resp?.error || 'erro');
-    rowsGlobal = resp.data || [];
-    render(rowsGlobal);
-    setStatus('pronto');
-  }catch(e){
-    setStatus('erro');
-    $('msg').textContent = 'Falha ao carregar: ' + e.message;
-  }
-}
-
-function render(rows){
-  const tb = $('tbody'); tb.innerHTML='';
-  $('progress').textContent = `${rows.length} registro(s)`;
-  if (!rows.length) { $('msg').textContent='Nenhum registro na seleção.'; return; }
-  rows.forEach((item, idx)=>{
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td><input type="checkbox" class="rowchk" data-idx="${idx}" checked></td>
-      <td>${esc(item.nome)}</td>
-      <td>${esc(item.empresa||'')}</td>
-      <td>${esc(item.aniversario)}</td>
-      <td>${item.dias}</td>
-      <td>${esc(formatPhone(item.phoneE164 || item.phoneRaw || ''))}</td>
-      <td id="st_${idx}" class="small"></td>`;
-    tb.appendChild(tr);
-  });
-}
-
-function formatPhone(n){ return n.replace(/^55/,'+55 ').replace(/(\d{2})(\d{5})(\d{4})$/,'($1) $2-$3'); }
-
-function checkAll(master){
-  document.querySelectorAll('.rowchk').forEach(c => c.checked = master.checked);
-}
-function toggleSelectAll(){
-  const boxes = Array.from(document.querySelectorAll('.rowchk'));
-  const anyUnchecked = boxes.some(b=>!b.checked);
-  boxes.forEach(b=> b.checked = anyUnchecked);
-}
-
-/* Envio em massa via Vercel */
-async function sendSelected(){
-  const reservaUrl = $('RESERVA_URL').value.trim();
-  const infoUrl = $('INFO_URL').value.trim();
-  const selectedIdx = Array.from(document.querySelectorAll('.rowchk'))
-    .filter(c => c.checked)
-    .map(c => Number(c.getAttribute('data-idx')));
-
-  if (!selectedIdx.length) { alert('Selecione pelo menos um contato.'); return; }
-
-  let ok = 0, fail = 0;
-  for (const i of selectedIdx){
-    const r = rowsGlobal[i];
-    const el = $('st_'+i);
-    el.textContent = 'enviando…';
-    try{
-      const body = { to: r.phoneE164 || r.phoneRaw, name: r.nome, reservaUrl, infoUrl };
-      const resp = await fetch(VERCEL_API, {
-        method: 'POST',
-        headers: { 'Content-Type':'application/json' },
-        body: JSON.stringify(body),
-      });
-      const json = await resp.json().catch(()=> ({}));
-      if (!resp.ok) throw new Error(json?.error || ('HTTP '+resp.status));
-      el.textContent = '✅ enviado';
-      ok++;
-    }catch(e){
-      el.textContent = '❌ ' + (e?.message || 'erro');
-      fail++;
+    for (const row of rows){
+      const d = parseDateBrazil(row.aniversario);
+      const phone = normPhoneBR(row.telefone);
+      const sent = row.horarioEnvio ? '✅' : '—';
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${row.empresa||''}</td>
+        <td>${row.nome||''}</td>
+        <td>${d ? d.toLocaleDateString('pt-BR') : (row.aniversario||'')}</td>
+        <td>${phone}</td>
+        <td>${sent}</td>
+        <td>
+          <button class="btn btn-outline" data-row="${row.row}" data-name="${encodeURIComponent(row.nome||'')}" data-phone="${phone}">Enviar</button>
+        </td>`;
+      tblBody.appendChild(tr);
     }
-    // pequeno intervalo para não saturar
-    await new Promise(res=>setTimeout(res, 350));
+
+    [...document.querySelectorAll('button[data-phone]')].forEach(b => b.addEventListener('click', async () => {
+      await sendOne(b.dataset.row, decodeURIComponent(b.dataset.name), b.dataset.phone);
+    }));
+
+    setStatus(`${rows.length} aniversariante(s) encontrado(s)`);
+  }catch(err){
+    console.error(err);
+    setStatus('Erro ao carregar', 'bad');
   }
-  $('msg').textContent = `Concluído: ${ok} enviados, ${fail} falhas.`;
 }
 
-/* boot */
-document.addEventListener('DOMContentLoaded', loadCompanies);
+async function sendOne(row, nome, phone){
+  try{
+    setStatus(`Enviando para ${nome}…`);
+    const text = msgTemplateInput.value.replace('{{NOME}}', nome);
+
+    // Envio via Vercel
+    const r = await fetch('/api/whatsapp/send', {
+      method: 'POST',
+      headers: { 'Content-Type':'application/json' },
+      body: JSON.stringify({ to: phone, text })
+    });
+    const data = await r.json();
+    if (!r.ok){
+      console.error(data);
+      setStatus('Falha no envio', 'bad');
+      return;
+    }
+
+    // Atualizar planilha com horário
+    await fetch(GAS_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ row: Number(row), horario: new Date().toISOString() })
+    });
+
+    setStatus('Enviado ✔️', 'ok');
+    loadRows();
+  }catch(err){
+    console.error(err);
+    setStatus('Erro ao enviar', 'bad');
+  }
+}
 </script>
 </body>
 </html>
