@@ -65,9 +65,8 @@
       </label>
 
       <label style="grid-column:1/-1">
-        Mensagem (texto simples)
-        <input id="msgTemplate" value="Olá, {{NOME}}! Parabéns pelo seu aniversário 🎉 A equipe Mercatto deseja muitas felicidades!" />
-        <div class="hint">Use {{NOME}} para inserir automaticamente o nome.</div>
+        Mensagem (texto livre) — <span class="hint">não usada no template hello_world</span>
+        <input id="msgTemplate" value="Olá, {{NOME}}! Parabéns 🎉" />
       </label>
     </div>
 
@@ -89,16 +88,15 @@
   </div>
 
 <script>
-// ========= CONFIG (ajuste se precisar) =========
+// ========= CONFIG =========
 const GAS_URL = "https://script.google.com/macros/s/AKfycbwqJypN425q5w6Zz-xBc00zFpPycFNfsnvElWX1sUtt16BEx6I7_1kR4hOWI2g0jKZ0bw/exec";
 const WHATSAPP_ENDPOINT = "https://aniversarios-three.vercel.app/api/whatsapp/send";
-// ==============================================
+// =========================
 
 const tblBody = document.querySelector('#tbl tbody');
 const statusEl = document.getElementById('status');
 const empresaSel = document.getElementById('empresa');
 const diasSel = document.getElementById('dias');
-const msgTemplateInput = document.getElementById('msgTemplate');
 const btnSendAll = document.getElementById('btnSendAll');
 
 function sleep(ms){ return new Promise(r => setTimeout(r, ms)); }
@@ -194,18 +192,23 @@ async function loadRows(){
   }
 }
 
+// ===== Envio com TEMPLATE "hello_world" (en_US) =====
 async function sendOne(row, nome, phone){
   try{
     setStatus(`Enviando para ${nome}…`);
-    const text = msgTemplateInput.value.replace('{{NOME}}', nome);
 
     const r = await fetch(WHATSAPP_ENDPOINT, {
       method: 'POST',
       headers: { 'Content-Type':'application/json' },
-      body: JSON.stringify({ to: phone, text })
+      body: JSON.stringify({
+        to: phone,
+        template: {
+          name: 'hello_world',
+          language: { code: 'en_US' }
+        }
+      })
     });
 
-    // Lê o corpo mesmo quando a resposta for erro
     let data = {};
     try { data = await r.json(); } catch {}
 
@@ -216,7 +219,6 @@ async function sendOne(row, nome, phone){
       return;
     }
 
-    // Marca horário na planilha
     await fetch(GAS_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
