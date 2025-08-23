@@ -4,6 +4,8 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Painel • Aniversários (WhatsApp Oficial)</title>
+  <meta name="description" content="Painel que lê planilha do Google e envia felicitações via WhatsApp Cloud API">
+  <link rel="icon" href="assets/favicon.png">
   <style>
     :root{ --bg:#0f0f10; --card:#151515; --line:#2a2a2a; --text:#f6f6f6; --muted:#cfcfcf; --brand:#22c55e; --danger:#ef4444 }
     *{ box-sizing:border-box }
@@ -19,8 +21,7 @@
     .btn{ background:var(--brand); border:0; color:#000; padding:10px 14px; border-radius:10px; cursor:pointer; font-weight:600 }
     .btn-outline{ background:transparent; color:var(--text); border:1px solid var(--line) }
     .chip{ padding:4px 8px; border:1px solid var(--line); border-radius:999px; font-size:12px; color:var(--muted) }
-    .ok{ color:#22c55e }
-    .bad{ color:var(--danger) }
+    .ok{ color:#22c55e }.bad{ color:var(--danger) }
     input,select{ background:#0d0d0d; color:var(--text); border:1px solid var(--line); border-radius:10px; padding:10px }
     .grid{ display:grid; gap:12px; grid-template-columns:repeat(3, minmax(0,1fr)) }
     @media (max-width:900px){ .grid{ grid-template-columns:1fr } }
@@ -61,13 +62,13 @@
           <option value="7" selected>Próximos 7 dias</option>
           <option value="14">Próximos 14 dias</option>
         </select>
-        <div class="hint">Inclui o dia de hoje</div>
+        <div class="hint">Inclui hoje</div>
       </label>
 
       <label style="grid-column:1/-1">
         Mensagem (texto simples)
         <input id="msgTemplate" value="Olá, {{NOME}}! Parabéns pelo seu aniversário 🎉 A equipe Mercatto deseja muitas felicidades!" />
-        <div class="hint">Use {{NOME}} para inserir automaticamente o nome do aniversariante.</div>
+        <div class="hint">Use {{NOME}} para inserir automaticamente o nome.</div>
       </label>
     </div>
 
@@ -89,6 +90,13 @@
   </div>
 
 <script>
+// ========= CONFIG =========
+// GAS (Web App publicado)
+const GAS_URL = "https://script.google.com/macros/s/AKfycbyGIvsOOCOJMpZHSop5ZzLoNTFutuaz5amXAdvyLoSovjMMXwgkBJWvIFFuiG5RcFKBHQ/exec";
+// Endpoint público da Vercel (API)
+const WHATSAPP_ENDPOINT = "https://aniversarios-three.vercel.app/api/whatsapp/send";
+// =========================
+
 const tblBody = document.querySelector('#tbl tbody');
 const statusEl = document.getElementById('status');
 const empresaSel = document.getElementById('empresa');
@@ -96,47 +104,20 @@ const diasSel = document.getElementById('dias');
 const msgTemplateInput = document.getElementById('msgTemplate');
 const btnSendAll = document.getElementById('btnSendAll');
 
-// 🔗 SUA URL DO GAS FIXA (Web App publicado)
-const GAS_URL = "https://script.google.com/macros/s/AKfycbwqJypN425q5w6Zz-xBc00zFpPycFNfsnvElWX1sUtt16BEx6I7_1kR4hOWI2g0jKZ0bw/exec";
-
-/* ----------------- Utils ----------------- */
 function sleep(ms){ return new Promise(r => setTimeout(r, ms)); }
 function setStatus(t, cls){ statusEl.textContent = t; statusEl.className = 'chip ' + (cls||''); }
-
-function removeAcentos(s){
-  return (s || '')
-    .toString()
-    .normalize('NFD')
-    .replace(/\p{Diacritic}/gu,'')
-    .toUpperCase()
-    .trim();
-}
+function removeAcentos(s){ return (s||'').toString().normalize('NFD').replace(/\p{Diacritic}/gu,'').toUpperCase().trim(); }
 
 function toDateBRorISO(v){
-  // Já veio como Date (Apps Script pode enviar)?
   if (Object.prototype.toString.call(v) === '[object Date]' && !isNaN(v)) return v;
-
   if (!v) return null;
   const str = String(v).trim();
-
-  // ISO (yyyy-mm-dd ou com T)
-  if (/^\d{4}-\d{2}-\d{2}/.test(str) || str.includes('T')) {
-    const d = new Date(str);
-    return isNaN(d) ? null : d;
-  }
-
-  // BR (dd/mm/yyyy ou dd/m/yyyy)
-  const s = str.replaceAll('-', '/');
-  const parts = s.split('/').map(x => x.trim());
-  if (parts.length < 2) return null;
-  let [dd, mm, yyyy] = parts;
-  const day = parseInt(dd, 10);
-  const mon = parseInt(mm, 10) - 1;
-  const year = yyyy ? parseInt(yyyy, 10) : new Date().getFullYear();
-  const d = new Date(year, mon, day);
+  if (/^\d{4}-\d{2}-\d{2}/.test(str) || str.includes('T')) { const d = new Date(str); return isNaN(d) ? null : d; }
+  const s = str.replaceAll('-', '/'); const parts = s.split('/').map(x => x.trim());
+  if (parts.length < 2) return null; let [dd, mm, yyyy] = parts;
+  const d = new Date(yyyy ? +yyyy : new Date().getFullYear(), (+mm)-1, +dd);
   return isNaN(d) ? null : d;
 }
-
 function isBirthdayNextDays(d, dias){
   if (!d) return false;
   const hoje = new Date();
@@ -146,26 +127,18 @@ function isBirthdayNextDays(d, dias){
   const diff = (alvo - baseHoje) / (1000*60*60*24);
   return diff >= 0 && diff <= Number(dias);
 }
+function normPhoneBR(p){ const digits = (p||'').replace(/\D+/g,''); if (!digits) return ''; const num = digits.startsWith('55')?digits:'55'+digits; return '+'+num; }
 
-function normPhoneBR(p){
-  const digits = (p||'').replace(/\D+/g,'');
-  if (!digits) return '';
-  const num = digits.startsWith('55') ? digits : '55' + digits;
-  return '+' + num;
-}
-
-/* --------------- Carregar dados --------------- */
-window.addEventListener('load', () => loadRows());
+window.addEventListener('load', loadRows);
 empresaSel.addEventListener('change', loadRows);
 diasSel.addEventListener('change', loadRows);
-msgTemplateInput.addEventListener('change', () => { /* só salva se quiser futuramente */ });
 
 btnSendAll.addEventListener('click', async () => {
   const buttons = [...document.querySelectorAll('button[data-phone]')];
   if (!buttons.length){ setStatus('Nada para enviar', 'bad'); return; }
   for (const b of buttons) {
     await sendOne(b.dataset.row, b.dataset.name, b.dataset.phone);
-    await sleep(700); // evita rate-limit
+    await sleep(700);
   }
 });
 
@@ -174,32 +147,22 @@ async function loadRows(){
     setStatus('Carregando…');
     tblBody.innerHTML = '';
 
-    // Tenta usar o filtro do próprio GAS se suportar ?days e ?empresa
     const empresaParam = encodeURIComponent(empresaSel.value || '');
     const url = GAS_URL + `?days=${encodeURIComponent(diasSel.value)}${empresaSel.value ? `&empresa=${empresaParam}` : ''}`;
-
     const r = await fetch(url);
     const data = await r.json();
-
-    // Compatibilidade: alguns scripts retornam {rows:[...]} sem meta; outros {meta, rows}
     const list = Array.isArray(data) ? data : (data.rows || []);
 
-    // Se o GAS não filtrar por dias/empresa, filtramos no cliente também:
     const empresaFiltro = removeAcentos(empresaSel.value);
     const rows = list.filter(item => {
       const emp = removeAcentos(item.empresa);
       const okEmp = !empresaFiltro || emp === empresaFiltro;
-
       const d = toDateBRorISO(item.aniversario);
       const okDia = isBirthdayNextDays(d, Number(diasSel.value));
-
       return okEmp && okDia;
     });
 
-    if (!rows.length){ 
-      setStatus(`Sem aniversariantes (próx. ${diasSel.value} dia(s))`);
-      return; 
-    }
+    if (!rows.length){ setStatus(`Sem aniversariantes (próx. ${diasSel.value} dia(s))`); return; }
 
     for (const row of rows){
       const d = toDateBRorISO(row.aniversario);
@@ -212,9 +175,7 @@ async function loadRows(){
         <td>${d ? d.toLocaleDateString('pt-BR') : (row.aniversario||'')}</td>
         <td>${phone}</td>
         <td>${sent}</td>
-        <td>
-          <button class="btn btn-outline" data-row="${row.row}" data-name="${encodeURIComponent(row.nome||'')}" data-phone="${phone}">Enviar</button>
-        </td>`;
+        <td><button class="btn btn-outline" data-row="${row.row}" data-name="${encodeURIComponent(row.nome||'')}" data-phone="${phone}">Enviar</button></td>`;
       tblBody.appendChild(tr);
     }
 
@@ -229,26 +190,19 @@ async function loadRows(){
   }
 }
 
-/* --------------- Enviar WhatsApp + marcar planilha --------------- */
 async function sendOne(row, nome, phone){
   try{
     setStatus(`Enviando para ${nome}…`);
     const text = msgTemplateInput.value.replace('{{NOME}}', nome);
 
-    // Envio via Vercel
-    const r = await fetch('/api/whatsapp/send', {
+    const r = await fetch(WHATSAPP_ENDPOINT, {
       method: 'POST',
       headers: { 'Content-Type':'application/json' },
       body: JSON.stringify({ to: phone, text })
     });
     const data = await r.json();
-    if (!r.ok){
-      console.error('WhatsApp error:', data);
-      setStatus('Falha no envio', 'bad');
-      return;
-    }
+    if (!r.ok){ console.error('WhatsApp error:', data); setStatus('Falha no envio', 'bad'); return; }
 
-    // Marca horário na planilha
     await fetch(GAS_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
