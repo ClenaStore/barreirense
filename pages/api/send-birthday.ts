@@ -30,7 +30,7 @@ export default async function handler(req, res) {
       try { body = JSON.parse(body || '{}'); } catch { body = {}; }
     }
 
-    const { to, text, template } = body || {};
+    const { to, text, template, preview_url } = body || {};
     if (!to || (!text && !template)) {
       return res.status(400).json({ error: 'Missing `to` or `text/template`', received: body });
     }
@@ -38,13 +38,30 @@ export default async function handler(req, res) {
     const phoneId = process.env.WHATSAPP_PHONE_ID;
     const token   = process.env.WHATSAPP_TOKEN;
     if (!phoneId || !token) {
-      return res.status(500).json({
-        error: 'Missing env vars',
-        need: ['WHATSAPP_PHONE_ID', 'WHATSAPP_TOKEN']
-      });
+      return res.status(500).json({ error: 'Missing env vars', need: ['WHATSAPP_PHONE_ID', 'WHATSAPP_TOKEN'] });
     }
 
     const url = `https://graph.facebook.com/v20.0/${phoneId}/messages`;
+
+    // Monta objeto de texto com preview_url quando aplicável
+    let textObj;
+    if (template) {
+      // (não usado neste fluxo, mas mantido)
+      textObj = null;
+    } else {
+      if (typeof text === 'object' && text) {
+        textObj = {
+          body: String(text.body || ''),
+          preview_url: typeof text.preview_url === 'boolean' ? text.preview_url : !!preview_url
+        };
+      } else {
+        textObj = { body: String(text || ''), preview_url: !!preview_url };
+      }
+      if (!textObj.body) {
+        return res.status(400).json({ error: 'Empty text body' });
+      }
+    }
+
     const payload = template ? {
       messaging_product: 'whatsapp',
       to,
@@ -54,7 +71,7 @@ export default async function handler(req, res) {
       messaging_product: 'whatsapp',
       to,
       type: 'text',
-      text: { body: text }
+      text: textObj
     };
 
     const upstream = await fetch(url, {
