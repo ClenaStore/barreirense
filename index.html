@@ -23,7 +23,8 @@
     .btn-outline{ background:transparent; color:var(--text); border:1px solid var(--line) }
     .chip{ padding:4px 8px; border:1px solid var(--line); border-radius:999px; font-size:12px; color:var(--muted) }
     .ok{ color:#22c55e }.bad{ color:var(--danger) }.warn{ color:var(--warn) }
-    input,select{ background:#0d0d0d; color:var(--text); border:1px solid var(--line); border-radius:10px; padding:10px }
+    input,select,textarea{ background:#0d0d0d; color:var(--text); border:1px solid var(--line); border-radius:10px; padding:10px }
+    textarea{ min-height:108px; resize:vertical; line-height:1.35 }
     .grid{ display:grid; gap:12px; grid-template-columns:repeat(3, minmax(0,1fr)) }
     @media (max-width:900px){ .grid{ grid-template-columns:1fr } }
     .hint{ font-size:12px; color:var(--muted); margin-top:6px }
@@ -78,18 +79,23 @@
       <label>
         Link de Reserva
         <input id="linkReserva" placeholder="https://seusite.com/reserva" value="https://seusite.com/reserva" />
+        <div class="hint">URL completa (https://...)</div>
       </label>
 
       <label>
         WhatsApp do Restaurante
         <input id="linkWhats" placeholder="https://wa.me/55DDDNUMERO" value="https://wa.me/5599999999999" />
+        <div class="hint">Pode colar a URL wa.me/web.whatsapp ou só o número (com DDD)</div>
       </label>
 
       <label style="grid-column:1/-1">
         Mensagem (placeholders)
-        <input id="msgTemplate" value="Olá, {{NOME}}! 🎉 A equipe {{EMPRESA}} deseja um feliz aniversário! 🎂
+        <textarea id="msgTemplate">Olá, {{NOME}}! 🎉
+A equipe {{EMPRESA}} deseja um feliz aniversário! 🎂
+
 Faça sua reserva aqui: {{LINK_RESERVA}}
-Fale conosco no WhatsApp: {{LINK_WHATSAPP}}" />
+Fale conosco no WhatsApp: {{LINK_WHATSAPP}}</textarea>
+        <div class="hint">Placeholders: {{NOME}}, {{EMPRESA}}, {{LINK_RESERVA}}, {{LINK_WHATSAPP}} ({{LINK}} = {{LINK_RESERVA}})</div>
       </label>
     </div>
 
@@ -160,26 +166,45 @@ function normalizePhoneBR(p){
   return {digits:raw, valid:(raw.length>=12)};
 }
 
-function ensureHttpUrl(u){ const s=String(u||'').trim(); return s? (/^https?:\/\//i.test(s)?s:'https://'+s):''; }
-function ensureWhatsAppLink(v){ return v; }
-
-// Mensagem
-function buildMessage(nome, empresa, linkReserva, linkWhats){
-  let tpl = msgTemplateEl.value||'';
-  const map = {
-    '{{NOME}}': nome||'',
-    '{{EMPRESA}}': empresa||'',
-    '{{LINK_RESERVA}}': linkReserva||'',
-    '{{LINK_WHATSAPP}}': linkWhats||'',
-    '{{LINK}}': linkReserva||''
-  };
-  for (const [k,v] of Object.entries(map)) tpl=tpl.split(k).join(v);
-  return tpl.replace(/\r\n|\r/g,'\n').trim();
+function ensureHttpUrl(u){
+  const s=String(u||'').trim();
+  return s ? (/^https?:\/\//i.test(s)?s:'https://'+s) : '';
 }
 
-// Deep link usando api.whatsapp.com
+// Mantém o que você digitar (wa.me ou número), mas para a mensagem só precisamos de texto
+function ensureWhatsAppLink(v){
+  let s = String(v||'').trim();
+  if (!s) return '';
+  if (/^https?:\/\//i.test(s)) return s;
+  return 'https://wa.me/'+s.replace(/\D+/g,'');
+}
+
+// --- Mensagem ---
+function buildMessage(nome, empresa, linkReserva, linkWhats){
+  // pega o texto do TEXTAREA (multilinha)
+  let tpl = msgTemplateEl.value || '';
+  const map = {
+    '{{NOME}}': nome || '',
+    '{{EMPRESA}}': empresa || '',
+    '{{LINK_RESERVA}}': linkReserva || '',
+    '{{LINK_WHATSAPP}}': linkWhats || '',
+    '{{LINK}}': linkReserva || ''
+  };
+  for (const [k,v] of Object.entries(map)) tpl = tpl.split(k).join(v);
+
+  // normaliza quebras de linha para \n (WhatsApp entende) e remove espaços estranhos
+  return tpl.replace(/\r\n|\r/g,'\n').replace(/[ \t]+\n/g,'\n').trim();
+}
+
+// Deep link usando api.whatsapp.com com URLSearchParams (mais estável no Web)
 function buildWhatsDeepLink(phoneDigits, text){
-  return `https://api.whatsapp.com/send?phone=${phoneDigits}&text=${encodeURIComponent(text)}&type=phone_number&app_absent=0`;
+  const params = new URLSearchParams({
+    phone: phoneDigits,
+    text: text, // URLSearchParams já faz o encode
+    type: 'phone_number',
+    app_absent: '0'
+  });
+  return `https://api.whatsapp.com/send?${params.toString()}`;
 }
 
 window.addEventListener('load', loadRows);
@@ -189,7 +214,9 @@ diasSel.addEventListener('change', loadRows);
 btnSendAll.addEventListener('click', async ()=>{
   const buttons=[...document.querySelectorAll('button[data-phone]:not([disabled])')];
   if (!buttons.length){ setStatus('Nada para abrir','bad'); return;}
-  for (const b of buttons){ await openOne(b.dataset.row, decodeURIComponent(b.dataset.name), b.dataset.phone, decodeURIComponent(b.dataset.empresa), b); }
+  for (const b of buttons){
+    await openOne(b.dataset.row, decodeURIComponent(b.dataset.name), b.dataset.phone, decodeURIComponent(b.dataset.empresa), b);
+  }
 });
 
 async function loadRows(){
@@ -198,7 +225,8 @@ async function loadRows(){
     tblBody.innerHTML='';
     const empresaParam=encodeURIComponent(empresaSel.value||'');
     const url=GAS_URL+`?days=${encodeURIComponent(diasSel.value)}${empresaSel.value?`&empresa=${empresaParam}`:''}`;
-    const r=await fetch(url); const data=await r.json();
+    const r=await fetch(url);
+    let data; try{ data=await r.json(); }catch{ setStatus('Erro ao ler JSON do GAS','bad'); return; }
     const list=Array.isArray(data)?data:(data.rows||[]);
     const empresaFiltro=removeAcentos(empresaSel.value);
     const rows=list.filter(item=>{
@@ -207,6 +235,7 @@ async function loadRows(){
       return okEmp&&okDia;
     });
     if (!rows.length){ setStatus(`Sem aniversariantes`); return;}
+
     for (const row of rows){
       const d=toDateBRorISO(row.aniversario);
       const norm=normalizePhoneBR(row.telefone);
@@ -224,19 +253,36 @@ async function loadRows(){
           Abrir WhatsApp</button></td>`;
       tblBody.appendChild(tr);
     }
+
     [...document.querySelectorAll('button[data-phone]')].forEach(b=>b.addEventListener('click', async()=>{
       await openOne(b.dataset.row, decodeURIComponent(b.dataset.name), b.dataset.phone, decodeURIComponent(b.dataset.empresa), b);
     }));
+
     setStatus(`${rows.length} aniversariante(s)`);
   }catch(err){ console.error(err); setStatus('Erro','bad'); }
 }
 
 async function openOne(row,nome,phoneDigits,empresa,btn){
   const norm=normalizePhoneBR(phoneDigits);
-  if (!norm.valid){ setStatus('Telefone inválido','bad'); return false;}
-  const text=buildMessage(nome,empresa,ensureHttpUrl(linkReservaEl.value),ensureHttpUrl(linkWhatsEl.value));
-  location.href=buildWhatsDeepLink(norm.digits,text);
-  if (chkMarkSent.checked){ try{ await fetch(GAS_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({row:Number(row),horario:new Date().toISOString()})}); }catch(e){} }
+  if (!norm.valid){ setStatus('Telefone inválido','bad'); return false; }
+
+  const linkReserva = ensureHttpUrl(linkReservaEl.value);
+  const linkWhats   = ensureWhatsAppLink(linkWhatsEl.value);
+  const text        = buildMessage(nome, empresa, linkReserva, linkWhats);
+
+  // abrir na MESMA aba é mais confiável para manter o texto
+  location.href = buildWhatsDeepLink(norm.digits, text);
+
+  if (chkMarkSent.checked){
+    try{
+      await fetch(GAS_URL,{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({row:Number(row),horario:new Date().toISOString()})
+      });
+    }catch(e){}
+  }
+
   if (btn){ btn.textContent='Aberto ✔️'; btn.disabled=true; }
   setStatus('WhatsApp aberto ✅','ok');
 }
