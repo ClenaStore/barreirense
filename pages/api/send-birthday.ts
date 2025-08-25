@@ -1,7 +1,7 @@
 // api/whatsapp/send.js
 const ALLOWED_ORIGINS = [
-  'https://clenastore.github.io', // seu GitHub Pages (domínio base)
-  'http://localhost:5500'         // opcional para testes locais
+  'https://clenastore.github.io', // GitHub Pages base
+  'http://localhost:5500',        // opcional para testes locais
 ];
 
 function allow(origin) {
@@ -9,20 +9,22 @@ function allow(origin) {
 }
 
 export default async function handler(req, res) {
-  const origin = req.headers.origin || '';
-  const corsOrigin = allow(origin) ? origin : '*';
-
-  // CORS
-  res.setHeader('Access-Control-Allow-Origin', corsOrigin);
-  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  res.setHeader('Access-Control-Max-Age', '86400');
-
-  if (req.method === 'OPTIONS') return res.status(204).end();
-  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
-
   try {
-    // Body pode chegar string
+    const origin = req.headers.origin || '';
+    const corsOrigin = allow(origin) ? origin : '*';
+
+    // CORS + no-store
+    res.setHeader('Access-Control-Allow-Origin', corsOrigin);
+    res.setHeader('Vary', 'Origin');
+    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    res.setHeader('Access-Control-Max-Age', '86400');
+    res.setHeader('Cache-Control', 'no-store');
+
+    if (req.method === 'OPTIONS') return res.status(204).end();
+    if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+
+    // Body pode vir string quando sem Content-Type
     let body = req.body;
     if (typeof body === 'string') {
       try { body = JSON.parse(body || '{}'); } catch { body = {}; }
@@ -36,14 +38,23 @@ export default async function handler(req, res) {
     const phoneId = process.env.WHATSAPP_PHONE_ID;
     const token   = process.env.WHATSAPP_TOKEN;
     if (!phoneId || !token) {
-      return res.status(500).json({ error: 'Missing env vars', need: ['WHATSAPP_PHONE_ID', 'WHATSAPP_TOKEN'] });
+      return res.status(500).json({
+        error: 'Missing env vars',
+        need: ['WHATSAPP_PHONE_ID', 'WHATSAPP_TOKEN']
+      });
     }
 
     const url = `https://graph.facebook.com/v20.0/${phoneId}/messages`;
     const payload = template ? {
-      messaging_product: 'whatsapp', to, type: 'template', template
+      messaging_product: 'whatsapp',
+      to,
+      type: 'template',
+      template
     } : {
-      messaging_product: 'whatsapp', to, type: 'text', text: { body: text }
+      messaging_product: 'whatsapp',
+      to,
+      type: 'text',
+      text: { body: text }
     };
 
     const upstream = await fetch(url, {
@@ -52,13 +63,11 @@ export default async function handler(req, res) {
       body: JSON.stringify(payload)
     });
 
-    // tenta JSON; se falhar, pega texto bruto
     let upstreamBody;
     try { upstreamBody = await upstream.json(); }
     catch { upstreamBody = { raw: await upstream.text() }; }
 
     if (!upstream.ok) {
-      // devolve o status e o corpo da Meta pra depurar no front
       return res.status(upstream.status).json({
         error: 'WhatsApp API error',
         upstream_status: upstream.status,
