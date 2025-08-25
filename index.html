@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Painel • Aniversários (WhatsApp Oficial)</title>
-  <meta name="description" content="Painel que lê planilha do Google e envia felicitações via WhatsApp Cloud API">
+  <title>Painel • Aniversários (WhatsApp Manual)</title>
+  <meta name="description" content="Painel que lê planilha do Google e prepara mensagens no WhatsApp para envio manual">
   <style>
     :root{ --bg:#0f0f10; --card:#151515; --line:#2a2a2a; --text:#f6f6f6; --muted:#cfcfcf; --brand:#22c55e; --danger:#ef4444 }
     *{ box-sizing:border-box }
@@ -12,7 +12,7 @@
     header{ padding:20px 24px; border-bottom:1px solid var(--line); display:flex; gap:12px; align-items:center; justify-content:space-between }
     h1{ margin:0; font-size:20px }
     .wrap{ padding:20px; display:grid; gap:16px }
-    .toolbar{ display:flex; gap:8px; flex-wrap:wrap }
+    .toolbar{ display:flex; gap:12px; flex-wrap:wrap; align-items:center }
     .card{ background:var(--card); border:1px solid var(--line); border-radius:14px; padding:16px }
     table{ width:100%; border-collapse:collapse }
     th,td{ padding:10px; border-bottom:1px solid var(--line); font-size:14px }
@@ -29,13 +29,19 @@
     .hint{ font-size:12px; color:var(--muted); margin-top:6px }
     .spin{ display:inline-block; width:14px; height:14px; border:2px solid #fff; border-top-color:transparent; border-radius:50%; vertical-align:-2px; animation:sp .7s linear infinite }
     @keyframes sp{ to{ transform:rotate(360deg) } }
+    .row-actions{ display:flex; gap:8px; align-items:center; }
+    .small{ font-size:12px; color:var(--muted) }
   </style>
 </head>
 <body>
   <header>
-    <h1>🎂 Painel de Aniversários → WhatsApp</h1>
+    <h1>🎂 Painel de Aniversários → WhatsApp (envio manual)</h1>
     <div class="toolbar">
-      <button id="btnSendAll" class="btn">Enviar para todos listados</button>
+      <button id="btnSendAll" class="btn">Abrir WhatsApp para todos</button>
+      <label class="small" style="display:flex;gap:8px;align-items:center;">
+        <input id="chkMarkSent" type="checkbox" checked />
+        Marcar como enviado ao abrir
+      </label>
       <span id="status" class="chip">Pronto</span>
     </div>
   </header>
@@ -71,13 +77,13 @@
       <label>
         Link de Reserva
         <input id="linkReserva" placeholder="https://seusite.com/reserva" value="https://seusite.com/reserva" />
-        <div class="hint">URL completa (https://...). Ex.: https://seusite.com/reserva</div>
+        <div class="hint">Use URL completa (https://...). O WhatsApp transforma em link clicável.</div>
       </label>
 
       <label>
         WhatsApp do Restaurante
         <input id="linkWhats" placeholder="https://wa.me/55DDDNUMERO" value="https://wa.me/5599999999999" />
-        <div class="hint">Pode colar a URL (https://wa.me/55...) ou só o número (com DDD). O sistema monta o link.</div>
+        <div class="hint">Pode colar a URL (wa.me/web.whatsapp) ou apenas o número (com DDD). O sistema padroniza.</div>
       </label>
 
       <label style="grid-column:1/-1">
@@ -111,7 +117,6 @@ Fale conosco no WhatsApp: {{LINK_WHATSAPP}}" />
 <script>
 // ========= CONFIG =========
 const GAS_URL = "https://script.google.com/macros/s/AKfycbwqJypN425q5w6Zz-xBc00zFpPycFNfsnvElWX1sUtt16BEx6I7_1kR4hOWI2g0jKZ0bw/exec";
-const WHATSAPP_ENDPOINT = "https://aniversarios-three.vercel.app/api/whatsapp/send";
 // =========================
 
 const tblBody = document.querySelector('#tbl tbody');
@@ -122,6 +127,7 @@ const btnSendAll = document.getElementById('btnSendAll');
 const linkReservaEl = document.getElementById('linkReserva');
 const linkWhatsEl = document.getElementById('linkWhats');
 const msgTemplateEl = document.getElementById('msgTemplate');
+const chkMarkSent = document.getElementById('chkMarkSent');
 
 function sleep(ms){ return new Promise(r => setTimeout(r, ms)); }
 function setStatus(t, cls){ statusEl.textContent = t; statusEl.className = 'chip ' + (cls||''); }
@@ -152,7 +158,7 @@ function normPhoneBR(p){
   const digits = (p||'').replace(/\D+/g,'');
   if (!digits) return '';
   const base = digits.startsWith('55') ? digits : '55' + digits;
-  return '+' + base.replace(/^(\+?55)?0+/, '55');
+  return base.replace(/^(\+?55)?0+/, '55'); // sem "+", pois wa.me usa só dígitos
 }
 
 function ensureHttpUrl(u){
@@ -161,26 +167,25 @@ function ensureHttpUrl(u){
   return /^https?:\/\//i.test(s) ? s : ('https://' + s);
 }
 
-// Aceita: URL do wa.me, link web.whatsapp ou apenas número (com/sem 55/DDD)
-// Retorna sempre um https://wa.me/55DDDNÚMERO limpinho
+// Aceita URL (wa.me/web.whatsapp) ou apenas número; retorna wa.me/55DDDNÚMERO
 function ensureWhatsAppLink(v){
   if (!v) return '';
   let s = String(v).trim();
-  // Se for link completo, tenta extrair os dígitos
-  const maybeUrl = s.match(/^https?:\/\//i);
+  const urlMatch = s.match(/^https?:\/\//i);
   let digits = '';
-  if (maybeUrl){
-    const m = s.match(/(\d{10,15})/); // pega bloco de dígitos
+  if (urlMatch){
+    const m = s.match(/(\d{10,15})/); // captura bloco de dígitos
     digits = m ? m[1] : '';
   }else{
     digits = s.replace(/\D+/g,'');
   }
-  if (!digits) return ensureHttpUrl(s); // fallback: retorna o que vier, mas com protocolo
+  if (!digits) return ensureHttpUrl(s); // fallback com protocolo
   if (!digits.startsWith('55')) digits = '55' + digits;
-  digits = digits.replace(/^55+0+/, '55'); // remove zeros após o 55
+  digits = digits.replace(/^55+0+/, '55');
   return `https://wa.me/${digits}`;
 }
 
+// Monta a mensagem com placeholders
 function buildMessage(nome, empresa, linkReserva, linkWhats){
   let tpl = msgTemplateEl.value || '';
   const map = {
@@ -188,32 +193,41 @@ function buildMessage(nome, empresa, linkReserva, linkWhats){
     '{{EMPRESA}}': empresa || '',
     '{{LINK_RESERVA}}': linkReserva || '',
     '{{LINK_WHATSAPP}}': linkWhats || '',
-    // compatibilidade com versões antigas:
+    // compat:
     '{{LINK}}': linkReserva || ''
   };
   for (const [k,v] of Object.entries(map)) tpl = tpl.split(k).join(v);
-  return tpl;
+  return tpl.trim();
+}
+
+// Gera deep link para abrir o WhatsApp com texto preenchido
+function buildWhatsDeepLink(phoneDigits, text){
+  // wa.me aceitando "?text=" com URL encoded
+  // (api.whatsapp.com também funciona, mas wa.me é mais curto)
+  return `https://wa.me/${phoneDigits}?text=${encodeURIComponent(text)}`;
 }
 
 window.addEventListener('load', loadRows);
 empresaSel.addEventListener('change', loadRows);
 diasSel.addEventListener('change', loadRows);
 
+// Abre WhatsApp para todos (uma aba por clique, pode ser bloqueado se não for interativo)
 btnSendAll.addEventListener('click', async () => {
   const buttons = [...document.querySelectorAll('button[data-phone]:not([disabled])')];
-  if (!buttons.length){ setStatus('Nada para enviar', 'bad'); return; }
-  btnSendAll.disabled = true;
-  const total = buttons.length;
+  if (!buttons.length){ setStatus('Nada para abrir', 'bad'); return; }
   let ok = 0, fail = 0;
-  for (let i = 0; i < total; i++) {
-    const b = buttons[i];
-    setStatus(`Enviando (${i+1}/${total})…`);
-    const sent = await sendOne(b.dataset.row, decodeURIComponent(b.dataset.name), b.dataset.phone, b.dataset.empresa, true, b);
-    sent ? ok++ : fail++;
-    await sleep(700);
+  for (const b of buttons){
+    const success = await openOne(
+      b.dataset.row,
+      decodeURIComponent(b.dataset.name),
+      b.dataset.phone, // já vem só dígitos
+      decodeURIComponent(b.dataset.empresa),
+      b
+    );
+    success ? ok++ : fail++;
+    await sleep(200);
   }
-  setStatus(`Concluído: ${ok} enviado(s), ${fail} falha(s)`, fail ? 'bad' : 'ok');
-  btnSendAll.disabled = false;
+  setStatus(`Abertos: ${ok}; falhas: ${fail}`, fail ? 'bad' : 'ok');
   loadRows();
 });
 
@@ -244,34 +258,35 @@ async function loadRows(){
 
     for (const row of rows){
       const d = toDateBRorISO(row.aniversario);
-      const phone = normPhoneBR(row.telefone);
+      const phoneDigits = normPhoneBR(row.telefone); // só dígitos p/ wa.me
       const sent = row.horarioEnvio ? '✅' : '—';
       const tr = document.createElement('tr');
       tr.innerHTML = `
         <td>${row.empresa||''}</td>
         <td>${row.nome||''}</td>
         <td>${d ? d.toLocaleDateString('pt-BR') : (row.aniversario||'')}</td>
-        <td>${phone}</td>
+        <td>${phoneDigits ? '+'+phoneDigits : ''}</td>
         <td>${sent}</td>
         <td>
-          <button class="btn btn-outline"
-            data-row="${row.row}"
-            data-name="${encodeURIComponent(row.nome||'')}"
-            data-phone="${phone}"
-            data-empresa="${encodeURIComponent(row.empresa||'')}">
-            Enviar
-          </button>
+          <div class="row-actions">
+            <button class="btn btn-outline"
+              data-row="${row.row}"
+              data-name="${encodeURIComponent(row.nome||'')}"
+              data-phone="${phoneDigits}"
+              data-empresa="${encodeURIComponent(row.empresa||'')}">
+              Abrir WhatsApp
+            </button>
+          </div>
         </td>`;
       tblBody.appendChild(tr);
     }
 
     [...document.querySelectorAll('button[data-phone]')].forEach(b => b.addEventListener('click', async () => {
-      await sendOne(
+      await openOne(
         b.dataset.row,
         decodeURIComponent(b.dataset.name),
         b.dataset.phone,
         decodeURIComponent(b.dataset.empresa),
-        false,
         b
       );
     }));
@@ -283,58 +298,54 @@ async function loadRows(){
   }
 }
 
-// ===== Envio como TEXTO (sem template), com preview de link =====
-async function sendOne(row, nome, phone, empresa, silent=false, btn){
+// ===== Abertura do WhatsApp com texto preenchido =====
+async function openOne(row, nome, phoneDigits, empresa, btn){
   try{
-    if (!phone){ if (!silent) setStatus('Telefone vazio/ inválido', 'bad'); return false; }
+    if (!phoneDigits){ setStatus('Telefone vazio/ inválido', 'bad'); return false; }
+
     const linkReserva = ensureHttpUrl(linkReservaEl.value);
     const linkWhats = ensureWhatsAppLink(linkWhatsEl.value);
     const text = buildMessage(nome, empresa, linkReserva, linkWhats);
 
-    if (!silent) setStatus(`Enviando para ${nome}…`);
-    if (btn){ btn.disabled = true; const old = btn.innerHTML; btn._old = old; btn.innerHTML = '<span class="spin"></span>'; }
+    // Deep link
+    const deeplink = buildWhatsDeepLink(phoneDigits, text);
 
-    const resp = await fetch(WHATSAPP_ENDPOINT, {
-      method: 'POST',
-      // sem headers → evita preflight
-      body: JSON.stringify({ to: phone, text, preview_url: true })
-    });
+    // Tenta abrir em nova aba/janela (bloqueadores de pop-up podem impedir se não for ação direta)
+    const win = window.open(deeplink, '_blank', 'noopener,noreferrer');
 
-    let data = {};
-    try { data = await resp.json(); } catch { data = { raw: 'non-JSON response' }; }
-
-    if (!resp.ok){
-      console.error('Erro WhatsApp →', data);
-      const upstream = data?.upstream;
-      const msg =
-        data?.error ||
-        upstream?.error?.error_user_msg ||
-        upstream?.error?.message ||
-        upstream?.message ||
-        `HTTP ${resp.status}`;
-      if (!silent) setStatus(`Falha: ${msg}`, 'bad');
-      if (btn){ btn.disabled = false; btn.innerHTML = btn._old || 'Enviar'; }
-      return false;
+    if (!win){
+      // Fallback: copia o texto para a área de transferência e redireciona a aba atual
+      try{
+        await navigator.clipboard.writeText(text);
+        setStatus('Texto copiado. Redirecionando para o WhatsApp…');
+      }catch(e){
+        console.warn('Clipboard falhou:', e);
+        setStatus('Abra o WhatsApp: texto pronto no painel.', 'bad');
+      }
+      location.href = deeplink;
+    }else{
+      setStatus('WhatsApp aberto ✅', 'ok');
     }
 
-    // Marca horário na planilha (tolerante a falha)
-    try {
-      await fetch(GAS_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ row: Number(row), horario: new Date().toISOString() })
-      });
-    } catch(e) {
-      console.warn('Falha ao marcar na planilha:', e);
+    // Marcar na planilha (opcional)
+    if (chkMarkSent.checked){
+      try {
+        await fetch(GAS_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ row: Number(row), horario: new Date().toISOString() })
+        });
+      } catch(e) {
+        console.warn('Falha ao marcar na planilha:', e);
+      }
     }
 
-    if (btn){ btn.innerHTML = 'Enviado ✔️'; }
-    if (!silent) setStatus('Enviado ✔️', 'ok');
+    if (btn){ btn.textContent = 'Aberto ✔️'; btn.disabled = true; }
     return true;
   }catch(err){
     console.error(err);
-    if (!silent) setStatus(`Erro ao enviar: ${String(err)}`, 'bad');
-    if (btn){ btn.disabled = false; btn.innerHTML = btn._old || 'Enviar'; }
+    setStatus(`Erro ao abrir WhatsApp: ${String(err)}`, 'bad');
+    if (btn){ btn.disabled = false; btn.textContent = 'Abrir WhatsApp'; }
     return false;
   }
 }
