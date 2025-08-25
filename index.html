@@ -71,13 +71,23 @@
       <label>
         Link de Reserva
         <input id="linkReserva" placeholder="https://seusite.com/reserva" value="https://seusite.com/reserva" />
-        <div class="hint">Use URL completa (https://...). O WhatsApp transforma em link clicável.</div>
+        <div class="hint">URL completa (https://...). Ex.: https://seusite.com/reserva</div>
+      </label>
+
+      <label>
+        WhatsApp do Restaurante
+        <input id="linkWhats" placeholder="https://wa.me/55DDDNUMERO" value="https://wa.me/5599999999999" />
+        <div class="hint">Pode colar a URL (https://wa.me/55...) ou só o número (com DDD). O sistema monta o link.</div>
       </label>
 
       <label style="grid-column:1/-1">
-        Mensagem (usa placeholders)
-        <input id="msgTemplate" value="Olá, {{NOME}}! 🎉 A equipe {{EMPRESA}} deseja um feliz aniversário! 🎂 Reserve aqui: {{LINK}}" />
-        <div class="hint">Placeholders: {{NOME}}, {{EMPRESA}}, {{LINK}}</div>
+        Mensagem (placeholders)
+        <input id="msgTemplate" value="Olá, {{NOME}}! 🎉 A equipe {{EMPRESA}} deseja um feliz aniversário! 🎂
+Faça sua reserva aqui: {{LINK_RESERVA}}
+Fale conosco no WhatsApp: {{LINK_WHATSAPP}}" />
+        <div class="hint">
+          Placeholders: {{NOME}}, {{EMPRESA}}, {{LINK_RESERVA}}, {{LINK_WHATSAPP}} (compat.: {{LINK}} = {{LINK_RESERVA}})
+        </div>
       </label>
     </div>
 
@@ -110,6 +120,7 @@ const empresaSel = document.getElementById('empresa');
 const diasSel = document.getElementById('dias');
 const btnSendAll = document.getElementById('btnSendAll');
 const linkReservaEl = document.getElementById('linkReserva');
+const linkWhatsEl = document.getElementById('linkWhats');
 const msgTemplateEl = document.getElementById('msgTemplate');
 
 function sleep(ms){ return new Promise(r => setTimeout(r, ms)); }
@@ -150,12 +161,35 @@ function ensureHttpUrl(u){
   return /^https?:\/\//i.test(s) ? s : ('https://' + s);
 }
 
-function buildMessage(nome, empresa, link){
+// Aceita: URL do wa.me, link web.whatsapp ou apenas número (com/sem 55/DDD)
+// Retorna sempre um https://wa.me/55DDDNÚMERO limpinho
+function ensureWhatsAppLink(v){
+  if (!v) return '';
+  let s = String(v).trim();
+  // Se for link completo, tenta extrair os dígitos
+  const maybeUrl = s.match(/^https?:\/\//i);
+  let digits = '';
+  if (maybeUrl){
+    const m = s.match(/(\d{10,15})/); // pega bloco de dígitos
+    digits = m ? m[1] : '';
+  }else{
+    digits = s.replace(/\D+/g,'');
+  }
+  if (!digits) return ensureHttpUrl(s); // fallback: retorna o que vier, mas com protocolo
+  if (!digits.startsWith('55')) digits = '55' + digits;
+  digits = digits.replace(/^55+0+/, '55'); // remove zeros após o 55
+  return `https://wa.me/${digits}`;
+}
+
+function buildMessage(nome, empresa, linkReserva, linkWhats){
   let tpl = msgTemplateEl.value || '';
   const map = {
     '{{NOME}}': nome || '',
     '{{EMPRESA}}': empresa || '',
-    '{{LINK}}': link || ''
+    '{{LINK_RESERVA}}': linkReserva || '',
+    '{{LINK_WHATSAPP}}': linkWhats || '',
+    // compatibilidade com versões antigas:
+    '{{LINK}}': linkReserva || ''
   };
   for (const [k,v] of Object.entries(map)) tpl = tpl.split(k).join(v);
   return tpl;
@@ -249,13 +283,13 @@ async function loadRows(){
   }
 }
 
-// ===== Envio como TEXTO (sem template), com preview do link =====
-// Sem Content-Type para evitar preflight CORS
+// ===== Envio como TEXTO (sem template), com preview de link =====
 async function sendOne(row, nome, phone, empresa, silent=false, btn){
   try{
     if (!phone){ if (!silent) setStatus('Telefone vazio/ inválido', 'bad'); return false; }
-    const link = ensureHttpUrl(linkReservaEl.value);
-    const text = buildMessage(nome, empresa, link);
+    const linkReserva = ensureHttpUrl(linkReservaEl.value);
+    const linkWhats = ensureWhatsAppLink(linkWhatsEl.value);
+    const text = buildMessage(nome, empresa, linkReserva, linkWhats);
 
     if (!silent) setStatus(`Enviando para ${nome}…`);
     if (btn){ btn.disabled = true; const old = btn.innerHTML; btn._old = old; btn.innerHTML = '<span class="spin"></span>'; }
