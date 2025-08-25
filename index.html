@@ -68,9 +68,16 @@
         <div class="hint">Inclui hoje</div>
       </label>
 
+      <label>
+        Link de Reserva
+        <input id="linkReserva" placeholder="https://seusite.com/reserva" value="https://seusite.com/reserva" />
+        <div class="hint">Use URL completa (https://...). O WhatsApp transforma em link clicável.</div>
+      </label>
+
       <label style="grid-column:1/-1">
-        Mensagem (texto livre) — <span class="hint">não usada no template hello_world</span>
-        <input id="msgTemplate" value="Olá, {{NOME}}! Parabéns 🎉" />
+        Mensagem (usa placeholders)
+        <input id="msgTemplate" value="Olá, {{NOME}}! 🎉 A equipe {{EMPRESA}} deseja um feliz aniversário! 🎂 Reserve aqui: {{LINK}}" />
+        <div class="hint">Placeholders: {{NOME}}, {{EMPRESA}}, {{LINK}}</div>
       </label>
     </div>
 
@@ -102,6 +109,8 @@ const statusEl = document.getElementById('status');
 const empresaSel = document.getElementById('empresa');
 const diasSel = document.getElementById('dias');
 const btnSendAll = document.getElementById('btnSendAll');
+const linkReservaEl = document.getElementById('linkReserva');
+const msgTemplateEl = document.getElementById('msgTemplate');
 
 function sleep(ms){ return new Promise(r => setTimeout(r, ms)); }
 function setStatus(t, cls){ statusEl.textContent = t; statusEl.className = 'chip ' + (cls||''); }
@@ -132,7 +141,24 @@ function normPhoneBR(p){
   const digits = (p||'').replace(/\D+/g,'');
   if (!digits) return '';
   const base = digits.startsWith('55') ? digits : '55' + digits;
-  return '+' + base.replace(/^(\+?55)?0+/, '55'); // remove zeros à esquerda após DDI
+  return '+' + base.replace(/^(\+?55)?0+/, '55');
+}
+
+function ensureHttpUrl(u){
+  const s = String(u||'').trim();
+  if (!s) return '';
+  return /^https?:\/\//i.test(s) ? s : ('https://' + s);
+}
+
+function buildMessage(nome, empresa, link){
+  let tpl = msgTemplateEl.value || '';
+  const map = {
+    '{{NOME}}': nome || '',
+    '{{EMPRESA}}': empresa || '',
+    '{{LINK}}': link || ''
+  };
+  for (const [k,v] of Object.entries(map)) tpl = tpl.split(k).join(v);
+  return tpl;
 }
 
 window.addEventListener('load', loadRows);
@@ -148,7 +174,7 @@ btnSendAll.addEventListener('click', async () => {
   for (let i = 0; i < total; i++) {
     const b = buttons[i];
     setStatus(`Enviando (${i+1}/${total})…`);
-    const sent = await sendOne(b.dataset.row, b.dataset.name, b.dataset.phone, true, b);
+    const sent = await sendOne(b.dataset.row, decodeURIComponent(b.dataset.name), b.dataset.phone, b.dataset.empresa, true, b);
     sent ? ok++ : fail++;
     await sleep(700);
   }
@@ -194,7 +220,11 @@ async function loadRows(){
         <td>${phone}</td>
         <td>${sent}</td>
         <td>
-          <button class="btn btn-outline" data-row="${row.row}" data-name="${encodeURIComponent(row.nome||'')}" data-phone="${phone}">
+          <button class="btn btn-outline"
+            data-row="${row.row}"
+            data-name="${encodeURIComponent(row.nome||'')}"
+            data-phone="${phone}"
+            data-empresa="${encodeURIComponent(row.empresa||'')}">
             Enviar
           </button>
         </td>`;
@@ -202,7 +232,14 @@ async function loadRows(){
     }
 
     [...document.querySelectorAll('button[data-phone]')].forEach(b => b.addEventListener('click', async () => {
-      await sendOne(b.dataset.row, decodeURIComponent(b.dataset.name), b.dataset.phone, false, b);
+      await sendOne(
+        b.dataset.row,
+        decodeURIComponent(b.dataset.name),
+        b.dataset.phone,
+        decodeURIComponent(b.dataset.empresa),
+        false,
+        b
+      );
     }));
 
     setStatus(`${rows.length} aniversariante(s) – próximos ${diasSel.value} dia(s)`);
@@ -212,23 +249,21 @@ async function loadRows(){
   }
 }
 
-// ===== Envio com TEMPLATE "hello_world" (en_US) =====
+// ===== Envio como TEXTO (sem template), com preview do link =====
 // Sem Content-Type para evitar preflight CORS
-async function sendOne(row, nome, phone, silent=false, btn){
+async function sendOne(row, nome, phone, empresa, silent=false, btn){
   try{
     if (!phone){ if (!silent) setStatus('Telefone vazio/ inválido', 'bad'); return false; }
+    const link = ensureHttpUrl(linkReservaEl.value);
+    const text = buildMessage(nome, empresa, link);
+
     if (!silent) setStatus(`Enviando para ${nome}…`);
     if (btn){ btn.disabled = true; const old = btn.innerHTML; btn._old = old; btn.innerHTML = '<span class="spin"></span>'; }
 
-    const payload = {
-      to: phone,
-      template: { name: 'hello_world', language: { code: 'en_US' } }
-      // Se quiser texto livre, troque por: { text: "Olá, ..." }
-    };
-
     const resp = await fetch(WHATSAPP_ENDPOINT, {
       method: 'POST',
-      body: JSON.stringify(payload)
+      // sem headers → evita preflight
+      body: JSON.stringify({ to: phone, text, preview_url: true })
     });
 
     let data = {};
