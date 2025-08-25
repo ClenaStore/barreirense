@@ -6,7 +6,7 @@
   <title>Painel • Aniversários (WhatsApp Manual)</title>
   <meta name="description" content="Painel que lê planilha do Google e prepara mensagens no WhatsApp para envio manual">
   <style>
-    :root{ --bg:#0f0f10; --card:#151515; --line:#2a2a2a; --text:#f6f6f6; --muted:#cfcfcf; --brand:#22c55e; --danger:#ef4444 }
+    :root{ --bg:#0f0f10; --card:#151515; --line:#2a2a2a; --text:#f6f6f6; --muted:#cfcfcf; --brand:#22c55e; --danger:#ef4444; --warn:#f59e0b }
     *{ box-sizing:border-box }
     body{ margin:0; font-family:system-ui, Arial, sans-serif; background:var(--bg); color:var(--text) }
     header{ padding:20px 24px; border-bottom:1px solid var(--line); display:flex; gap:12px; align-items:center; justify-content:space-between }
@@ -15,22 +15,23 @@
     .toolbar{ display:flex; gap:12px; flex-wrap:wrap; align-items:center }
     .card{ background:var(--card); border:1px solid var(--line); border-radius:14px; padding:16px }
     table{ width:100%; border-collapse:collapse }
-    th,td{ padding:10px; border-bottom:1px solid var(--line); font-size:14px }
+    th,td{ padding:10px; border-bottom:1px solid var(--line); font-size:14px; vertical-align:middle }
     th{ text-align:left; color:var(--muted) }
     .btn{ background:var(--brand); border:0; color:#000; padding:10px 14px; border-radius:10px; cursor:pointer; font-weight:600; transition:transform .08s ease }
     .btn:active{ transform:scale(.98) }
     .btn[disabled]{ opacity:.6; cursor:not-allowed }
     .btn-outline{ background:transparent; color:var(--text); border:1px solid var(--line) }
     .chip{ padding:4px 8px; border:1px solid var(--line); border-radius:999px; font-size:12px; color:var(--muted) }
-    .ok{ color:#22c55e }.bad{ color:var(--danger) }
+    .ok{ color:#22c55e }.bad{ color:var(--danger) }.warn{ color:var(--warn) }
     input,select{ background:#0d0d0d; color:var(--text); border:1px solid var(--line); border-radius:10px; padding:10px }
     .grid{ display:grid; gap:12px; grid-template-columns:repeat(3, minmax(0,1fr)) }
     @media (max-width:900px){ .grid{ grid-template-columns:1fr } }
     .hint{ font-size:12px; color:var(--muted); margin-top:6px }
-    .spin{ display:inline-block; width:14px; height:14px; border:2px solid #fff; border-top-color:transparent; border-radius:50%; vertical-align:-2px; animation:sp .7s linear infinite }
-    @keyframes sp{ to{ transform:rotate(360deg) } }
     .row-actions{ display:flex; gap:8px; align-items:center; }
     .small{ font-size:12px; color:var(--muted) }
+    .invalid{ color:var(--danger); font-weight:600 }
+    .tag{ display:inline-block; padding:2px 8px; border:1px solid var(--line); border-radius:999px; font-size:12px; margin-left:6px }
+    .tag-auto9{ border-color:var(--warn); color:var(--warn) }
   </style>
 </head>
 <body>
@@ -154,11 +155,47 @@ function isBirthdayNextDays(d, dias){
   return diff >= 0 && diff <= Number(dias);
 }
 
-function normPhoneBR(p){
-  const digits = (p||'').replace(/\D+/g,'');
-  if (!digits) return '';
-  const base = digits.startsWith('55') ? digits : '55' + digits;
-  return base.replace(/^(\+?55)?0+/, '55'); // sem "+", pois wa.me usa só dígitos
+/**
+ * Normaliza/“corrige” número BR para wa.me:
+ * - mantém apenas dígitos
+ * - adiciona 55 se faltar
+ * - se tiver 8 dígitos no número local, injeta o 9 (vira celular)
+ * Retorna {digits, valid, addedNine}
+ *  - valid=true se tiver comprimento >= 12 (55 + DDD 2 + número 8) — mínimo aceito pelo wa.me
+ *  - addedNine=true se foi inserido 9º dígito automaticamente
+ */
+function normalizePhoneBR(p){
+  let raw = String(p||'').replace(/\D+/g,'');
+  if (!raw) return { digits:'', valid:false, addedNine:false };
+
+  // remove zeros iniciais isolados
+  raw = raw.replace(/^0+/, '');
+
+  // garante 55
+  if (!raw.startsWith('55')){
+    // casos comuns: 10/11 dígitos nacionais → prefira adicionar 55
+    if (raw.length >= 10 && raw.length <= 13){
+      raw = '55' + raw;
+    }
+  }
+
+  // se já tem 55 + DDD (2) + número
+  if (raw.startsWith('55') && raw.length >= 12){
+    const ddd = raw.substring(2,4);
+    let local = raw.substring(4);
+    // se local tem 8 (fixo): injeta 9 -> vira 9 + 8
+    if (local.length === 8){
+      local = '9' + local;
+      raw = '55' + ddd + local;
+      return { digits:raw, valid:true, addedNine:true };
+    }
+    // se local tem 9 (celular) ou mais → ok
+    return { digits:raw, valid:true, addedNine:false };
+  }
+
+  // tentativas finais de saneamento
+  if (raw.length >= 12) return { digits:raw, valid:true, addedNine:false };
+  return { digits:'', valid:false, addedNine:false };
 }
 
 function ensureHttpUrl(u){
@@ -167,21 +204,28 @@ function ensureHttpUrl(u){
   return /^https?:\/\//i.test(s) ? s : ('https://' + s);
 }
 
-// Aceita URL (wa.me/web.whatsapp) ou apenas número; retorna wa.me/55DDDNÚMERO
+// Aceita URL wa.me/web.whatsapp ou apenas número; retorna wa.me/55DDDNÚMERO
 function ensureWhatsAppLink(v){
   if (!v) return '';
   let s = String(v).trim();
   const urlMatch = s.match(/^https?:\/\//i);
   let digits = '';
   if (urlMatch){
-    const m = s.match(/(\d{10,15})/); // captura bloco de dígitos
+    const m = s.match(/(\d{10,15})/);
     digits = m ? m[1] : '';
   }else{
     digits = s.replace(/\D+/g,'');
   }
-  if (!digits) return ensureHttpUrl(s); // fallback com protocolo
-  if (!digits.startsWith('55')) digits = '55' + digits;
+  if (!digits) return ensureHttpUrl(s);
+  if (!digits.startsWith('55')) digits = '55' + digits.replace(/^0+/, '');
+  // ajusta zeros após 55
   digits = digits.replace(/^55+0+/, '55');
+  // tenta aplicar regra do 9º dígito se vier só com 8
+  if (digits.length === 12){
+    const ddd = digits.substring(2,4);
+    const local = digits.substring(4);
+    if (local.length === 8) digits = '55' + ddd + '9' + local;
+  }
   return `https://wa.me/${digits}`;
 }
 
@@ -202,8 +246,6 @@ function buildMessage(nome, empresa, linkReserva, linkWhats){
 
 // Gera deep link para abrir o WhatsApp com texto preenchido
 function buildWhatsDeepLink(phoneDigits, text){
-  // wa.me aceitando "?text=" com URL encoded
-  // (api.whatsapp.com também funciona, mas wa.me é mais curto)
   return `https://wa.me/${phoneDigits}?text=${encodeURIComponent(text)}`;
 }
 
@@ -211,7 +253,7 @@ window.addEventListener('load', loadRows);
 empresaSel.addEventListener('change', loadRows);
 diasSel.addEventListener('change', loadRows);
 
-// Abre WhatsApp para todos (uma aba por clique, pode ser bloqueado se não for interativo)
+// Abre WhatsApp para todos
 btnSendAll.addEventListener('click', async () => {
   const buttons = [...document.querySelectorAll('button[data-phone]:not([disabled])')];
   if (!buttons.length){ setStatus('Nada para abrir', 'bad'); return; }
@@ -220,12 +262,12 @@ btnSendAll.addEventListener('click', async () => {
     const success = await openOne(
       b.dataset.row,
       decodeURIComponent(b.dataset.name),
-      b.dataset.phone, // já vem só dígitos
+      b.dataset.phone,
       decodeURIComponent(b.dataset.empresa),
       b
     );
     success ? ok++ : fail++;
-    await sleep(200);
+    await sleep(150);
   }
   setStatus(`Abertos: ${ok}; falhas: ${fail}`, fail ? 'bad' : 'ok');
   loadRows();
@@ -244,8 +286,8 @@ async function loadRows(){
     catch { setStatus('Erro ao ler JSON do GAS', 'bad'); return; }
 
     const list = Array.isArray(data) ? data : (data.rows || []);
-
     const empresaFiltro = removeAcentos(empresaSel.value);
+
     const rows = list.filter(item => {
       const emp = removeAcentos(item.empresa);
       const okEmp = !empresaFiltro || emp === empresaFiltro;
@@ -258,18 +300,25 @@ async function loadRows(){
 
     for (const row of rows){
       const d = toDateBRorISO(row.aniversario);
-      const phoneDigits = normPhoneBR(row.telefone); // só dígitos p/ wa.me
+
+      // >>> NOVO: normalização completa + flag de 9º dígito inserido
+      const norm = normalizePhoneBR(row.telefone);
+      const phoneDigits = norm.digits;
+      const valid = norm.valid;
+      const tagAuto9 = norm.addedNine ? '<span class="tag tag-auto9" title="Adicionado 9º dígito automaticamente">auto 9</span>' : '';
+
       const sent = row.horarioEnvio ? '✅' : '—';
       const tr = document.createElement('tr');
       tr.innerHTML = `
         <td>${row.empresa||''}</td>
         <td>${row.nome||''}</td>
         <td>${d ? d.toLocaleDateString('pt-BR') : (row.aniversario||'')}</td>
-        <td>${phoneDigits ? '+'+phoneDigits : ''}</td>
+        <td>${valid ? ('+'+phoneDigits) : '<span class="invalid">inválido</span>'} ${tagAuto9}</td>
         <td>${sent}</td>
         <td>
           <div class="row-actions">
             <button class="btn btn-outline"
+              ${valid ? '' : 'disabled'}
               data-row="${row.row}"
               data-name="${encodeURIComponent(row.nome||'')}"
               data-phone="${phoneDigits}"
@@ -301,27 +350,22 @@ async function loadRows(){
 // ===== Abertura do WhatsApp com texto preenchido =====
 async function openOne(row, nome, phoneDigits, empresa, btn){
   try{
-    if (!phoneDigits){ setStatus('Telefone vazio/ inválido', 'bad'); return false; }
+    // revalida aqui por segurança
+    const norm = normalizePhoneBR(phoneDigits);
+    if (!norm.valid){
+      setStatus(`Telefone inválido para ${nome}.`, 'bad');
+      return false;
+    }
 
     const linkReserva = ensureHttpUrl(linkReservaEl.value);
     const linkWhats = ensureWhatsAppLink(linkWhatsEl.value);
     const text = buildMessage(nome, empresa, linkReserva, linkWhats);
 
-    // Deep link
-    const deeplink = buildWhatsDeepLink(phoneDigits, text);
+    const deeplink = buildWhatsDeepLink(norm.digits, text);
 
-    // Tenta abrir em nova aba/janela (bloqueadores de pop-up podem impedir se não for ação direta)
+    // abrir em nova aba; se bloquear, redireciona a atual
     const win = window.open(deeplink, '_blank', 'noopener,noreferrer');
-
     if (!win){
-      // Fallback: copia o texto para a área de transferência e redireciona a aba atual
-      try{
-        await navigator.clipboard.writeText(text);
-        setStatus('Texto copiado. Redirecionando para o WhatsApp…');
-      }catch(e){
-        console.warn('Clipboard falhou:', e);
-        setStatus('Abra o WhatsApp: texto pronto no painel.', 'bad');
-      }
       location.href = deeplink;
     }else{
       setStatus('WhatsApp aberto ✅', 'ok');
