@@ -78,13 +78,11 @@
       <label>
         Link de Reserva
         <input id="linkReserva" placeholder="https://seusite.com/reserva" value="https://seusite.com/reserva" />
-        <div class="hint">Use URL completa (https://...). O WhatsApp transforma em link clicável.</div>
       </label>
 
       <label>
         WhatsApp do Restaurante
         <input id="linkWhats" placeholder="https://wa.me/55DDDNUMERO" value="https://wa.me/5599999999999" />
-        <div class="hint">Pode colar a URL (wa.me/web.whatsapp) ou apenas o número (com DDD). O sistema padroniza.</div>
       </label>
 
       <label style="grid-column:1/-1">
@@ -92,9 +90,6 @@
         <input id="msgTemplate" value="Olá, {{NOME}}! 🎉 A equipe {{EMPRESA}} deseja um feliz aniversário! 🎂
 Faça sua reserva aqui: {{LINK_RESERVA}}
 Fale conosco no WhatsApp: {{LINK_WHATSAPP}}" />
-        <div class="hint">
-          Placeholders: {{NOME}}, {{EMPRESA}}, {{LINK_RESERVA}}, {{LINK_WHATSAPP}} (compat.: {{LINK}} = {{LINK_RESERVA}})
-        </div>
       </label>
     </div>
 
@@ -116,9 +111,7 @@ Fale conosco no WhatsApp: {{LINK_WHATSAPP}}" />
   </div>
 
 <script>
-// ========= CONFIG =========
 const GAS_URL = "https://script.google.com/macros/s/AKfycbwqJypN425q5w6Zz-xBc00zFpPycFNfsnvElWX1sUtt16BEx6I7_1kR4hOWI2g0jKZ0bw/exec";
-// =========================
 
 const tblBody = document.querySelector('#tbl tbody');
 const statusEl = document.getElementById('status');
@@ -130,7 +123,6 @@ const linkWhatsEl = document.getElementById('linkWhats');
 const msgTemplateEl = document.getElementById('msgTemplate');
 const chkMarkSent = document.getElementById('chkMarkSent');
 
-function sleep(ms){ return new Promise(r => setTimeout(r, ms)); }
 function setStatus(t, cls){ statusEl.textContent = t; statusEl.className = 'chip ' + (cls||''); }
 function removeAcentos(s){ return (s||'').toString().normalize('NFD').replace(/\p{Diacritic}/gu,'').toUpperCase().trim(); }
 
@@ -155,243 +147,98 @@ function isBirthdayNextDays(d, dias){
   return diff >= 0 && diff <= Number(dias);
 }
 
-/**
- * Normaliza/“corrige” número BR para wa.me:
- * - mantém apenas dígitos
- * - adiciona 55 se faltar
- * - se tiver 8 dígitos no número local, injeta o 9 (vira celular)
- * Retorna {digits, valid, addedNine}
- *  - valid=true se tiver comprimento >= 12 (55 + DDD 2 + número 8) — mínimo aceito pelo wa.me
- *  - addedNine=true se foi inserido 9º dígito automaticamente
- */
+// Normaliza número BR
 function normalizePhoneBR(p){
   let raw = String(p||'').replace(/\D+/g,'');
-  if (!raw) return { digits:'', valid:false, addedNine:false };
-
-  // remove zeros iniciais isolados
+  if (!raw) return {digits:'', valid:false};
   raw = raw.replace(/^0+/, '');
-
-  // garante 55
-  if (!raw.startsWith('55')){
-    // casos comuns: 10/11 dígitos nacionais → prefira adicionar 55
-    if (raw.length >= 10 && raw.length <= 13){
-      raw = '55' + raw;
-    }
+  if (!raw.startsWith('55') && raw.length>=10) raw = '55' + raw;
+  if (raw.length===12){ // fixo 8 dígitos -> adiciona 9
+    const ddd=raw.substring(2,4), local=raw.substring(4);
+    raw = '55'+ddd+'9'+local;
   }
-
-  // se já tem 55 + DDD (2) + número
-  if (raw.startsWith('55') && raw.length >= 12){
-    const ddd = raw.substring(2,4);
-    let local = raw.substring(4);
-    // se local tem 8 (fixo): injeta 9 -> vira 9 + 8
-    if (local.length === 8){
-      local = '9' + local;
-      raw = '55' + ddd + local;
-      return { digits:raw, valid:true, addedNine:true };
-    }
-    // se local tem 9 (celular) ou mais → ok
-    return { digits:raw, valid:true, addedNine:false };
-  }
-
-  // tentativas finais de saneamento
-  if (raw.length >= 12) return { digits:raw, valid:true, addedNine:false };
-  return { digits:'', valid:false, addedNine:false };
+  return {digits:raw, valid:(raw.length>=12)};
 }
 
-function ensureHttpUrl(u){
-  const s = String(u||'').trim();
-  if (!s) return '';
-  return /^https?:\/\//i.test(s) ? s : ('https://' + s);
-}
+function ensureHttpUrl(u){ const s=String(u||'').trim(); return s? (/^https?:\/\//i.test(s)?s:'https://'+s):''; }
+function ensureWhatsAppLink(v){ return v; }
 
-// Aceita URL wa.me/web.whatsapp ou apenas número; retorna wa.me/55DDDNÚMERO
-function ensureWhatsAppLink(v){
-  if (!v) return '';
-  let s = String(v).trim();
-  const urlMatch = s.match(/^https?:\/\//i);
-  let digits = '';
-  if (urlMatch){
-    const m = s.match(/(\d{10,15})/);
-    digits = m ? m[1] : '';
-  }else{
-    digits = s.replace(/\D+/g,'');
-  }
-  if (!digits) return ensureHttpUrl(s);
-  if (!digits.startsWith('55')) digits = '55' + digits.replace(/^0+/, '');
-  // ajusta zeros após 55
-  digits = digits.replace(/^55+0+/, '55');
-  // tenta aplicar regra do 9º dígito se vier só com 8
-  if (digits.length === 12){
-    const ddd = digits.substring(2,4);
-    const local = digits.substring(4);
-    if (local.length === 8) digits = '55' + ddd + '9' + local;
-  }
-  return `https://wa.me/${digits}`;
-}
-
-// Monta a mensagem com placeholders
+// Mensagem
 function buildMessage(nome, empresa, linkReserva, linkWhats){
-  let tpl = msgTemplateEl.value || '';
+  let tpl = msgTemplateEl.value||'';
   const map = {
-    '{{NOME}}': nome || '',
-    '{{EMPRESA}}': empresa || '',
-    '{{LINK_RESERVA}}': linkReserva || '',
-    '{{LINK_WHATSAPP}}': linkWhats || '',
-    // compat:
-    '{{LINK}}': linkReserva || ''
+    '{{NOME}}': nome||'',
+    '{{EMPRESA}}': empresa||'',
+    '{{LINK_RESERVA}}': linkReserva||'',
+    '{{LINK_WHATSAPP}}': linkWhats||'',
+    '{{LINK}}': linkReserva||''
   };
-  for (const [k,v] of Object.entries(map)) tpl = tpl.split(k).join(v);
-  return tpl.trim();
+  for (const [k,v] of Object.entries(map)) tpl=tpl.split(k).join(v);
+  return tpl.replace(/\r\n|\r/g,'\n').trim();
 }
 
-// Gera deep link para abrir o WhatsApp com texto preenchido
+// Deep link usando api.whatsapp.com
 function buildWhatsDeepLink(phoneDigits, text){
-  return `https://wa.me/${phoneDigits}?text=${encodeURIComponent(text)}`;
+  return `https://api.whatsapp.com/send?phone=${phoneDigits}&text=${encodeURIComponent(text)}&type=phone_number&app_absent=0`;
 }
 
 window.addEventListener('load', loadRows);
 empresaSel.addEventListener('change', loadRows);
 diasSel.addEventListener('change', loadRows);
 
-// Abre WhatsApp para todos
-btnSendAll.addEventListener('click', async () => {
-  const buttons = [...document.querySelectorAll('button[data-phone]:not([disabled])')];
-  if (!buttons.length){ setStatus('Nada para abrir', 'bad'); return; }
-  let ok = 0, fail = 0;
-  for (const b of buttons){
-    const success = await openOne(
-      b.dataset.row,
-      decodeURIComponent(b.dataset.name),
-      b.dataset.phone,
-      decodeURIComponent(b.dataset.empresa),
-      b
-    );
-    success ? ok++ : fail++;
-    await sleep(150);
-  }
-  setStatus(`Abertos: ${ok}; falhas: ${fail}`, fail ? 'bad' : 'ok');
-  loadRows();
+btnSendAll.addEventListener('click', async ()=>{
+  const buttons=[...document.querySelectorAll('button[data-phone]:not([disabled])')];
+  if (!buttons.length){ setStatus('Nada para abrir','bad'); return;}
+  for (const b of buttons){ await openOne(b.dataset.row, decodeURIComponent(b.dataset.name), b.dataset.phone, decodeURIComponent(b.dataset.empresa), b); }
 });
 
 async function loadRows(){
   try{
     setStatus('Carregando…');
-    tblBody.innerHTML = '';
-
-    const empresaParam = encodeURIComponent(empresaSel.value || '');
-    const url = GAS_URL + `?days=${encodeURIComponent(diasSel.value)}${empresaSel.value ? `&empresa=${empresaParam}` : ''}`;
-    const r = await fetch(url);
-    let data;
-    try { data = await r.json(); }
-    catch { setStatus('Erro ao ler JSON do GAS', 'bad'); return; }
-
-    const list = Array.isArray(data) ? data : (data.rows || []);
-    const empresaFiltro = removeAcentos(empresaSel.value);
-
-    const rows = list.filter(item => {
-      const emp = removeAcentos(item.empresa);
-      const okEmp = !empresaFiltro || emp === empresaFiltro;
-      const d = toDateBRorISO(item.aniversario);
-      const okDia = isBirthdayNextDays(d, Number(diasSel.value));
-      return okEmp && okDia;
+    tblBody.innerHTML='';
+    const empresaParam=encodeURIComponent(empresaSel.value||'');
+    const url=GAS_URL+`?days=${encodeURIComponent(diasSel.value)}${empresaSel.value?`&empresa=${empresaParam}`:''}`;
+    const r=await fetch(url); const data=await r.json();
+    const list=Array.isArray(data)?data:(data.rows||[]);
+    const empresaFiltro=removeAcentos(empresaSel.value);
+    const rows=list.filter(item=>{
+      const emp=removeAcentos(item.empresa); const okEmp=!empresaFiltro||emp===empresaFiltro;
+      const d=toDateBRorISO(item.aniversario); const okDia=isBirthdayNextDays(d,Number(diasSel.value));
+      return okEmp&&okDia;
     });
-
-    if (!rows.length){ setStatus(`Sem aniversariantes (próx. ${diasSel.value} dia(s))`); return; }
-
+    if (!rows.length){ setStatus(`Sem aniversariantes`); return;}
     for (const row of rows){
-      const d = toDateBRorISO(row.aniversario);
-
-      // >>> NOVO: normalização completa + flag de 9º dígito inserido
-      const norm = normalizePhoneBR(row.telefone);
-      const phoneDigits = norm.digits;
-      const valid = norm.valid;
-      const tagAuto9 = norm.addedNine ? '<span class="tag tag-auto9" title="Adicionado 9º dígito automaticamente">auto 9</span>' : '';
-
-      const sent = row.horarioEnvio ? '✅' : '—';
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
+      const d=toDateBRorISO(row.aniversario);
+      const norm=normalizePhoneBR(row.telefone);
+      const phoneDigits=norm.digits; const valid=norm.valid;
+      const tr=document.createElement('tr');
+      tr.innerHTML=`
         <td>${row.empresa||''}</td>
         <td>${row.nome||''}</td>
-        <td>${d ? d.toLocaleDateString('pt-BR') : (row.aniversario||'')}</td>
-        <td>${valid ? ('+'+phoneDigits) : '<span class="invalid">inválido</span>'} ${tagAuto9}</td>
-        <td>${sent}</td>
-        <td>
-          <div class="row-actions">
-            <button class="btn btn-outline"
-              ${valid ? '' : 'disabled'}
-              data-row="${row.row}"
-              data-name="${encodeURIComponent(row.nome||'')}"
-              data-phone="${phoneDigits}"
-              data-empresa="${encodeURIComponent(row.empresa||'')}">
-              Abrir WhatsApp
-            </button>
-          </div>
-        </td>`;
+        <td>${d?d.toLocaleDateString('pt-BR'):(row.aniversario||'')}</td>
+        <td>${valid?('+'+phoneDigits):'<span class="invalid">inválido</span>'}</td>
+        <td>${row.horarioEnvio?'✅':'—'}</td>
+        <td><button class="btn btn-outline" ${valid?'':'disabled'}
+          data-row="${row.row}" data-name="${encodeURIComponent(row.nome||'')}"
+          data-phone="${phoneDigits}" data-empresa="${encodeURIComponent(row.empresa||'')}">
+          Abrir WhatsApp</button></td>`;
       tblBody.appendChild(tr);
     }
-
-    [...document.querySelectorAll('button[data-phone]')].forEach(b => b.addEventListener('click', async () => {
-      await openOne(
-        b.dataset.row,
-        decodeURIComponent(b.dataset.name),
-        b.dataset.phone,
-        decodeURIComponent(b.dataset.empresa),
-        b
-      );
+    [...document.querySelectorAll('button[data-phone]')].forEach(b=>b.addEventListener('click', async()=>{
+      await openOne(b.dataset.row, decodeURIComponent(b.dataset.name), b.dataset.phone, decodeURIComponent(b.dataset.empresa), b);
     }));
-
-    setStatus(`${rows.length} aniversariante(s) – próximos ${diasSel.value} dia(s)`);
-  }catch(err){
-    console.error(err);
-    setStatus('Erro ao carregar', 'bad');
-  }
+    setStatus(`${rows.length} aniversariante(s)`);
+  }catch(err){ console.error(err); setStatus('Erro','bad'); }
 }
 
-// ===== Abertura do WhatsApp com texto preenchido =====
-async function openOne(row, nome, phoneDigits, empresa, btn){
-  try{
-    // revalida aqui por segurança
-    const norm = normalizePhoneBR(phoneDigits);
-    if (!norm.valid){
-      setStatus(`Telefone inválido para ${nome}.`, 'bad');
-      return false;
-    }
-
-    const linkReserva = ensureHttpUrl(linkReservaEl.value);
-    const linkWhats = ensureWhatsAppLink(linkWhatsEl.value);
-    const text = buildMessage(nome, empresa, linkReserva, linkWhats);
-
-    const deeplink = buildWhatsDeepLink(norm.digits, text);
-
-    // abrir em nova aba; se bloquear, redireciona a atual
-    const win = window.open(deeplink, '_blank', 'noopener,noreferrer');
-    if (!win){
-      location.href = deeplink;
-    }else{
-      setStatus('WhatsApp aberto ✅', 'ok');
-    }
-
-    // Marcar na planilha (opcional)
-    if (chkMarkSent.checked){
-      try {
-        await fetch(GAS_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ row: Number(row), horario: new Date().toISOString() })
-        });
-      } catch(e) {
-        console.warn('Falha ao marcar na planilha:', e);
-      }
-    }
-
-    if (btn){ btn.textContent = 'Aberto ✔️'; btn.disabled = true; }
-    return true;
-  }catch(err){
-    console.error(err);
-    setStatus(`Erro ao abrir WhatsApp: ${String(err)}`, 'bad');
-    if (btn){ btn.disabled = false; btn.textContent = 'Abrir WhatsApp'; }
-    return false;
-  }
+async function openOne(row,nome,phoneDigits,empresa,btn){
+  const norm=normalizePhoneBR(phoneDigits);
+  if (!norm.valid){ setStatus('Telefone inválido','bad'); return false;}
+  const text=buildMessage(nome,empresa,ensureHttpUrl(linkReservaEl.value),ensureHttpUrl(linkWhatsEl.value));
+  location.href=buildWhatsDeepLink(norm.digits,text);
+  if (chkMarkSent.checked){ try{ await fetch(GAS_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({row:Number(row),horario:new Date().toISOString()})}); }catch(e){} }
+  if (btn){ btn.textContent='Aberto ✔️'; btn.disabled=true; }
+  setStatus('WhatsApp aberto ✅','ok');
 }
 </script>
 </body>
