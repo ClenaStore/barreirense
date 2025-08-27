@@ -292,11 +292,12 @@ async function openOne(row,nome,phoneDigits,empresa,btn){
 
   // Observação: via deeplink não é possível anexar mídia automaticamente; colocar o link da imagem na primeira linha faz o WhatsApp gerar o preview.
 const deeplinks = buildWhatsDeepLink(norm.digits, text);
-// Tenta wa.me primeiro; se o texto não aparecer para você, troque para "api" abaixo
-location.href = deeplinks.primary;
-// Como alternativa, descomente a linha abaixo:
-// location.href = deeplinks.fallback;
-console.log('WA deeplink usado:', location.href);
+// Copia o texto para a área de transferência como "seguro" caso o navegador não pré-preencha automaticamente
+try{ await navigator.clipboard.writeText(text); }catch(_){ /* sem permissão, ignora */ }
+// Abre usando a opção preferida (Desktop: api.whatsapp.com; Mobile: wa.me)
+location.href = deeplinks.prefer;
+console.log('WA deeplink usado:', deeplinks.prefer);
+
 
 
   if (chkMarkSent.checked){
