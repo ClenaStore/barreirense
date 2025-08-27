@@ -90,7 +90,7 @@
 
       <label>
         URL da Foto (jpg/png)
-        <input id="linkFoto" placeholder="https://github.com/ClenaStore/aniversarios/blob/main/pages/api/Imagem%20do%20WhatsApp%20de%202025-08-27%20%C3%A0(s)%2010.13.55_d0cbe205.jpg?raw=true" />
+        <input id="linkFoto" placeholder="https://seusite.com/imagens/banner-aniversario.jpg" />
         <div class="hint">O WhatsApp faz preview do link; anexar automaticamente não é possível via link.</div>
       </label>
 
@@ -215,13 +215,12 @@ function buildMessage(nome, empresa, linkReserva, linkWhats, linkAtendente, link
 
 // Deep link usando api.whatsapp.com
 function buildWhatsDeepLink(phoneDigits, text){
-  const params = new URLSearchParams({
-    phone: phoneDigits,
-    text: text,
-    type: 'phone_number',
-    app_absent: '0'
-  });
-  return `https://api.whatsapp.com/send?${params.toString()}`;
+  // Preferimos o formato wa.me, que costuma preservar melhor o texto no WhatsApp Web/Mobile
+  const encoded = encodeURIComponent(text).replace(/%20/g, '+').replace(/%0A/g, '%0A');
+  const waMe = `https://wa.me/${phoneDigits}?text=${encoded}`;
+  // Fallback alternativo (alguns navegadores se dão melhor com o api.whatsapp)
+  const api = `https://api.whatsapp.com/send?phone=${phoneDigits}&text=${encoded}`;
+  return { primary: waMe, fallback: api };
 }
 
 window.addEventListener('load', loadRows);
@@ -287,11 +286,16 @@ async function openOne(row,nome,phoneDigits,empresa,btn){
   const linkWhats   = ensureWhatsAppLink(linkWhatsEl.value);
   const linkAtendente = buildAttendantDeepLink(linkWhatsEl.value);
   const linkImagem = ensureHttpUrl(linkFotoEl.value);
-  const text        = buildMessage(nome, empresa, linkReserva, linkWhats, linkAtendente, linkImagem);
+  const text = buildMessage(nome, empresa, linkReserva, linkWhats, linkAtendente, linkImagem);
 
-  // Observação: via deeplink não é possível anexar mídia automaticamente;
-  // colocar o link da imagem na primeira linha faz o WhatsApp gerar o preview.
-  location.href = buildWhatsDeepLink(norm.digits, text);
+  // Observação: via deeplink não é possível anexar mídia automaticamente; colocar o link da imagem na primeira linha faz o WhatsApp gerar o preview.
+const deeplinks = buildWhatsDeepLink(norm.digits, text);
+// Tenta wa.me primeiro; se o texto não aparecer para você, troque para "api" abaixo
+location.href = deeplinks.primary;
+// Como alternativa, descomente a linha abaixo:
+// location.href = deeplinks.fallback;
+console.log('WA deeplink usado:', location.href);
+
 
   if (chkMarkSent.checked){
     try{
