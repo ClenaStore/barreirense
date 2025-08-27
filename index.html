@@ -24,9 +24,9 @@
     .chip{ padding:4px 8px; border:1px solid var(--line); border-radius:999px; font-size:12px; color:var(--muted) }
     .ok{ color:#22c55e }.bad{ color:var(--danger) }.warn{ color:var(--warn) }
     input,select,textarea{ background:#0d0d0d; color:var(--text); border:1px solid var(--line); border-radius:10px; padding:10px }
-    textarea{ min-height:108px; resize:vertical; line-height:1.35 }
+    textarea{ min-height:128px; resize:vertical; line-height:1.35 }
     .grid{ display:grid; gap:12px; grid-template-columns:repeat(3, minmax(0,1fr)) }
-    @media (max-width:900px){ .grid{ grid-template-columns:1fr } }
+    @media (max-width:980px){ .grid{ grid-template-columns:1fr } }
     .hint{ font-size:12px; color:var(--muted); margin-top:6px }
     .row-actions{ display:flex; gap:8px; align-items:center; }
     .small{ font-size:12px; color:var(--muted) }
@@ -83,19 +83,28 @@
       </label>
 
       <label>
-        WhatsApp do Restaurante
+        WhatsApp do Restaurante (nº ou URL)
         <input id="linkWhats" placeholder="https://wa.me/55DDDNUMERO" value="https://wa.me/5599999999999" />
-        <div class="hint">Pode colar a URL wa.me/web.whatsapp ou só o número (com DDD)</div>
+        <div class="hint">Cole a URL wa.me / api.whatsapp.com ou só o número (com DDD)</div>
+      </label>
+
+      <label>
+        URL da Foto (jpg/png)
+        <input id="linkFoto" placeholder="https://seusite.com/imagens/banner-aniversario.jpg" />
+        <div class="hint">O WhatsApp faz preview do link; anexar automaticamente não é possível via link.</div>
       </label>
 
       <label style="grid-column:1/-1">
         Mensagem (placeholders)
-        <textarea id="msgTemplate">Olá, {{NOME}}! 🎉
+        <textarea id="msgTemplate">{{LINK_IMAGEM}}
+
+Olá, {{NOME}}! 🎉
 A equipe {{EMPRESA}} deseja um feliz aniversário! 🎂
 
-Faça sua reserva aqui: {{LINK_RESERVA}}
-Fale conosco no WhatsApp: {{LINK_WHATSAPP}}</textarea>
-        <div class="hint">Placeholders: {{NOME}}, {{EMPRESA}}, {{LINK_RESERVA}}, {{LINK_WHATSAPP}} ({{LINK}} = {{LINK_RESERVA}})</div>
+👉 Reserve sua mesa: {{LINK_RESERVA}}
+💬 Falar com atendente: {{LINK_ATENDENTE}}
+        </textarea>
+        <div class="hint">Placeholders: {{NOME}}, {{EMPRESA}}, {{LINK_RESERVA}}, {{LINK_ATENDENTE}}, {{LINK_WHATSAPP}}, {{LINK_IMAGEM}}, {{LINK}} (alias para {{LINK_RESERVA}})</div>
       </label>
     </div>
 
@@ -126,6 +135,7 @@ const diasSel = document.getElementById('dias');
 const btnSendAll = document.getElementById('btnSendAll');
 const linkReservaEl = document.getElementById('linkReserva');
 const linkWhatsEl = document.getElementById('linkWhats');
+const linkFotoEl   = document.getElementById('linkFoto');
 const msgTemplateEl = document.getElementById('msgTemplate');
 const chkMarkSent = document.getElementById('chkMarkSent');
 
@@ -171,7 +181,7 @@ function ensureHttpUrl(u){
   return s ? (/^https?:\/\//i.test(s)?s:'https://'+s) : '';
 }
 
-// Mantém o que você digitar (wa.me ou número), mas para a mensagem só precisamos de texto
+// Mantém o que você digitar (wa.me/api.whatsapp.com ou número)
 function ensureWhatsAppLink(v){
   let s = String(v||'').trim();
   if (!s) return '';
@@ -179,28 +189,35 @@ function ensureWhatsAppLink(v){
   return 'https://wa.me/'+s.replace(/\D+/g,'');
 }
 
+// Constrói link direto para falar com atendente com mensagem padrão
+function buildAttendantDeepLink(baseWhatsInput){
+  const base = ensureWhatsAppLink(baseWhatsInput);
+  const msg = 'Olá! Gostaria de falar com um atendente sobre reserva.';
+  const join = base.includes('?') ? '&' : '?';
+  return base ? (base + join + 'text=' + encodeURIComponent(msg)) : '';
+}
+
 // --- Mensagem ---
-function buildMessage(nome, empresa, linkReserva, linkWhats){
-  // pega o texto do TEXTAREA (multilinha)
+function buildMessage(nome, empresa, linkReserva, linkWhats, linkAtendente, linkImagem){
   let tpl = msgTemplateEl.value || '';
   const map = {
     '{{NOME}}': nome || '',
     '{{EMPRESA}}': empresa || '',
     '{{LINK_RESERVA}}': linkReserva || '',
     '{{LINK_WHATSAPP}}': linkWhats || '',
+    '{{LINK_ATENDENTE}}': linkAtendente || linkWhats || '',
+    '{{LINK_IMAGEM}}': linkImagem || '',
     '{{LINK}}': linkReserva || ''
   };
   for (const [k,v] of Object.entries(map)) tpl = tpl.split(k).join(v);
-
-  // normaliza quebras de linha para \n (WhatsApp entende) e remove espaços estranhos
   return tpl.replace(/\r\n|\r/g,'\n').replace(/[ \t]+\n/g,'\n').trim();
 }
 
-// Deep link usando api.whatsapp.com com URLSearchParams (mais estável no Web)
+// Deep link usando api.whatsapp.com
 function buildWhatsDeepLink(phoneDigits, text){
   const params = new URLSearchParams({
     phone: phoneDigits,
-    text: text, // URLSearchParams já faz o encode
+    text: text,
     type: 'phone_number',
     app_absent: '0'
   });
@@ -268,9 +285,12 @@ async function openOne(row,nome,phoneDigits,empresa,btn){
 
   const linkReserva = ensureHttpUrl(linkReservaEl.value);
   const linkWhats   = ensureWhatsAppLink(linkWhatsEl.value);
-  const text        = buildMessage(nome, empresa, linkReserva, linkWhats);
+  const linkAtendente = buildAttendantDeepLink(linkWhatsEl.value);
+  const linkImagem = ensureHttpUrl(linkFotoEl.value);
+  const text        = buildMessage(nome, empresa, linkReserva, linkWhats, linkAtendente, linkImagem);
 
-  // abrir na MESMA aba é mais confiável para manter o texto
+  // Observação: via deeplink não é possível anexar mídia automaticamente;
+  // colocar o link da imagem na primeira linha faz o WhatsApp gerar o preview.
   location.href = buildWhatsDeepLink(norm.digits, text);
 
   if (chkMarkSent.checked){
