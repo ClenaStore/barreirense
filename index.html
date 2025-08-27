@@ -215,12 +215,14 @@ function buildMessage(nome, empresa, linkReserva, linkWhats, linkAtendente, link
 
 // Deep link usando api.whatsapp.com
 function buildWhatsDeepLink(phoneDigits, text){
-  // Preferimos o formato wa.me, que costuma preservar melhor o texto no WhatsApp Web/Mobile
-  const encoded = encodeURIComponent(text).replace(/%20/g, '+').replace(/%0A/g, '%0A');
+  // Usa api.whatsapp.com como padrão no Desktop (mais confiável para pré-preencher)
+  // e wa.me como padrão no Mobile. Sempre com encodeURIComponent puro (sem trocar espaço por '+').
+  const encoded = encodeURIComponent(text);
   const waMe = `https://wa.me/${phoneDigits}?text=${encoded}`;
-  // Fallback alternativo (alguns navegadores se dão melhor com o api.whatsapp)
-  const api = `https://api.whatsapp.com/send?phone=${phoneDigits}&text=${encoded}`;
-  return { primary: waMe, fallback: api };
+  const api  = `https://api.whatsapp.com/send?phone=${phoneDigits}&text=${encoded}`;
+  const isMobile = /Android|iPhone|iPad|iPod|Mobile|WhatsApp/i.test(navigator.userAgent);
+  const prefer = isMobile ? waMe : api;
+  return { prefer, waMe, api };
 }
 
 window.addEventListener('load', loadRows);
