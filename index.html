@@ -7,8 +7,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #f9fafb; --ink: #1f2937; --muted: #6b7280;
-      --brand: #2563eb; --brand-2: #1e40af; --card: #fff;
+      --bg:#f9fafb;--ink:#1f2937;--muted:#6b7280;
+      --brand:#2563eb;--brand-2:#1e40af;--card:#fff;
     }
     *{margin:0;padding:0;box-sizing:border-box}
     body{font-family:"Inter",sans-serif;background:var(--bg);color:var(--ink);line-height:1.6}
@@ -29,11 +29,13 @@
     .carousel{position:relative;width:100%;overflow:hidden}
     .carousel-track{display:flex;transition:transform .6s ease-in-out}
     .carousel-slide{min-width:100%;position:relative}
-    .carousel-slide img{width:100%;height:500px;object-fit:cover;filter:brightness(0.7)}
-    .carousel-slide h2{
-      position:absolute;bottom:20px;left:20px;
-      color:white;font-size:2rem;font-weight:700;text-shadow:0 3px 6px rgba(0,0,0,.7)
+    .carousel-slide img{width:100%;height:500px;object-fit:cover;filter:brightness(0.65)}
+    .carousel-slide .caption{
+      position:absolute;bottom:40px;left:40px;max-width:70%;
+      color:white;text-shadow:0 3px 6px rgba(0,0,0,.7)
     }
+    .carousel-slide .caption h2{font-size:2.2rem;margin-bottom:.3rem}
+    .carousel-slide .caption p{font-size:1.1rem}
     .carousel-btn{
       position:absolute;top:50%;transform:translateY(-50%);
       background:rgba(0,0,0,0.5);color:white;border:none;
@@ -53,8 +55,8 @@
     .carousel-indicators button.active{background:white}
 
     /* SEÇÕES */
-    section{padding:2rem 1rem;max-width:1200px;margin:auto}
-    section h2{font-size:1.8rem;margin-bottom:1rem;color:var(--brand-2);text-align:center}
+    section{padding:3rem 1rem;max-width:1200px;margin:auto}
+    section h2{font-size:1.9rem;margin-bottom:1.5rem;color:var(--brand-2);text-align:center}
 
     /* CARDS */
     .cards-container{display:grid;gap:20px;grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
@@ -83,9 +85,12 @@
     .modal-content img{width:100%;border-radius:8px;margin-bottom:1rem}
     .modal h3{margin-bottom:.5rem;color:var(--brand-2)}
     .modal p{margin-bottom:1rem}
-    .close-btn{
-      position:absolute;top:10px;right:15px;font-size:1.5rem;font-weight:bold;color:#555;cursor:pointer
+    .close-btn, .prev-article, .next-article{
+      position:absolute;top:10px;font-size:1.4rem;font-weight:bold;color:#555;cursor:pointer;background:#eee;border-radius:6px;padding:.3rem .6rem
     }
+    .close-btn{right:10px}
+    .prev-article{left:10px}
+    .next-article{right:50px}
     @keyframes fadeIn{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:scale(1)}}
 
     /* FOOTER */
@@ -100,7 +105,8 @@
     /* RESPONSIVO */
     @media(max-width:768px){
       .carousel-slide img{height:280px}
-      .carousel-slide h2{font-size:1.3rem}
+      .carousel-slide .caption h2{font-size:1.4rem}
+      .carousel-slide .caption p{font-size:.9rem}
       header{flex-direction:column;align-items:flex-start}
       header nav{margin-top:.5rem}
     }
@@ -123,10 +129,9 @@
   <!-- CARROSSEL -->
   <div class="carousel" id="carousel">
     <div class="carousel-track">
-      <div class="carousel-slide"><img src="https://upload.wikimedia.org/wikipedia/commons/9/94/Ponte_estaiada_SP.jpg" alt=""><h2>Ponte Estaiada</h2></div>
-      <div class="carousel-slide"><img src="https://vejasp.abril.com.br/wp-content/uploads/2016/11/avenida-paulista-noite.jpg" alt=""><h2>Avenida Paulista</h2></div>
-      <div class="carousel-slide"><img src="https://upload.wikimedia.org/wikipedia/commons/8/89/Parque_do_Ibirapuera_SP.jpg" alt=""><h2>Parque Ibirapuera</h2></div>
-      <div class="carousel-slide"><img src="https://upload.wikimedia.org/wikipedia/commons/c/cf/Mercado_Municipal_SP.jpg" alt=""><h2>Mercado Municipal</h2></div>
+      <div class="carousel-slide"><img src="https://upload.wikimedia.org/wikipedia/commons/9/94/Ponte_estaiada_SP.jpg" alt=""><div class="caption"><h2>Ponte Estaiada</h2><p>Um dos cartões postais de São Paulo</p></div></div>
+      <div class="carousel-slide"><img src="https://vejasp.abril.com.br/wp-content/uploads/2016/11/avenida-paulista-noite.jpg" alt=""><div class="caption"><h2>Avenida Paulista</h2><p>O coração econômico e cultural da cidade</p></div></div>
+      <div class="carousel-slide"><img src="https://upload.wikimedia.org/wikipedia/commons/8/89/Parque_do_Ibirapuera_SP.jpg" alt=""><div class="caption"><h2>Parque Ibirapuera</h2><p>O pulmão verde de São Paulo</p></div></div>
     </div>
     <button class="carousel-btn prev">&#10094;</button>
     <button class="carousel-btn next">&#10095;</button>
@@ -139,28 +144,73 @@
     <div class="cards-container">
       <div class="card" data-title="Neuralgia do Trigêmeo" data-img="https://s2.glbimg.com/ul1wGvYj2xw/image.jpg" data-text="Matéria completa sobre Neuralgia do Trigêmeo. Aqui você pode colocar todo o conteúdo da reportagem.">
         <img src="https://s2.glbimg.com/ul1wGvYj2xw/image.jpg" alt="">
-        <div class="card-content">
-          <div class="card-title">Neuralgia do Trigêmeo</div>
-          <div class="card-text">Tratamento minimamente invasivo para dores faciais.</div>
-          <div class="card-footer">9 de junho de 2023</div>
-        </div>
+        <div class="card-content"><div class="card-title">Neuralgia do Trigêmeo</div><div class="card-text">Tratamento minimamente invasivo.</div><div class="card-footer">9 de junho de 2023</div></div>
       </div>
-
       <div class="card" data-title="Goldincision" data-img="https://img.freepik.com/celulite.jpg" data-text="Reportagem completa sobre Goldincision e os avanços no tratamento de celulite.">
         <img src="https://img.freepik.com/celulite.jpg" alt="">
-        <div class="card-content">
-          <div class="card-title">Goldincision</div>
-          <div class="card-text">Técnica inovadora contra celulite.</div>
-          <div class="card-footer">30 de janeiro de 2020</div>
-        </div>
+        <div class="card-content"><div class="card-title">Goldincision</div><div class="card-text">Técnica inovadora contra celulite.</div><div class="card-footer">30 de janeiro de 2020</div></div>
       </div>
     </div>
+  </section>
+
+  <!-- EVENTOS -->
+  <section id="eventos">
+    <h2>Próximos Eventos</h2>
+    <div class="cards-container">
+      <div class="card" data-title="Espetáculo Baixa Terapia" data-img="https://midia.folhavp.com.br/baixa-terapia.jpg" data-text="Espetáculo de comédia em cartaz no Teatro TUCA.">
+        <img src="https://midia.folhavp.com.br/baixa-terapia.jpg" alt="">
+        <div class="card-content"><div class="card-title">Baixa Terapia</div><div class="card-text">Uma comédia no divã.</div><div class="card-footer">2 de setembro de 2019</div></div>
+      </div>
+      <div class="card" data-title="Exposição Rei Pelé" data-img="https://cdn.cnn.com/cnnnext/dam/assets/pele-exposicao.jpg" data-text="Mostra em homenagem ao Rei do Futebol com acervo histórico.">
+        <img src="https://cdn.cnn.com/cnnnext/dam/assets/pele-exposicao.jpg" alt="">
+        <div class="card-content"><div class="card-title">Exposição Rei Pelé</div><div class="card-text">Exposição cultural.</div><div class="card-footer">16 de dezembro de 2024</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SHOWS -->
+  <section id="shows">
+    <h2>Shows & Espetáculos</h2>
+    <div class="cards-container">
+      <div class="card" data-title="Vitor Kley e Bruno Martini" data-img="https://s2.glbimg.com/vitor-kley.jpg" data-text="Apresentação gratuita neste domingo em São Paulo.">
+        <img src="https://s2.glbimg.com/vitor-kley.jpg" alt="">
+        <div class="card-content"><div class="card-title">Vitor Kley</div><div class="card-text">Show gratuito em SP.</div><div class="card-footer">16 de dezembro de 2024</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TURISMO -->
+  <section id="turismo">
+    <h2>Turismo em São Paulo</h2>
+    <div class="cards-container">
+      <div class="card" data-title="Avenida Paulista" data-img="https://upload.wikimedia.org/wikipedia/commons/e/e0/Avenida_Paulista_SP.jpg" data-text="Principal cartão postal de São Paulo, com museus, shoppings e vida noturna.">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/e/e0/Avenida_Paulista_SP.jpg" alt="">
+        <div class="card-content"><div class="card-title">Avenida Paulista</div><div class="card-text">Cartão postal de SP.</div><div class="card-footer">Sempre aberto</div></div>
+      </div>
+      <div class="card" data-title="Mercado Municipal" data-img="https://upload.wikimedia.org/wikipedia/commons/c/cf/Mercado_Municipal_SP.jpg" data-text="Famoso pelos pastéis de bacalhau e sanduíches de mortadela.">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/c/cf/Mercado_Municipal_SP.jpg" alt="">
+        <div class="card-content"><div class="card-title">Mercado Municipal</div><div class="card-text">Gastronomia e cultura.</div><div class="card-footer">Todos os dias</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTATO -->
+  <section id="contato">
+    <h2>Fale Conosco</h2>
+    <form onsubmit="event.preventDefault();alert('Mensagem enviada!');" style="max-width:600px;margin:auto;display:grid;gap:1rem">
+      <input type="text" placeholder="Seu nome" required style="padding:.8rem;border:1px solid #ddd;border-radius:8px">
+      <input type="email" placeholder="Seu e-mail" required style="padding:.8rem;border:1px solid #ddd;border-radius:8px">
+      <textarea rows="5" placeholder="Sua mensagem" style="padding:.8rem;border:1px solid #ddd;border-radius:8px"></textarea>
+      <button type="submit" style="padding:.8rem;background:var(--brand);color:white;border:none;border-radius:8px;font-weight:600;cursor:pointer">Enviar</button>
+    </form>
   </section>
 
   <!-- MODAL -->
   <div class="modal" id="modal">
     <div class="modal-content">
       <span class="close-btn" id="closeBtn">&times;</span>
+      <span class="prev-article" id="prevArticle">&#10094;</span>
+      <span class="next-article" id="nextArticle">&#10095;</span>
       <img id="modalImg" src="" alt="">
       <h3 id="modalTitle"></h3>
       <p id="modalText"></p>
@@ -192,22 +242,14 @@
     const nextBtn=document.querySelector('.carousel-btn.next');
     const indicators=document.querySelector('.carousel-indicators');
     let current=0;
-
     slides.forEach((_,i)=>{
       const btn=document.createElement('button');
       if(i===0)btn.classList.add('active');
       btn.addEventListener('click',()=>goToSlide(i));
       indicators.appendChild(btn);
     });
-
-    function updateIndicators(){
-      indicators.querySelectorAll('button').forEach((btn,i)=>btn.classList.toggle('active',i===current));
-    }
-    function goToSlide(i){
-      current=(i+slides.length)%slides.length;
-      track.style.transform=`translateX(-${100*current}%)`;
-      updateIndicators();
-    }
+    function updateIndicators(){indicators.querySelectorAll('button').forEach((btn,i)=>btn.classList.toggle('active',i===current));}
+    function goToSlide(i){current=(i+slides.length)%slides.length;track.style.transform=`translateX(-${100*current}%)`;updateIndicators();}
     prevBtn.addEventListener('click',()=>goToSlide(current-1));
     nextBtn.addEventListener('click',()=>goToSlide(current+1));
     setInterval(()=>goToSlide(current+1),5000);
@@ -218,16 +260,23 @@
     const modalTitle=document.getElementById("modalTitle");
     const modalText=document.getElementById("modalText");
     const closeBtn=document.getElementById("closeBtn");
+    const prevArticle=document.getElementById("prevArticle");
+    const nextArticle=document.getElementById("nextArticle");
+    const cards=document.querySelectorAll(".card");
+    let currentIndex=0;
 
-    document.querySelectorAll(".card").forEach(card=>{
-      card.addEventListener("click",()=>{
-        modalImg.src=card.dataset.img;
-        modalTitle.textContent=card.dataset.title;
-        modalText.textContent=card.dataset.text;
-        modal.style.display="flex";
-      });
-    });
+    function openModal(index){
+      const card=cards[index];
+      modalImg.src=card.dataset.img;
+      modalTitle.textContent=card.dataset.title;
+      modalText.textContent=card.dataset.text;
+      modal.style.display="flex";
+      currentIndex=index;
+    }
+    cards.forEach((card,i)=>card.addEventListener("click",()=>openModal(i)));
     closeBtn.onclick=()=>modal.style.display="none";
+    prevArticle.onclick=()=>openModal((currentIndex-1+cards.length)%cards.length);
+    nextArticle.onclick=()=>openModal((currentIndex+1)%cards.length);
     window.onclick=e=>{if(e.target===modal)modal.style.display="none";}
   </script>
 </body>
