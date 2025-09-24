@@ -42,6 +42,70 @@ header{
 .brand{
   display:flex;align-items:center;gap:.75rem;font-weight:800;font-size:1.2rem;
 }
+  /* ---------- SERVIÇOS RÁPIDOS ---------- */
+.quick{
+  display:grid;
+  grid-template-columns:repeat(auto-fit, minmax(220px,1fr));
+  gap:1rem;
+}
+.q{
+  display:flex;
+  align-items:center;
+  gap:.8rem;
+  padding:1rem;
+  background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.03));
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:var(--radius-sm);
+  color:var(--ink);
+  text-decoration:none;
+  font-weight:600;
+  transition:.2s;
+}
+.q:hover{transform:translateY(-3px);box-shadow:var(--shadow)}
+.q .icon{font-size:1.4rem}
+.q .muted{font-weight:400;color:var(--muted);font-size:.9rem}
+
+/* ---------- NEWSLETTER ---------- */
+.newsbox{
+  margin-top:2rem;
+  padding:1.5rem;
+  border-radius:var(--radius);
+  background:linear-gradient(90deg, rgba(79,70,229,.2), rgba(6,182,212,.2));
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  justify-content:space-between;
+  gap:1rem;
+}
+.newsbox form{display:flex;gap:.6rem}
+.input{
+  padding:.6rem .8rem;
+  border-radius:var(--radius-sm);
+  border:1px solid rgba(255,255,255,.1);
+  background:rgba(255,255,255,.05);
+  color:var(--ink);
+  flex:1;
+}
+.btn{
+  padding:.6rem 1.2rem;
+  border-radius:var(--radius-sm);
+  border:0;
+  background:var(--brand);
+  color:#fff;
+  font-weight:600;
+  cursor:pointer;
+  transition:.3s;
+}
+.btn:hover{background:var(--brand-2)}
+
+/* ---------- CONTATO ---------- */
+.form{
+  display:grid;
+  gap:.8rem;
+  max-width:600px;
+}
+textarea.input{resize:vertical}
+
 .logo{height:36px}
 .city{color:#0b1220;font-size:1.4rem}
 .uf{color:#e63946;font-size:1.4rem;margin-left:4px}
