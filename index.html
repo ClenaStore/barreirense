@@ -6,41 +6,45 @@
   <title>Portal São Paulo</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
   <style>
-    :root{
-      --bg:#f9fafb;--ink:#1f2937;--muted:#6b7280;
-      --brand:#2563eb;--brand-2:#1e40af;--card:#fff;
+    :root {
+      --bg: #f9fafb; --ink: #1f2937; --muted: #6b7280;
+      --brand: #2563eb; --brand-2: #1e40af; --card: #fff;
     }
-    *{box-sizing:border-box;margin:0;padding:0}
+    *{margin:0;padding:0;box-sizing:border-box}
     body{font-family:"Inter",sans-serif;background:var(--bg);color:var(--ink);line-height:1.6}
 
     /* HEADER */
     header{
       background:linear-gradient(90deg,var(--brand),var(--brand-2));
-      color:white;padding:1rem 2rem;display:flex;align-items:center;justify-content:space-between;
-      flex-wrap:wrap;position:sticky;top:0;z-index:10;
+      color:white;padding:1rem 2rem;
+      display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;
+      position:sticky;top:0;z-index:1000;
     }
-    header .logo{font-weight:800;font-size:1.3rem}
+    header .logo{font-weight:800;font-size:1.4rem;display:flex;align-items:center;gap:.5rem}
     header nav{display:flex;gap:1rem;flex-wrap:wrap}
     header nav a{color:white;text-decoration:none;font-weight:600;padding:.3rem .6rem;border-radius:6px;transition:.3s}
     header nav a:hover{background:rgba(255,255,255,0.2)}
 
     /* CARROSSEL */
     .carousel{position:relative;width:100%;overflow:hidden}
-    .carousel-track{display:flex;transition:transform 0.6s ease-in-out}
-    .carousel-slide{min-width:100%;flex:1}
-    .carousel-slide img{width:100%;height:500px;object-fit:cover;display:block}
-
+    .carousel-track{display:flex;transition:transform .6s ease-in-out}
+    .carousel-slide{min-width:100%;position:relative}
+    .carousel-slide img{width:100%;height:500px;object-fit:cover;filter:brightness(0.7)}
+    .carousel-slide h2{
+      position:absolute;bottom:20px;left:20px;
+      color:white;font-size:2rem;font-weight:700;text-shadow:0 3px 6px rgba(0,0,0,.7)
+    }
     .carousel-btn{
       position:absolute;top:50%;transform:translateY(-50%);
-      background:rgba(0,0,0,0.4);color:white;border:none;
+      background:rgba(0,0,0,0.5);color:white;border:none;
       font-size:2rem;padding:.3rem .6rem;cursor:pointer;border-radius:50%;
+      z-index:10
     }
     .carousel-btn.prev{left:15px}
     .carousel-btn.next{right:15px}
-
     .carousel-indicators{
       position:absolute;bottom:15px;left:50%;transform:translateX(-50%);
-      display:flex;gap:.5rem;
+      display:flex;gap:.5rem
     }
     .carousel-indicators button{
       width:12px;height:12px;border-radius:50%;border:none;cursor:pointer;
@@ -50,20 +54,39 @@
 
     /* SEÇÕES */
     section{padding:2rem 1rem;max-width:1200px;margin:auto}
-    section h2{font-size:1.8rem;margin-bottom:1rem;color:var(--brand-2)}
+    section h2{font-size:1.8rem;margin-bottom:1rem;color:var(--brand-2);text-align:center}
 
     /* CARDS */
-    .cards-container{display:grid;gap:20px;grid-template-columns: repeat(auto-fit, minmax(280px, 1fr))}
+    .cards-container{display:grid;gap:20px;grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
     .card{
       background:var(--card);border-radius:12px;overflow:hidden;
-      display:flex;flex-direction:column;box-shadow:0 2px 6px rgba(0,0,0,0.1);transition:.3s
+      display:flex;flex-direction:column;
+      box-shadow:0 4px 12px rgba(0,0,0,0.08);cursor:pointer;transition:.3s
     }
-    .card:hover{transform:scale(1.02)}
+    .card:hover{transform:translateY(-6px);box-shadow:0 8px 20px rgba(0,0,0,0.15)}
     .card img{width:100%;height:200px;object-fit:cover}
     .card-content{padding:15px;flex:1;display:flex;flex-direction:column;justify-content:space-between}
     .card-title{font-size:1.1rem;font-weight:600;margin-bottom:.5rem;color:var(--brand)}
     .card-text{font-size:.9rem;color:var(--ink);flex:1;margin-bottom:.5rem}
     .card-footer{font-size:.8rem;color:var(--muted);text-align:right}
+
+    /* MODAL POPUP */
+    .modal{
+      position:fixed;top:0;left:0;width:100%;height:100%;
+      background:rgba(0,0,0,0.7);display:none;align-items:center;justify-content:center;
+      z-index:2000;padding:1rem
+    }
+    .modal-content{
+      background:white;border-radius:12px;max-width:800px;width:100%;max-height:90vh;overflow-y:auto;
+      padding:20px;position:relative;animation:fadeIn .3s ease
+    }
+    .modal-content img{width:100%;border-radius:8px;margin-bottom:1rem}
+    .modal h3{margin-bottom:.5rem;color:var(--brand-2)}
+    .modal p{margin-bottom:1rem}
+    .close-btn{
+      position:absolute;top:10px;right:15px;font-size:1.5rem;font-weight:bold;color:#555;cursor:pointer
+    }
+    @keyframes fadeIn{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:scale(1)}}
 
     /* FOOTER */
     footer{background:var(--ink);color:white;padding:2rem 1rem;margin-top:2rem}
@@ -77,10 +100,9 @@
     /* RESPONSIVO */
     @media(max-width:768px){
       .carousel-slide img{height:280px}
+      .carousel-slide h2{font-size:1.3rem}
       header{flex-direction:column;align-items:flex-start}
       header nav{margin-top:.5rem}
-      section h2{text-align:center}
-      .card img{height:160px}
     }
   </style>
 </head>
@@ -88,7 +110,7 @@
 
   <!-- HEADER -->
   <header>
-    <div class="logo">🌆 São Paulo</div>
+    <div class="logo">🏙️ São Paulo</div>
     <nav>
       <a href="#noticias">Notícias</a>
       <a href="#eventos">Eventos</a>
@@ -101,10 +123,10 @@
   <!-- CARROSSEL -->
   <div class="carousel" id="carousel">
     <div class="carousel-track">
-      <div class="carousel-slide"><img src="https://upload.wikimedia.org/wikipedia/commons/9/94/Ponte_estaiada_SP.jpg" alt="Ponte Estaiada"></div>
-      <div class="carousel-slide"><img src="https://vejasp.abril.com.br/wp-content/uploads/2016/11/avenida-paulista-noite.jpg" alt="Avenida Paulista à noite"></div>
-      <div class="carousel-slide"><img src="https://upload.wikimedia.org/wikipedia/commons/8/89/Parque_do_Ibirapuera_SP.jpg" alt="Parque Ibirapuera"></div>
-      <div class="carousel-slide"><img src="https://upload.wikimedia.org/wikipedia/commons/c/cf/Mercado_Municipal_SP.jpg" alt="Mercadão"></div>
+      <div class="carousel-slide"><img src="https://upload.wikimedia.org/wikipedia/commons/9/94/Ponte_estaiada_SP.jpg" alt=""><h2>Ponte Estaiada</h2></div>
+      <div class="carousel-slide"><img src="https://vejasp.abril.com.br/wp-content/uploads/2016/11/avenida-paulista-noite.jpg" alt=""><h2>Avenida Paulista</h2></div>
+      <div class="carousel-slide"><img src="https://upload.wikimedia.org/wikipedia/commons/8/89/Parque_do_Ibirapuera_SP.jpg" alt=""><h2>Parque Ibirapuera</h2></div>
+      <div class="carousel-slide"><img src="https://upload.wikimedia.org/wikipedia/commons/c/cf/Mercado_Municipal_SP.jpg" alt=""><h2>Mercado Municipal</h2></div>
     </div>
     <button class="carousel-btn prev">&#10094;</button>
     <button class="carousel-btn next">&#10095;</button>
@@ -115,155 +137,40 @@
   <section id="noticias">
     <h2>Últimas Notícias</h2>
     <div class="cards-container">
-      <div class="card">
-        <img src="https://s2.glbimg.com/ul1wGvYj2xw/image.jpg" alt="Neuralgia do Trigêmeo">
+      <div class="card" data-title="Neuralgia do Trigêmeo" data-img="https://s2.glbimg.com/ul1wGvYj2xw/image.jpg" data-text="Matéria completa sobre Neuralgia do Trigêmeo. Aqui você pode colocar todo o conteúdo da reportagem.">
+        <img src="https://s2.glbimg.com/ul1wGvYj2xw/image.jpg" alt="">
         <div class="card-content">
-          <div>
-            <div class="card-title">Neuralgia do Trigêmeo</div>
-            <div class="card-text">Tratamento minimamente invasivo e definitivo para dores faciais intensas.</div>
-          </div>
+          <div class="card-title">Neuralgia do Trigêmeo</div>
+          <div class="card-text">Tratamento minimamente invasivo para dores faciais.</div>
           <div class="card-footer">9 de junho de 2023</div>
         </div>
       </div>
-      <div class="card">
-        <img src="https://img.freepik.com/celulite.jpg" alt="Goldincision">
+
+      <div class="card" data-title="Goldincision" data-img="https://img.freepik.com/celulite.jpg" data-text="Reportagem completa sobre Goldincision e os avanços no tratamento de celulite.">
+        <img src="https://img.freepik.com/celulite.jpg" alt="">
         <div class="card-content">
-          <div>
-            <div class="card-title">Goldincision</div>
-            <div class="card-text">Técnica inovadora para tratar graus avançados de celulite.</div>
-          </div>
+          <div class="card-title">Goldincision</div>
+          <div class="card-text">Técnica inovadora contra celulite.</div>
           <div class="card-footer">30 de janeiro de 2020</div>
         </div>
       </div>
-      <div class="card">
-        <img src="https://vejasp.abril.com.br/wp-content/uploads/2019/09/coala.jpg" alt="Festival Coala">
-        <div class="card-content">
-          <div>
-            <div class="card-title">Festival Coala</div>
-            <div class="card-text">Memorial da América Latina recebe evento musical com artistas renomados.</div>
-          </div>
-          <div class="card-footer">3 de setembro de 2019</div>
-        </div>
-      </div>
     </div>
   </section>
 
-  <!-- EVENTOS -->
-  <section id="eventos">
-    <h2>Próximos Eventos</h2>
-    <div class="cards-container">
-      <div class="card">
-        <img src="https://midia.folhavp.com.br/baixa-terapia.jpg" alt="Baixa Terapia TUCA">
-        <div class="card-content">
-          <div>
-            <div class="card-title">Espetáculo Baixa Terapia</div>
-            <div class="card-text">Uma comédia no divã em cartaz no Teatro TUCA.</div>
-          </div>
-          <div class="card-footer">2 de setembro de 2019</div>
-        </div>
-      </div>
-      <div class="card">
-        <img src="https://images.unsplash.com/photo-1579546929518" alt="Clube de Fotografia">
-        <div class="card-content">
-          <div>
-            <div class="card-title">Clube de Fotografia</div>
-            <div class="card-text">Encontros de fotógrafos freelancers em São Paulo.</div>
-          </div>
-          <div class="card-footer">30 de agosto de 2019</div>
-        </div>
-      </div>
-      <div class="card">
-        <img src="https://cdn.cnn.com/cnnnext/dam/assets/pele-exposicao.jpg" alt="Exposição Rei Pelé">
-        <div class="card-content">
-          <div>
-            <div class="card-title">Exposição Rei Pelé</div>
-            <div class="card-text">Mostra em homenagem ao Rei do Futebol com acervo histórico.</div>
-          </div>
-          <div class="card-footer">16 de dezembro de 2024</div>
-        </div>
-      </div>
+  <!-- MODAL -->
+  <div class="modal" id="modal">
+    <div class="modal-content">
+      <span class="close-btn" id="closeBtn">&times;</span>
+      <img id="modalImg" src="" alt="">
+      <h3 id="modalTitle"></h3>
+      <p id="modalText"></p>
     </div>
-  </section>
-
-  <!-- SHOWS -->
-  <section id="shows">
-    <h2>Shows & Espetáculos</h2>
-    <div class="cards-container">
-      <div class="card">
-        <img src="https://s2.glbimg.com/vitor-kley.jpg" alt="Vitor Kley e Bruno Martini">
-        <div class="card-content">
-          <div>
-            <div class="card-title">Vitor Kley e Bruno Martini</div>
-            <div class="card-text">Apresentação gratuita neste domingo em São Paulo.</div>
-          </div>
-          <div class="card-footer">16 de dezembro de 2024</div>
-        </div>
-      </div>
-      <div class="card">
-        <img src="https://vejasp.abril.com.br/wp-content/uploads/natal-iluminado.jpg" alt="Natal Iluminado">
-        <div class="card-content">
-          <div>
-            <div class="card-title">Natal Iluminado</div>
-            <div class="card-text">Evento tradicional com música e luzes no centro da cidade.</div>
-          </div>
-          <div class="card-footer">Dezembro 2024</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- TURISMO -->
-  <section id="turismo">
-    <h2>Turismo em São Paulo</h2>
-    <div class="cards-container">
-      <div class="card">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/e/e0/Avenida_Paulista_SP.jpg" alt="Avenida Paulista">
-        <div class="card-content">
-          <div>
-            <div class="card-title">Avenida Paulista</div>
-            <div class="card-text">Principal cartão postal de São Paulo, com museus, shoppings e vida noturna.</div>
-          </div>
-          <div class="card-footer">Sempre aberto</div>
-        </div>
-      </div>
-      <div class="card">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/8/89/Parque_do_Ibirapuera_SP.jpg" alt="Parque Ibirapuera">
-        <div class="card-content">
-          <div>
-            <div class="card-title">Parque Ibirapuera</div>
-            <div class="card-text">Um dos maiores parques urbanos do Brasil, perfeito para lazer e cultura.</div>
-          </div>
-          <div class="card-footer">Seg a Dom</div>
-        </div>
-      </div>
-      <div class="card">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/c/cf/Mercado_Municipal_SP.jpg" alt="Mercado Municipal">
-        <div class="card-content">
-          <div>
-            <div class="card-title">Mercado Municipal</div>
-            <div class="card-text">Famoso pelos pastéis de bacalhau e sanduíches de mortadela.</div>
-          </div>
-          <div class="card-footer">Todos os dias</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- CONTATO -->
-  <section id="contato">
-    <h2>Fale Conosco</h2>
-    <form onsubmit="event.preventDefault();alert('Mensagem enviada!');" style="max-width:600px;margin:auto;display:grid;gap:1rem">
-      <input type="text" placeholder="Seu nome" required style="padding:.8rem;border:1px solid #ddd;border-radius:8px">
-      <input type="email" placeholder="Seu e-mail" required style="padding:.8rem;border:1px solid #ddd;border-radius:8px">
-      <textarea rows="5" placeholder="Sua mensagem" style="padding:.8rem;border:1px solid #ddd;border-radius:8px"></textarea>
-      <button type="submit" style="padding:.8rem;background:var(--brand);color:white;border:none;border-radius:8px;font-weight:600;cursor:pointer">Enviar</button>
-    </form>
-  </section>
+  </div>
 
   <!-- FOOTER -->
   <footer>
     <div class="footer-top">
-      <div class="logo">🌆 São Paulo</div>
+      <div class="logo">🏙️ São Paulo</div>
       <nav>
         <a href="#noticias">Notícias</a>
         <a href="#eventos">Eventos</a>
@@ -276,8 +183,9 @@
     <p style="margin-top:1rem;font-size:.85rem;color:#cbd5e1">© 2025 Portal São Paulo. Todos os direitos reservados.</p>
   </footer>
 
-  <!-- SCRIPT DO CARROSSEL -->
+  <!-- SCRIPT -->
   <script>
+    /* Carrossel */
     const track=document.querySelector('.carousel-track');
     const slides=Array.from(track.children);
     const prevBtn=document.querySelector('.carousel-btn.prev');
@@ -293,21 +201,34 @@
     });
 
     function updateIndicators(){
-      indicators.querySelectorAll('button').forEach((btn,i)=>{
-        btn.classList.toggle('active',i===current);
-      });
+      indicators.querySelectorAll('button').forEach((btn,i)=>btn.classList.toggle('active',i===current));
     }
     function goToSlide(i){
       current=(i+slides.length)%slides.length;
       track.style.transform=`translateX(-${100*current}%)`;
       updateIndicators();
     }
-
     prevBtn.addEventListener('click',()=>goToSlide(current-1));
     nextBtn.addEventListener('click',()=>goToSlide(current+1));
+    setInterval(()=>goToSlide(current+1),5000);
 
-    setInterval(()=>goToSlide(current+1),5000); // troca automática a cada 5s
+    /* Modal */
+    const modal=document.getElementById("modal");
+    const modalImg=document.getElementById("modalImg");
+    const modalTitle=document.getElementById("modalTitle");
+    const modalText=document.getElementById("modalText");
+    const closeBtn=document.getElementById("closeBtn");
+
+    document.querySelectorAll(".card").forEach(card=>{
+      card.addEventListener("click",()=>{
+        modalImg.src=card.dataset.img;
+        modalTitle.textContent=card.dataset.title;
+        modalText.textContent=card.dataset.text;
+        modal.style.display="flex";
+      });
+    });
+    closeBtn.onclick=()=>modal.style.display="none";
+    window.onclick=e=>{if(e.target===modal)modal.style.display="none";}
   </script>
-
 </body>
 </html>
