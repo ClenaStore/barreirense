@@ -62,6 +62,18 @@ nav a {
 nav a:hover {
   background:rgba(0,0,0,.05);
 }
+  /* Nome da cidade */
+.city {
+  color:#0b1220;  /* Azul escuro */
+  font-size:1.4rem;
+}
+
+.uf {
+  color:#e63946;  /* Vermelho */
+  font-size:1.4rem;
+  margin-left:4px;
+}
+
 
   .hamb{display:none;font-size:1.6rem;background:transparent;border:0;color:#fff;cursor:pointer}
   @media (max-width: 880px){
@@ -194,9 +206,9 @@ nav a:hover {
 <!-- HEADER -->
 <header>
   <div class="nav">
-    <div class="brand">
+  <div class="brand">
   <img class="logo" src="https://github.com/ClenaStore/barreirense/blob/main/paste/ChatGPT%20Image%2023%20de%20set.%20de%202025,%2023_02_48.png?raw=true" alt="Logo Barreiras">
-  Barreiras -BA
+  <span class="city">Barreiras</span> <span class="uf">-BA</span>
 </div>
     <button class="hamb" aria-label="Abrir menu" id="hamb">☰</button>
     <nav id="menu" aria-label="Navegação principal">
