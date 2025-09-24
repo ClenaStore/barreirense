@@ -399,9 +399,84 @@ footer{margin-top:2rem;border-top:1px solid rgba(255,255,255,.08);background:lin
 </footer>
 
 <script>
-const hamb=document.getElementById('hamb');
-const menu=document.getElementById('menu');
+/* ===== MENU MOBILE ===== */
+const hamb = document.getElementById('hamb');
+const menu = document.getElementById('menu');
 hamb.addEventListener('click',()=>menu.classList.toggle('open'));
+
+/* ===== CARROSSEL ===== */
+const slidesWrap = document.getElementById('slides');
+const slides = [...slidesWrap.children];
+const prev = document.getElementById('prev');
+const next = document.getElementById('next');
+const dotsWrap = document.getElementById('dots');
+let idx = 0, timer;
+
+function go(i){
+  idx = (i + slides.length) % slides.length;
+  slidesWrap.style.transform = `translateX(-${idx*100}%)`;
+  updateDots();
+}
+function updateDots(){
+  dotsWrap.querySelectorAll('button').forEach((b,n)=>b.classList.toggle('active', n===idx));
+}
+function autoplay(){ clearInterval(timer); timer = setInterval(()=>go(idx+1), 5000); }
+
+slides.forEach((_,i)=>{
+  const b=document.createElement('button');
+  if(i===0) b.classList.add('active');
+  b.addEventListener('click', ()=>{ go(i); autoplay(); });
+  dotsWrap.appendChild(b);
+});
+prev.addEventListener('click', ()=>{ go(idx-1); autoplay(); });
+next.addEventListener('click', ()=>{ go(idx+1); autoplay(); });
+autoplay();
+
+/* Swipe no celular */
+let startX = null;
+slidesWrap.addEventListener('touchstart', e=> startX = e.touches[0].clientX, {passive:true});
+slidesWrap.addEventListener('touchmove', e=>{
+  if(startX===null) return;
+  const dx = e.touches[0].clientX - startX;
+  if(Math.abs(dx) > 60){ go(idx + (dx<0?1:-1)); startX = null; autoplay(); }
+}, {passive:true});
+
+/* ===== MODAL ===== */
+const modal = document.getElementById('modal');
+const mImg  = document.getElementById('mImg');
+const mMeta = document.getElementById('mMeta');
+const mSub  = document.getElementById('mSub');
+const mBody = document.getElementById('mBody');
+const mTitle= document.getElementById('modal-title');
+const mPrev = document.getElementById('mPrev');
+const mNext = document.getElementById('mNext');
+const mClose= document.getElementById('mClose');
+
+const cards = [...document.querySelectorAll('.card')];
+let current = 0;
+
+function openModal(i){
+  current = (i+cards.length)%cards.length;
+  const el = cards[current];
+  mImg.src   = el.dataset.img;
+  mMeta.textContent = el.querySelector('.chip')?.textContent || '';
+  mTitle.textContent = el.dataset.title;
+  mSub.textContent  = el.dataset.meta;
+  mBody.textContent = el.dataset.body;
+  modal.setAttribute('aria-hidden','false');
+  document.body.style.overflow='hidden';
+}
+function closeModal(){
+  modal.setAttribute('aria-hidden','true');
+  document.body.style.overflow='';
+}
+cards.forEach((card,i)=> card.addEventListener('click', ()=> openModal(i)));
+mPrev.addEventListener('click', ()=> openModal(current-1));
+mNext.addEventListener('click', ()=> openModal(current+1));
+mClose.addEventListener('click', closeModal);
+modal.addEventListener('click', e=>{ if(e.target===modal) closeModal(); });
+document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeModal(); });
 </script>
+
 </body>
 </html>
