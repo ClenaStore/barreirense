@@ -17,12 +17,20 @@
     header{
       background:linear-gradient(90deg,var(--brand),var(--brand-2));
       color:white;padding:1rem 2rem;display:flex;align-items:center;justify-content:space-between;
-      flex-wrap:wrap;
+      flex-wrap:wrap;position:sticky;top:0;z-index:10;
     }
-    header .logo{display:flex;align-items:center;gap:.5rem;font-weight:800;font-size:1.3rem}
+    header .logo{font-weight:800;font-size:1.3rem}
     header nav{display:flex;gap:1rem;flex-wrap:wrap}
     header nav a{color:white;text-decoration:none;font-weight:600;padding:.3rem .6rem;border-radius:6px;transition:.3s}
     header nav a:hover{background:rgba(255,255,255,0.2)}
+
+    /* BANNER */
+    .banner{
+      width:100%;overflow:hidden;position:relative;
+    }
+    .banner img{width:100%;height:auto;display:block}
+    .banner-desktop{display:block}
+    .banner-mobile{display:none}
 
     /* SEÇÕES */
     section{padding:2rem 1rem;max-width:1200px;margin:auto}
@@ -55,7 +63,9 @@
     footer .social a{color:white;font-size:1.2rem;text-decoration:none}
 
     /* RESPONSIVO */
-    @media(max-width:600px){
+    @media(max-width:768px){
+      .banner-desktop{display:none}
+      .banner-mobile{display:block}
       header{flex-direction:column;align-items:flex-start}
       header nav{margin-top:.5rem}
       section h2{text-align:center}
@@ -72,9 +82,18 @@
       <a href="#noticias">Notícias</a>
       <a href="#eventos">Eventos</a>
       <a href="#shows">Shows</a>
+      <a href="#turismo">Turismo</a>
       <a href="#contato">Contato</a>
     </nav>
   </header>
+
+  <!-- BANNER -->
+  <div class="banner">
+    <!-- imagem maior para desktop/tablet -->
+    <img class="banner-desktop" src="https://upload.wikimedia.org/wikipedia/commons/9/94/Ponte_estaiada_SP.jpg" alt="São Paulo - Ponte Estaiada">
+    <!-- imagem otimizada para celular -->
+    <img class="banner-mobile" src="https://vejasp.abril.com.br/wp-content/uploads/2016/11/avenida-paulista-noite.jpg" alt="São Paulo Paulista">
+  </div>
 
   <!-- NOTÍCIAS -->
   <section id="noticias">
@@ -90,7 +109,6 @@
           <div class="card-footer">9 de junho de 2023</div>
         </div>
       </div>
-
       <div class="card">
         <img src="https://img.freepik.com/celulite.jpg" alt="Goldincision">
         <div class="card-content">
@@ -101,7 +119,6 @@
           <div class="card-footer">30 de janeiro de 2020</div>
         </div>
       </div>
-
       <div class="card">
         <img src="https://vejasp.abril.com.br/wp-content/uploads/2019/09/coala.jpg" alt="Festival Coala">
         <div class="card-content">
@@ -129,7 +146,6 @@
           <div class="card-footer">2 de setembro de 2019</div>
         </div>
       </div>
-
       <div class="card">
         <img src="https://images.unsplash.com/photo-1579546929518" alt="Clube de Fotografia">
         <div class="card-content">
@@ -140,7 +156,6 @@
           <div class="card-footer">30 de agosto de 2019</div>
         </div>
       </div>
-
       <div class="card">
         <img src="https://cdn.cnn.com/cnnnext/dam/assets/pele-exposicao.jpg" alt="Exposição Rei Pelé">
         <div class="card-content">
@@ -168,7 +183,6 @@
           <div class="card-footer">16 de dezembro de 2024</div>
         </div>
       </div>
-
       <div class="card">
         <img src="https://vejasp.abril.com.br/wp-content/uploads/natal-iluminado.jpg" alt="Natal Iluminado">
         <div class="card-content">
@@ -177,6 +191,43 @@
             <div class="card-text">Evento tradicional com música e luzes no centro da cidade.</div>
           </div>
           <div class="card-footer">Dezembro 2024</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TURISMO -->
+  <section id="turismo">
+    <h2>Turismo em São Paulo</h2>
+    <div class="cards-container">
+      <div class="card">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/e/e0/Avenida_Paulista_SP.jpg" alt="Avenida Paulista">
+        <div class="card-content">
+          <div>
+            <div class="card-title">Avenida Paulista</div>
+            <div class="card-text">Principal cartão postal de São Paulo, com museus, shoppings e vida noturna.</div>
+          </div>
+          <div class="card-footer">Sempre aberto</div>
+        </div>
+      </div>
+      <div class="card">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/8/89/Parque_do_Ibirapuera_SP.jpg" alt="Parque Ibirapuera">
+        <div class="card-content">
+          <div>
+            <div class="card-title">Parque Ibirapuera</div>
+            <div class="card-text">Um dos maiores parques urbanos do Brasil, perfeito para lazer e cultura.</div>
+          </div>
+          <div class="card-footer">Seg a Dom</div>
+        </div>
+      </div>
+      <div class="card">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/c/cf/Mercado_Municipal_SP.jpg" alt="Mercado Municipal">
+        <div class="card-content">
+          <div>
+            <div class="card-title">Mercado Municipal</div>
+            <div class="card-text">Famoso pelos pastéis de bacalhau e sanduíches de mortadela.</div>
+          </div>
+          <div class="card-footer">Todos os dias</div>
         </div>
       </div>
     </div>
@@ -201,6 +252,7 @@
         <a href="#noticias">Notícias</a>
         <a href="#eventos">Eventos</a>
         <a href="#shows">Shows</a>
+        <a href="#turismo">Turismo</a>
         <a href="#contato">Contato</a>
       </nav>
     </div>
