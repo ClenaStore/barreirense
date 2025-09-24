@@ -1,283 +1,540 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Portal São Paulo</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --bg:#f9fafb;--ink:#1f2937;--muted:#6b7280;
-      --brand:#2563eb;--brand-2:#1e40af;--card:#fff;
-    }
-    *{margin:0;padding:0;box-sizing:border-box}
-    body{font-family:"Inter",sans-serif;background:var(--bg);color:var(--ink);line-height:1.6}
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Portal São Paulo</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --container: min(1200px, calc(100% - 2rem));
+    --radius: 16px;
+    --radius-sm: 12px;
+    --shadow: 0 10px 30px rgba(2,6,23,.08);
+    --shadow-lg: 0 18px 40px rgba(2,6,23,.18);
 
-    /* HEADER */
-    header{
-      background:linear-gradient(90deg,var(--brand),var(--brand-2));
-      color:white;padding:1rem 2rem;
-      display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;
-      position:sticky;top:0;z-index:1000;
-    }
-    header .logo{font-weight:800;font-size:1.4rem;display:flex;align-items:center;gap:.5rem}
-    header nav{display:flex;gap:1rem;flex-wrap:wrap}
-    header nav a{color:white;text-decoration:none;font-weight:600;padding:.3rem .6rem;border-radius:6px;transition:.3s}
-    header nav a:hover{background:rgba(255,255,255,0.2)}
+    /* cores */
+    --bg: #0b1220;
+    --surface: #0f172a;
+    --card: #0b1220;
+    --ink: #e5e7eb;
+    --muted: #9ca3af;
+    --brand: #4f46e5;         /* indigo */
+    --brand-2: #06b6d4;       /* cyan */
+    --brand-3: #22c55e;       /* green */
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{font-family:"Inter",system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:linear-gradient(180deg,#0a0f1d 0%, #0b1220 100%);color:var(--ink);line-height:1.6}
 
-    /* CARROSSEL */
-    .carousel{position:relative;width:100%;overflow:hidden}
-    .carousel-track{display:flex;transition:transform .6s ease-in-out}
-    .carousel-slide{min-width:100%;position:relative}
-    .carousel-slide img{width:100%;height:500px;object-fit:cover;filter:brightness(0.65)}
-    .carousel-slide .caption{
-      position:absolute;bottom:40px;left:40px;max-width:70%;
-      color:white;text-shadow:0 3px 6px rgba(0,0,0,.7)
-    }
-    .carousel-slide .caption h2{font-size:2.2rem;margin-bottom:.3rem}
-    .carousel-slide .caption p{font-size:1.1rem}
-    .carousel-btn{
-      position:absolute;top:50%;transform:translateY(-50%);
-      background:rgba(0,0,0,0.5);color:white;border:none;
-      font-size:2rem;padding:.3rem .6rem;cursor:pointer;border-radius:50%;
-      z-index:10
-    }
-    .carousel-btn.prev{left:15px}
-    .carousel-btn.next{right:15px}
-    .carousel-indicators{
-      position:absolute;bottom:15px;left:50%;transform:translateX(-50%);
-      display:flex;gap:.5rem
-    }
-    .carousel-indicators button{
-      width:12px;height:12px;border-radius:50%;border:none;cursor:pointer;
-      background:rgba(255,255,255,0.6);transition:.3s
-    }
-    .carousel-indicators button.active{background:white}
+  /* ---------- HEADER ---------- */
+  header{
+    position:sticky;top:0;z-index:50;
+    backdrop-filter: saturate(140%) blur(10px);
+    background:linear-gradient(90deg, rgba(79,70,229,.85), rgba(6,182,212,.85));
+    border-bottom:1px solid rgba(255,255,255,.08);
+  }
+  .nav{
+    width:var(--container);margin:auto;
+    display:flex;align-items:center;justify-content:space-between;gap:1rem;
+    padding:.9rem 0;
+  }
+  .brand{display:flex;align-items:center;gap:.75rem;font-weight:800;font-size:1.2rem}
+  .brand .logo{
+    width:38px;height:38px;border-radius:10px;
+    background:conic-gradient(from 180deg at 50% 50%, var(--brand), var(--brand-2), var(--brand-3), var(--brand));
+    box-shadow:inset 0 0 18px rgba(255,255,255,.2);
+  }
+  nav ul{display:flex;gap:1rem;list-style:none}
+  nav a{color:#fff;text-decoration:none;font-weight:600;padding:.5rem .8rem;border-radius:10px}
+  nav a:hover{background:rgba(255,255,255,.12)}
+  .hamb{display:none;font-size:1.6rem;background:transparent;border:0;color:#fff;cursor:pointer}
+  @media (max-width: 880px){
+    .hamb{display:block}
+    nav{position:absolute;left:0;right:0;top:65px;padding:10px 1rem;display:none}
+    nav.open{display:block;}
+    nav ul{flex-direction:column;background:rgba(15,23,42,.95);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:8px}
+  }
 
-    /* SEÇÕES */
-    section{padding:3rem 1rem;max-width:1200px;margin:auto}
-    section h2{font-size:1.9rem;margin-bottom:1.5rem;color:var(--brand-2);text-align:center}
+  /* ---------- HERO / CARROSSEL ---------- */
+  .hero{position:relative;overflow:hidden}
+  .slides{display:flex;transition:transform .6s ease-in-out}
+  .slide{min-width:100%;position:relative}
+  .slide img{width:100%;height:540px;object-fit:cover;display:block;filter:brightness(.75)}
+  .slide .overlay{
+    position:absolute;inset:0;
+    background:linear-gradient(180deg, rgba(0,0,0,0) 40%, rgba(2,6,23,.75) 100%);
+  }
+  .caption{
+    position:absolute;bottom:32px;left:50%;transform:translateX(-50%);
+    width:var(--container);padding:0 1rem;
+  }
+  .caption h1{font-size:clamp(1.4rem, 4vw, 2.4rem);font-weight:800}
+  .caption p{max-width:720px;color:#d1d5db}
+  .controls{position:absolute;inset:0;display:flex;align-items:center;justify-content:space-between;padding:0 1rem}
+  .ctrl-btn{
+    background:rgba(255,255,255,.18);border:0;color:#fff;width:44px;height:44px;border-radius:999px;cursor:pointer;
+    display:grid;place-items:center;font-size:1.4rem;backdrop-filter:blur(6px);transition:.2s;
+  }
+  .ctrl-btn:hover{background:rgba(255,255,255,.28)}
+  .dots{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);display:flex;gap:.5rem}
+  .dots button{width:10px;height:10px;border-radius:999px;border:0;background:rgba(255,255,255,.4)}
+  .dots button.active{background:#fff}
+  @media (max-width:768px){
+    .slide img{height:310px}
+    .caption p{display:none}
+  }
 
-    /* CARDS */
-    .cards-container{display:grid;gap:20px;grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
-    .card{
-      background:var(--card);border-radius:12px;overflow:hidden;
-      display:flex;flex-direction:column;
-      box-shadow:0 4px 12px rgba(0,0,0,0.08);cursor:pointer;transition:.3s
-    }
-    .card:hover{transform:translateY(-6px);box-shadow:0 8px 20px rgba(0,0,0,0.15)}
-    .card img{width:100%;height:200px;object-fit:cover}
-    .card-content{padding:15px;flex:1;display:flex;flex-direction:column;justify-content:space-between}
-    .card-title{font-size:1.1rem;font-weight:600;margin-bottom:.5rem;color:var(--brand)}
-    .card-text{font-size:.9rem;color:var(--ink);flex:1;margin-bottom:.5rem}
-    .card-footer{font-size:.8rem;color:var(--muted);text-align:right}
+  /* ---------- SEÇÕES GENERICAS ---------- */
+  section{width:var(--container);margin:2.2rem auto}
+  .section-title{
+    font-size:clamp(1.2rem, 3vw, 1.8rem);margin-bottom:1rem;
+    display:flex;align-items:center;gap:.6rem;color:#e6e9f5
+  }
+  .section-title .bar{width:8px;height:22px;border-radius:6px;background:linear-gradient(180deg,var(--brand),var(--brand-2))}
+  .grid{display:grid;gap:1.1rem;grid-template-columns:repeat(auto-fit, minmax(260px, 1fr))}
+  .card{
+    background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.03));
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);
+    transition:transform .2s ease, box-shadow .2s ease;cursor:pointer;
+    display:flex;flex-direction:column;min-height:100%;
+  }
+  .card:hover{transform:translateY(-6px);box-shadow:var(--shadow-lg)}
+  .media{aspect-ratio:16/9;background:#0b1220;overflow:hidden}
+  .media img{width:100%;height:100%;object-fit:cover;display:block}
+  .body{padding:14px 14px 12px;display:flex;flex-direction:column;gap:.45rem;flex:1}
+  .chip{display:inline-flex;align-items:center;gap:.4rem;padding:.22rem .5rem;border-radius:999px;font-size:.72rem;font-weight:600;color:#c7d2fe;background:rgba(79,70,229,.18);border:1px solid rgba(79,70,229,.35)}
+  .title{font-weight:700;color:#e5e7eb}
+  .excerpt{color:#cbd5e1;font-size:.95rem;flex:1}
+  .meta{display:flex;justify-content:space-between;align-items:center;color:#9ca3af;font-size:.82rem;margin-top:.3rem}
 
-    /* MODAL POPUP */
-    .modal{
-      position:fixed;top:0;left:0;width:100%;height:100%;
-      background:rgba(0,0,0,0.7);display:none;align-items:center;justify-content:center;
-      z-index:2000;padding:1rem
-    }
-    .modal-content{
-      background:white;border-radius:12px;max-width:800px;width:100%;max-height:90vh;overflow-y:auto;
-      padding:20px;position:relative;animation:fadeIn .3s ease
-    }
-    .modal-content img{width:100%;border-radius:8px;margin-bottom:1rem}
-    .modal h3{margin-bottom:.5rem;color:var(--brand-2)}
-    .modal p{margin-bottom:1rem}
-    .close-btn, .prev-article, .next-article{
-      position:absolute;top:10px;font-size:1.4rem;font-weight:bold;color:#555;cursor:pointer;background:#eee;border-radius:6px;padding:.3rem .6rem
-    }
-    .close-btn{right:10px}
-    .prev-article{left:10px}
-    .next-article{right:50px}
-    @keyframes fadeIn{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:scale(1)}}
+  /* ---------- SERVIÇOS RÁPIDOS ---------- */
+  .quick{display:grid;gap:12px;grid-template-columns:repeat(auto-fit, minmax(190px,1fr))}
+  .quick .q{
+    background:linear-gradient(180deg, rgba(79,70,229,.15), rgba(6,182,212,.15));
+    border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:14px;display:flex;gap:.8rem;align-items:center
+  }
+  .quick .icon{width:38px;height:38px;border-radius:10px;display:grid;place-items:center;
+    background:conic-gradient(from 180deg at 50% 50%, var(--brand), var(--brand-2));color:#fff;font-weight:800}
 
-    /* FOOTER */
-    footer{background:var(--ink);color:white;padding:2rem 1rem;margin-top:2rem}
-    footer .footer-top{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:1rem}
-    footer nav{display:flex;gap:1rem;flex-wrap:wrap}
-    footer nav a{color:#cbd5e1;text-decoration:none;font-size:.9rem}
-    footer nav a:hover{color:white}
-    footer .social{display:flex;gap:.8rem;margin-top:1rem}
-    footer .social a{color:white;font-size:1.2rem;text-decoration:none}
+  /* ---------- NEWSLETTER ---------- */
+  .newsbox{
+    background:linear-gradient(135deg, rgba(79,70,229,.18), rgba(6,182,212,.18));
+    border:1px solid rgba(255,255,255,.1);border-radius:var(--radius);
+    padding:20px;display:grid;gap:10px;grid-template-columns:1.2fr .8fr;
+  }
+  .newsbox p{color:#d1d5db}
+  .newsbox form{display:flex;gap:.6rem}
+  .newsbox input{
+    flex:1;padding:.85rem .9rem;background:#0b1220;border:1px solid rgba(255,255,255,.12);
+    border-radius:12px;color:#fff
+  }
+  .btn{
+    padding:.85rem 1rem;border-radius:12px;border:0;cursor:pointer;font-weight:700;
+    color:#0b1220;background:linear-gradient(90deg,var(--brand),var(--brand-2));color:#fff
+  }
+  @media (max-width:820px){
+    .newsbox{grid-template-columns:1fr}
+    .newsbox form{flex-direction:column}
+  }
 
-    /* RESPONSIVO */
-    @media(max-width:768px){
-      .carousel-slide img{height:280px}
-      .carousel-slide .caption h2{font-size:1.4rem}
-      .carousel-slide .caption p{font-size:.9rem}
-      header{flex-direction:column;align-items:flex-start}
-      header nav{margin-top:.5rem}
-    }
-  </style>
+  /* ---------- MODAL (POPUP) ---------- */
+  .modal{position:fixed;inset:0;background:rgba(2,6,23,.7);display:none;align-items:center;justify-content:center;z-index:60;padding:1rem}
+  .modal[aria-hidden="false"]{display:flex}
+  .modal__panel{
+    width:min(900px, 100%);max-height:90vh;overflow:auto;background:#0f172a;color:#e5e7eb;
+    border-radius:var(--radius);border:1px solid rgba(255,255,255,.09);box-shadow:var(--shadow-lg);position:relative
+  }
+  .modal__media img{width:100%;aspect-ratio:16/9;object-fit:cover;border-top-left-radius:var(--radius);border-top-right-radius:var(--radius)}
+  .modal__content{padding:18px}
+  .modal__title{font-size:clamp(1.2rem, 3vw, 1.6rem);font-weight:800;margin-bottom:8px}
+  .modal__meta{color:#9aa4b2;font-size:.9rem;margin-bottom:10px}
+  .modal__body{color:#d7dce5}
+  .modal__close, .modal__prev, .modal__next{
+    position:absolute;top:10px;background:rgba(255,255,255,.14);border:0;color:#fff;cursor:pointer;
+    width:38px;height:38px;border-radius:10px;display:grid;place-items:center
+  }
+  .modal__close{right:10px}
+  .modal__prev{left:10px}
+  .modal__next{right:56px}
+
+  /* ---------- FORM CONTATO ---------- */
+  .form{display:grid;gap:10px;grid-template-columns:1fr 1fr}
+  .form textarea{grid-column:1/-1}
+  .input{
+    padding:.85rem .9rem;background:#0b1220;border:1px solid rgba(255,255,255,.12);
+    border-radius:12px;color:#fff
+  }
+
+  footer{
+    margin-top:2rem;border-top:1px solid rgba(255,255,255,.08);
+    background:linear-gradient(90deg, rgba(79,70,229,.2), rgba(6,182,212,.2));
+  }
+  .foot{width:var(--container);margin:auto;padding:18px 0;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:1rem;color:#cbd5e1}
+</style>
 </head>
 <body>
 
-  <!-- HEADER -->
-  <header>
-    <div class="logo">🏙️ São Paulo</div>
-    <nav>
-      <a href="#noticias">Notícias</a>
-      <a href="#eventos">Eventos</a>
-      <a href="#shows">Shows</a>
-      <a href="#turismo">Turismo</a>
-      <a href="#contato">Contato</a>
+<!-- HEADER -->
+<header>
+  <div class="nav">
+    <div class="brand"><span class="logo"></span> São Paulo</div>
+    <button class="hamb" aria-label="Abrir menu" id="hamb">☰</button>
+    <nav id="menu" aria-label="Navegação principal">
+      <ul>
+        <li><a href="#destaques">Destaques</a></li>
+        <li><a href="#noticias">Notícias</a></li>
+        <li><a href="#eventos">Eventos</a></li>
+        <li><a href="#shows">Shows</a></li>
+        <li><a href="#turismo">Turismo</a></li>
+        <li><a href="#contato">Contato</a></li>
+      </ul>
     </nav>
-  </header>
+  </div>
+</header>
 
-  <!-- CARROSSEL -->
-  <div class="carousel" id="carousel">
-    <div class="carousel-track">
-      <div class="carousel-slide"><img src="https://upload.wikimedia.org/wikipedia/commons/9/94/Ponte_estaiada_SP.jpg" alt=""><div class="caption"><h2>Ponte Estaiada</h2><p>Um dos cartões postais de São Paulo</p></div></div>
-      <div class="carousel-slide"><img src="https://vejasp.abril.com.br/wp-content/uploads/2016/11/avenida-paulista-noite.jpg" alt=""><div class="caption"><h2>Avenida Paulista</h2><p>O coração econômico e cultural da cidade</p></div></div>
-      <div class="carousel-slide"><img src="https://upload.wikimedia.org/wikipedia/commons/8/89/Parque_do_Ibirapuera_SP.jpg" alt=""><div class="caption"><h2>Parque Ibirapuera</h2><p>O pulmão verde de São Paulo</p></div></div>
-    </div>
-    <button class="carousel-btn prev">&#10094;</button>
-    <button class="carousel-btn next">&#10095;</button>
-    <div class="carousel-indicators"></div>
+<!-- HERO / CARROSSEL -->
+<section class="hero" aria-label="Destaques do portal">
+  <div class="slides" id="slides">
+    <article class="slide">
+      <img loading="lazy" src="https://upload.wikimedia.org/wikipedia/commons/9/94/Ponte_estaiada_SP.jpg" alt="Ponte Estaiada">
+      <div class="overlay"></div>
+      <div class="caption">
+        <h1>Ponte Estaiada</h1>
+        <p>Um dos grandes cartões-postais de São Paulo, conectando tecnologia e arquitetura.</p>
+      </div>
+    </article>
+    <article class="slide">
+      <img loading="lazy" src="https://upload.wikimedia.org/wikipedia/commons/e/e0/Avenida_Paulista_SP.jpg" alt="Avenida Paulista">
+      <div class="overlay"></div>
+      <div class="caption">
+        <h1>Avenida Paulista</h1>
+        <p>Centro cultural e econômico com museus, centros culturais e vida noturna intensa.</p>
+      </div>
+    </article>
+    <article class="slide">
+      <img loading="lazy" src="https://upload.wikimedia.org/wikipedia/commons/8/89/Parque_do_Ibirapuera_SP.jpg" alt="Parque do Ibirapuera">
+      <div class="overlay"></div>
+      <div class="caption">
+        <h1>Parque Ibirapuera</h1>
+        <p>O pulmão verde da cidade — arte, design e natureza no mesmo lugar.</p>
+      </div>
+    </article>
   </div>
 
-  <!-- NOTÍCIAS -->
-  <section id="noticias">
-    <h2>Últimas Notícias</h2>
-    <div class="cards-container">
-      <div class="card" data-title="Neuralgia do Trigêmeo" data-img="https://s2.glbimg.com/ul1wGvYj2xw/image.jpg" data-text="Matéria completa sobre Neuralgia do Trigêmeo. Aqui você pode colocar todo o conteúdo da reportagem.">
-        <img src="https://s2.glbimg.com/ul1wGvYj2xw/image.jpg" alt="">
-        <div class="card-content"><div class="card-title">Neuralgia do Trigêmeo</div><div class="card-text">Tratamento minimamente invasivo.</div><div class="card-footer">9 de junho de 2023</div></div>
-      </div>
-      <div class="card" data-title="Goldincision" data-img="https://img.freepik.com/celulite.jpg" data-text="Reportagem completa sobre Goldincision e os avanços no tratamento de celulite.">
-        <img src="https://img.freepik.com/celulite.jpg" alt="">
-        <div class="card-content"><div class="card-title">Goldincision</div><div class="card-text">Técnica inovadora contra celulite.</div><div class="card-footer">30 de janeiro de 2020</div></div>
-      </div>
-    </div>
-  </section>
+  <div class="controls">
+    <button class="ctrl-btn" id="prev" aria-label="Slide anterior">❮</button>
+    <button class="ctrl-btn" id="next" aria-label="Próximo slide">❯</button>
+  </div>
+  <div class="dots" id="dots" aria-hidden="true"></div>
+</section>
 
-  <!-- EVENTOS -->
-  <section id="eventos">
-    <h2>Próximos Eventos</h2>
-    <div class="cards-container">
-      <div class="card" data-title="Espetáculo Baixa Terapia" data-img="https://midia.folhavp.com.br/baixa-terapia.jpg" data-text="Espetáculo de comédia em cartaz no Teatro TUCA.">
-        <img src="https://midia.folhavp.com.br/baixa-terapia.jpg" alt="">
-        <div class="card-content"><div class="card-title">Baixa Terapia</div><div class="card-text">Uma comédia no divã.</div><div class="card-footer">2 de setembro de 2019</div></div>
+<!-- DESTAQUES (exemplo de cards) -->
+<section id="destaques">
+  <h2 class="section-title"><span class="bar"></span> Destaques</h2>
+  <div class="grid">
+    <!-- Cada card tem dados completos para o modal -->
+    <article class="card"
+      data-title="Neuralgia do Trigêmeo: tratamento minimamente invasivo"
+      data-img="https://s2.glbimg.com/ul1wGvYj2xw/image.jpg"
+      data-meta="Bem-estar • 9 jun 2023"
+      data-body="A neuralgia do trigêmeo é uma neuropatia que causa dores faciais intensas. O tratamento minimamente invasivo permite alívio rápido com recuperação reduzida. Nesta matéria, explicamos causas, sintomas e opções terapêuticas, além de depoimentos de pacientes e orientação médica.">
+      <div class="media"><img loading="lazy" src="https://s2.glbimg.com/ul1wGvYj2xw/image.jpg" alt=""></div>
+      <div class="body">
+        <span class="chip">Bem-estar</span>
+        <h3 class="title">Neuralgia do Trigêmeo</h3>
+        <p class="excerpt">Técnicas modernas oferecem resultados mais previsíveis e menos invasivos.</p>
+        <div class="meta"><span>9 jun 2023</span><span>Leia mais ▸</span></div>
       </div>
-      <div class="card" data-title="Exposição Rei Pelé" data-img="https://cdn.cnn.com/cnnnext/dam/assets/pele-exposicao.jpg" data-text="Mostra em homenagem ao Rei do Futebol com acervo histórico.">
-        <img src="https://cdn.cnn.com/cnnnext/dam/assets/pele-exposicao.jpg" alt="">
-        <div class="card-content"><div class="card-title">Exposição Rei Pelé</div><div class="card-text">Exposição cultural.</div><div class="card-footer">16 de dezembro de 2024</div></div>
-      </div>
-    </div>
-  </section>
+    </article>
 
-  <!-- SHOWS -->
-  <section id="shows">
-    <h2>Shows & Espetáculos</h2>
-    <div class="cards-container">
-      <div class="card" data-title="Vitor Kley e Bruno Martini" data-img="https://s2.glbimg.com/vitor-kley.jpg" data-text="Apresentação gratuita neste domingo em São Paulo.">
-        <img src="https://s2.glbimg.com/vitor-kley.jpg" alt="">
-        <div class="card-content"><div class="card-title">Vitor Kley</div><div class="card-text">Show gratuito em SP.</div><div class="card-footer">16 de dezembro de 2024</div></div>
+    <article class="card"
+      data-title="Goldincision: conheça a técnica avançada para celulite"
+      data-img="https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?q=80&w=1400&auto=format&fit=crop"
+      data-meta="Notícias • 30 jan 2020"
+      data-body="A técnica Goldincision combina instrumentação precisa e protocolos de segurança para tratar graus avançados de celulite. Veja indicações, contraindicações e resultados clínicos observados.">
+      <div class="media"><img loading="lazy" src="https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?q=80&w=1400&auto=format&fit=crop" alt=""></div>
+      <div class="body">
+        <span class="chip">Notícias</span>
+        <h3 class="title">Goldincision</h3>
+        <p class="excerpt">Técnica inovadora com foco em textura e irregularidades.</p>
+        <div class="meta"><span>30 jan 2020</span><span>Leia mais ▸</span></div>
       </div>
-    </div>
-  </section>
+    </article>
 
-  <!-- TURISMO -->
-  <section id="turismo">
-    <h2>Turismo em São Paulo</h2>
-    <div class="cards-container">
-      <div class="card" data-title="Avenida Paulista" data-img="https://upload.wikimedia.org/wikipedia/commons/e/e0/Avenida_Paulista_SP.jpg" data-text="Principal cartão postal de São Paulo, com museus, shoppings e vida noturna.">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/e/e0/Avenida_Paulista_SP.jpg" alt="">
-        <div class="card-content"><div class="card-title">Avenida Paulista</div><div class="card-text">Cartão postal de SP.</div><div class="card-footer">Sempre aberto</div></div>
+    <article class="card"
+      data-title="Memorial da América Latina recebe o Coala Festival"
+      data-img="https://vejasp.abril.com.br/wp-content/uploads/2019/09/coala.jpg"
+      data-meta="Entretenimento • 3 set 2019"
+      data-body="O Coala Festival reúne nomes consagrados e novas vozes da música brasileira. A edição no Memorial da América Latina oferece line-up diverso, feira gastronômica e experiências imersivas.">
+      <div class="media"><img loading="lazy" src="https://vejasp.abril.com.br/wp-content/uploads/2019/09/coala.jpg" alt=""></div>
+      <div class="body">
+        <span class="chip">Entretenimento</span>
+        <h3 class="title">Coala Festival</h3>
+        <p class="excerpt">Música brasileira em um dos espaços culturais mais icônicos.</p>
+        <div class="meta"><span>3 set 2019</span><span>Leia mais ▸</span></div>
       </div>
-      <div class="card" data-title="Mercado Municipal" data-img="https://upload.wikimedia.org/wikipedia/commons/c/cf/Mercado_Municipal_SP.jpg" data-text="Famoso pelos pastéis de bacalhau e sanduíches de mortadela.">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/c/cf/Mercado_Municipal_SP.jpg" alt="">
-        <div class="card-content"><div class="card-title">Mercado Municipal</div><div class="card-text">Gastronomia e cultura.</div><div class="card-footer">Todos os dias</div></div>
-      </div>
-    </div>
-  </section>
+    </article>
+  </div>
+</section>
 
-  <!-- CONTATO -->
-  <section id="contato">
-    <h2>Fale Conosco</h2>
-    <form onsubmit="event.preventDefault();alert('Mensagem enviada!');" style="max-width:600px;margin:auto;display:grid;gap:1rem">
-      <input type="text" placeholder="Seu nome" required style="padding:.8rem;border:1px solid #ddd;border-radius:8px">
-      <input type="email" placeholder="Seu e-mail" required style="padding:.8rem;border:1px solid #ddd;border-radius:8px">
-      <textarea rows="5" placeholder="Sua mensagem" style="padding:.8rem;border:1px solid #ddd;border-radius:8px"></textarea>
-      <button type="submit" style="padding:.8rem;background:var(--brand);color:white;border:none;border-radius:8px;font-weight:600;cursor:pointer">Enviar</button>
+<!-- NOTÍCIAS -->
+<section id="noticias">
+  <h2 class="section-title"><span class="bar"></span> Últimas Notícias</h2>
+  <div class="grid">
+
+    <article class="card"
+      data-title="Espetáculo Baixa Terapia – Comédia no Divã"
+      data-img="https://midia.folhavp.com.br/baixa-terapia.jpg"
+      data-meta="Teatro • 2 set 2019"
+      data-body="A montagem reúne elenco consagrado em uma comédia afiada sobre relacionamentos. Em cartaz no TUCA, com sessões de quinta a domingo. Confira horários, valores e sinopse completa.">
+      <div class="media"><img loading="lazy" src="https://midia.folhavp.com.br/baixa-terapia.jpg" alt=""></div>
+      <div class="body">
+        <span class="chip">Teatro</span>
+        <h3 class="title">Baixa Terapia</h3>
+        <p class="excerpt">Comédia inteligente e ótimas atuações no TUCA.</p>
+        <div class="meta"><span>2 set 2019</span><span>Leia mais ▸</span></div>
+      </div>
+    </article>
+
+    <article class="card"
+      data-title="Exposição em homenagem a Rei Pelé"
+      data-img="https://cdn.cnn.com/cnnnext/dam/assets/pele-exposicao.jpg"
+      data-meta="Cultura • 16 dez 2024"
+      data-body="A mostra revisita momentos históricos do maior jogador de futebol de todos os tempos, com vídeos, troféus e ambientações imersivas. Informações sobre ingressos, acessibilidade e horários.">
+      <div class="media"><img loading="lazy" src="https://cdn.cnn.com/cnnnext/dam/assets/pele-exposicao.jpg" alt=""></div>
+      <div class="body">
+        <span class="chip">Cultura</span>
+        <h3 class="title">Exposição Rei Pelé</h3>
+        <p class="excerpt">Acervo raro e experiências multimídia para toda a família.</p>
+        <div class="meta"><span>16 dez 2024</span><span>Leia mais ▸</span></div>
+      </div>
+    </article>
+
+    <article class="card"
+      data-title="Restaurantes para o Natal em São Paulo"
+      data-img="https://images.unsplash.com/photo-1559333086-61b95495f2b8?q=80&w=1400&auto=format&fit=crop"
+      data-meta="Gastronomia • 16 dez 2024"
+      data-body="Selecionamos casas com menus especiais para a ceia e o almoço de Natal. Opções tradicionais, vegetarianas e experiências autorais — com telefone e links para reserva.">
+      <div class="media"><img loading="lazy" src="https://images.unsplash.com/photo-1559333086-61b95495f2b8?q=80&w=1400&auto=format&fit=crop" alt=""></div>
+      <div class="body">
+        <span class="chip">Gastronomia</span>
+        <h3 class="title">Natal: onde comer</h3>
+        <p class="excerpt">Endereços certeiros para celebrar com sabor.</p>
+        <div class="meta"><span>16 dez 2024</span><span>Leia mais ▸</span></div>
+      </div>
+    </article>
+
+  </div>
+</section>
+
+<!-- SHOWS -->
+<section id="shows">
+  <h2 class="section-title"><span class="bar"></span> Shows & Espetáculos</h2>
+  <div class="grid">
+    <article class="card"
+      data-title="Vitor Kley & Bruno Martini – apresentação gratuita"
+      data-img="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?q=80&w=1400&auto=format&fit=crop"
+      data-meta="Música • 16 dez 2024"
+      data-body="Show gratuito com convidados especiais e repertório de hits. Local, retirada de ingressos e dicas de transporte.">
+      <div class="media"><img loading="lazy" src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?q=80&w=1400&auto=format&fit=crop" alt=""></div>
+      <div class="body">
+        <span class="chip">Música</span>
+        <h3 class="title">Vitor Kley e Bruno Martini</h3>
+        <p class="excerpt">Música boa ao ar livre para fechar o domingo.</p>
+        <div class="meta"><span>16 dez 2024</span><span>Leia mais ▸</span></div>
+      </div>
+    </article>
+
+    <article class="card"
+      data-title="Natal Iluminado: programação especial"
+      data-img="https://images.unsplash.com/photo-1482517967863-00e15c9b44be?q=80&w=1400&auto=format&fit=crop"
+      data-meta="Cidade • Dez 2024"
+      data-body="Projeções, corais e parada de Natal tomam conta do centro histórico. Agenda completa e mapa com os pontos iluminados.">
+      <div class="media"><img loading="lazy" src="https://images.unsplash.com/photo-1482517967863-00e15c9b44be?q=80&w=1400&auto=format&fit=crop" alt=""></div>
+      <div class="body">
+        <span class="chip">Cidade</span>
+        <h3 class="title">Natal Iluminado</h3>
+        <p class="excerpt">Tradição que transforma a cidade em cenário mágico.</p>
+        <div class="meta"><span>dez 2024</span><span>Leia mais ▸</span></div>
+      </div>
+    </article>
+  </div>
+</section>
+
+<!-- TURISMO -->
+<section id="turismo">
+  <h2 class="section-title"><span class="bar"></span> Turismo em São Paulo</h2>
+  <div class="grid">
+    <article class="card"
+      data-title="Avenida Paulista: cultura e arquitetura"
+      data-img="https://upload.wikimedia.org/wikipedia/commons/e/e0/Avenida_Paulista_SP.jpg"
+      data-meta="Turismo • Sempre aberto"
+      data-body="Museus, centros culturais, ciclovia e feiras aos domingos. Um roteiro com paradas para café, arte e compras.">
+      <div class="media"><img loading="lazy" src="https://upload.wikimedia.org/wikipedia/commons/e/e0/Avenida_Paulista_SP.jpg" alt=""></div>
+      <div class="body">
+        <span class="chip">Turismo</span>
+        <h3 class="title">Avenida Paulista</h3>
+        <p class="excerpt">O clássico que nunca falha — do MASP ao Mirante.</p>
+        <div class="meta"><span>Sempre aberto</span><span>Leia mais ▸</span></div>
+      </div>
+    </article>
+
+    <article class="card"
+      data-title="Mercado Municipal: sabores de SP"
+      data-img="https://upload.wikimedia.org/wikipedia/commons/c/cf/Mercado_Municipal_SP.jpg"
+      data-meta="Gastronomia • Diariamente"
+      data-body="Experimente o sanduíche de mortadela, os pastéis gigantes e explore os vitrais históricos.">
+      <div class="media"><img loading="lazy" src="https://upload.wikimedia.org/wikipedia/commons/c/cf/Mercado_Municipal_SP.jpg" alt=""></div>
+      <div class="body">
+        <span class="chip">Gastronomia</span>
+        <h3 class="title">Mercadão</h3>
+        <p class="excerpt">Cores, aromas e receitas que contam a história da cidade.</p>
+        <div class="meta"><span>Diariamente</span><span>Leia mais ▸</span></div>
+      </div>
+    </article>
+  </div>
+</section>
+
+<!-- SERVIÇOS RÁPIDOS -->
+<section>
+  <h2 class="section-title"><span class="bar"></span> Serviços rápidos</h2>
+  <div class="quick">
+    <a class="q" href="#"><span class="icon">🧭</span><div><strong>Turismo</strong><div class="muted">Roteiros e mapas</div></div></a>
+    <a class="q" href="#"><span class="icon">🚌</span><div><strong>Trânsito</strong><div class="muted">Ônibus e metrô</div></div></a>
+    <a class="q" href="#"><span class="icon">🏥</span><div><strong>Saúde</strong><div class="muted">Postos & hospitais</div></div></a>
+    <a class="q" href="#"><span class="icon">🎫</span><div><strong>Ingressos</strong><div class="muted">Eventos e museus</div></div></a>
+  </div>
+</section>
+
+<!-- NEWSLETTER -->
+<section>
+  <div class="newsbox">
+    <div>
+      <h3 style="font-size:1.3rem;font-weight:800;margin-bottom:.4rem">Receba novidades da cidade</h3>
+      <p>Eventos, shows e notícias selecionadas, direto no seu e-mail.</p>
+    </div>
+    <form onsubmit="event.preventDefault(); alert('Inscrição realizada! 🙌')">
+      <input class="input" type="email" placeholder="Seu e-mail" required>
+      <button class="btn" type="submit">Assinar</button>
     </form>
-  </section>
+  </div>
+</section>
 
-  <!-- MODAL -->
-  <div class="modal" id="modal">
-    <div class="modal-content">
-      <span class="close-btn" id="closeBtn">&times;</span>
-      <span class="prev-article" id="prevArticle">&#10094;</span>
-      <span class="next-article" id="nextArticle">&#10095;</span>
-      <img id="modalImg" src="" alt="">
-      <h3 id="modalTitle"></h3>
-      <p id="modalText"></p>
+<!-- CONTATO -->
+<section id="contato">
+  <h2 class="section-title"><span class="bar"></span> Fale Conosco</h2>
+  <form class="form" onsubmit="event.preventDefault(); alert('Mensagem enviada! 💌')">
+    <input class="input" type="text" placeholder="Seu nome" required>
+    <input class="input" type="email" placeholder="Seu e-mail" required>
+    <textarea class="input" rows="5" placeholder="Mensagem"></textarea>
+    <button class="btn" type="submit">Enviar</button>
+  </form>
+</section>
+
+<!-- MODAL -->
+<div class="modal" id="modal" aria-hidden="true" aria-labelledby="modal-title" role="dialog">
+  <div class="modal__panel">
+    <button class="modal__prev" id="mPrev" aria-label="Matéria anterior">❮</button>
+    <button class="modal__next" id="mNext" aria-label="Próxima matéria">❯</button>
+    <button class="modal__close" id="mClose" aria-label="Fechar">✕</button>
+    <div class="modal__media"><img id="mImg" src="" alt=""></div>
+    <div class="modal__content">
+      <div class="chip" id="mMeta">Cidade</div>
+      <h3 class="modal__title" id="modal-title">Título</h3>
+      <div class="modal__meta" id="mSub">sub</div>
+      <div class="modal__body" id="mBody">texto</div>
     </div>
   </div>
+</div>
 
-  <!-- FOOTER -->
-  <footer>
-    <div class="footer-top">
-      <div class="logo">🏙️ São Paulo</div>
-      <nav>
-        <a href="#noticias">Notícias</a>
-        <a href="#eventos">Eventos</a>
-        <a href="#shows">Shows</a>
-        <a href="#turismo">Turismo</a>
-        <a href="#contato">Contato</a>
-      </nav>
-    </div>
-    <div class="social"><a href="#">📸</a><a href="#">🐦</a><a href="#">💼</a></div>
-    <p style="margin-top:1rem;font-size:.85rem;color:#cbd5e1">© 2025 Portal São Paulo. Todos os direitos reservados.</p>
-  </footer>
+<!-- FOOTER -->
+<footer>
+  <div class="foot">
+    <div class="brand"><span class="logo"></span> São Paulo</div>
+    <div>© 2025 Portal São Paulo — todos os direitos reservados.</div>
+  </div>
+</footer>
 
-  <!-- SCRIPT -->
-  <script>
-    /* Carrossel */
-    const track=document.querySelector('.carousel-track');
-    const slides=Array.from(track.children);
-    const prevBtn=document.querySelector('.carousel-btn.prev');
-    const nextBtn=document.querySelector('.carousel-btn.next');
-    const indicators=document.querySelector('.carousel-indicators');
-    let current=0;
-    slides.forEach((_,i)=>{
-      const btn=document.createElement('button');
-      if(i===0)btn.classList.add('active');
-      btn.addEventListener('click',()=>goToSlide(i));
-      indicators.appendChild(btn);
-    });
-    function updateIndicators(){indicators.querySelectorAll('button').forEach((btn,i)=>btn.classList.toggle('active',i===current));}
-    function goToSlide(i){current=(i+slides.length)%slides.length;track.style.transform=`translateX(-${100*current}%)`;updateIndicators();}
-    prevBtn.addEventListener('click',()=>goToSlide(current-1));
-    nextBtn.addEventListener('click',()=>goToSlide(current+1));
-    setInterval(()=>goToSlide(current+1),5000);
+<script>
+/* ===== NAV MOBILE ===== */
+const hamb = document.getElementById('hamb');
+const menu = document.getElementById('menu');
+hamb.addEventListener('click', ()=> menu.classList.toggle('open'));
 
-    /* Modal */
-    const modal=document.getElementById("modal");
-    const modalImg=document.getElementById("modalImg");
-    const modalTitle=document.getElementById("modalTitle");
-    const modalText=document.getElementById("modalText");
-    const closeBtn=document.getElementById("closeBtn");
-    const prevArticle=document.getElementById("prevArticle");
-    const nextArticle=document.getElementById("nextArticle");
-    const cards=document.querySelectorAll(".card");
-    let currentIndex=0;
+/* ===== CARROSSEL ===== */
+const slidesWrap = document.getElementById('slides');
+const slides = [...slidesWrap.children];
+const prev = document.getElementById('prev');
+const next = document.getElementById('next');
+const dotsWrap = document.getElementById('dots');
+let idx = 0, timer;
 
-    function openModal(index){
-      const card=cards[index];
-      modalImg.src=card.dataset.img;
-      modalTitle.textContent=card.dataset.title;
-      modalText.textContent=card.dataset.text;
-      modal.style.display="flex";
-      currentIndex=index;
-    }
-    cards.forEach((card,i)=>card.addEventListener("click",()=>openModal(i)));
-    closeBtn.onclick=()=>modal.style.display="none";
-    prevArticle.onclick=()=>openModal((currentIndex-1+cards.length)%cards.length);
-    nextArticle.onclick=()=>openModal((currentIndex+1)%cards.length);
-    window.onclick=e=>{if(e.target===modal)modal.style.display="none";}
-  </script>
+function go(i){
+  idx = (i + slides.length) % slides.length;
+  slidesWrap.style.transform = `translateX(-${idx*100}%)`;
+  updateDots();
+}
+function updateDots(){
+  dotsWrap.querySelectorAll('button').forEach((b,n)=>b.classList.toggle('active', n===idx));
+}
+function autoplay(){ clearInterval(timer); timer = setInterval(()=>go(idx+1), 5000); }
+
+slides.forEach((_,i)=>{
+  const b=document.createElement('button');
+  if(i===0) b.classList.add('active');
+  b.addEventListener('click', ()=>{ go(i); autoplay(); });
+  dotsWrap.appendChild(b);
+});
+prev.addEventListener('click', ()=>{ go(idx-1); autoplay(); });
+next.addEventListener('click', ()=>{ go(idx+1); autoplay(); });
+autoplay();
+
+/* Swipe (mobile) */
+let startX = null;
+slidesWrap.addEventListener('touchstart', (e)=> startX = e.touches[0].clientX, {passive:true});
+slidesWrap.addEventListener('touchmove', (e)=>{
+  if(startX===null) return;
+  const dx = e.touches[0].clientX - startX;
+  if(Math.abs(dx) > 60){ go(idx + (dx<0?1:-1)); startX = null; autoplay(); }
+}, {passive:true});
+
+/* ===== MODAL / POPUP ===== */
+const modal = document.getElementById('modal');
+const mImg  = document.getElementById('mImg');
+const mMeta = document.getElementById('mMeta');
+const mSub  = document.getElementById('mSub');
+const mBody = document.getElementById('mBody');
+const mPrev = document.getElementById('mPrev');
+const mNext = document.getElementById('mNext');
+const mClose= document.getElementById('mClose');
+
+const cards = [...document.querySelectorAll('.card')];
+let current = 0;
+
+function openModal(i){
+  current = (i+cards.length)%cards.length;
+  const el = cards[current];
+  mImg.src   = el.dataset.img;
+  mMeta.textContent = (el.querySelector('.chip')?.textContent || 'Cidade');
+  document.getElementById('modal-title').textContent = el.dataset.title;
+  mSub.textContent  = el.dataset.meta || '';
+  mBody.textContent = el.dataset.body || '';
+  modal.setAttribute('aria-hidden','false');
+  document.body.style.overflow='hidden';
+}
+function closeModal(){
+  modal.setAttribute('aria-hidden','true');
+  document.body.style.overflow='';
+}
+cards.forEach((card,i)=> card.addEventListener('click', ()=> openModal(i)));
+mPrev.addEventListener('click', ()=> openModal(current-1));
+mNext.addEventListener('click', ()=> openModal(current+1));
+mClose.addEventListener('click', closeModal);
+modal.addEventListener('click', e=>{ if(e.target===modal) closeModal(); });
+document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeModal(); });
+
+</script>
 </body>
 </html>
