@@ -8,7 +8,7 @@
   <meta name="theme-color" content="#000000" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="mobile-web-app-capable" content="yes" />
-  <meta name="description" content="Bazar de usados — stories, produtos, favoritos e contato por WhatsApp." />
+  <meta name="description" content="Bazar de usados — stories, produtos, favoritos e WhatsApp." />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
 
@@ -27,7 +27,6 @@
     body{font-family:Inter,system-ui,Arial;background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased;overscroll-behavior:none}
     ::-webkit-scrollbar{width:0;height:0} *{scrollbar-width:none}
 
-    /* Header + busca e coração */
     header{
       position:sticky; top:0; z-index:20;
       background:linear-gradient(180deg,var(--bg),rgba(0,0,0,0)),var(--surface);
@@ -42,32 +41,22 @@
     .container{max-width:1200px;margin:0 auto;padding:14px}
 
     .top-tools{display:flex; align-items:center; gap:8px; justify-content:flex-end}
-    .search-wrap{
-      display:flex; align-items:center; gap:6px; padding:8px 10px; border:1px solid var(--line);
-      background:var(--surface); border-radius:12px; min-width:180px; max-width:420px; flex:1;
-    }
+    .search-wrap{display:flex; align-items:center; gap:6px; padding:8px 10px; border:1px solid var(--line);
+      background:var(--surface); border-radius:12px; min-width:180px; max-width:420px; flex:1}
     .search{flex:1; background:transparent; border:0; outline:0; color:var(--ink); font-size:14px}
-    .heart-btn{
-      position:relative; width:40px; height:40px; border-radius:12px; border:1px solid var(--line);
-      display:grid; place-items:center; background:var(--surface); cursor:pointer;
-    }
+    .heart-btn{position:relative; width:40px; height:40px; border-radius:12px; border:1px solid var(--line);
+      display:grid; place-items:center; background:var(--surface); cursor:pointer}
     .heart-btn.active{ outline:2px solid rgba(239,68,68,.35) }
-    .badge{
-      position:absolute; top:-6px; right:-6px; background:var(--heart); color:#fff; font-weight:800;
+    .badge{position:absolute; top:-6px; right:-6px; background:var(--heart); color:#fff; font-weight:800;
       width:18px; height:18px; border-radius:999px; font-size:11px; display:grid; place-items:center;
-      box-shadow:0 4px 10px rgba(239,68,68,.4);
-    }
+      box-shadow:0 4px 10px rgba(239,68,68,.4)}
 
     /* Stories strip */
-    .stories-strip{display:flex; gap:10px; overflow-x:auto; padding:8px 2px 2px; -webkit-overflow-scrolling:touch; scroll-snap-type:x mandatory;}
-    .story-pill{ flex:0 0 auto; width:76px; scroll-snap-align:start; text-align:center; cursor:pointer; }
-    .story-ring{
-      width:76px;height:76px;border-radius:50%;
-      padding:3px; background:
-        radial-gradient(closest-side, #0000 70%, #0000 0) padding-box,
-        conic-gradient(from 0deg, var(--brand-2), var(--brand)) border-box;
-      display:grid; place-items:center;
-    }
+    .stories-strip{display:flex; gap:10px; overflow-x:auto; padding:8px 2px 2px; -webkit-overflow-scrolling:touch; scroll-snap-type:x mandatory}
+    .story-pill{flex:0 0 auto; width:76px; scroll-snap-align:start; text-align:center; cursor:pointer}
+    .story-ring{width:76px;height:76px;border-radius:50%; padding:3px; background:
+      radial-gradient(closest-side, #0000 70%, #0000 0) padding-box,
+      conic-gradient(from 0deg, var(--brand-2), var(--brand)) border-box; display:grid; place-items:center}
     .story-thumb{ width:68px;height:68px;border-radius:50%; object-fit:cover; border:2px solid var(--bg) }
     .story-title{font-size:12px;margin-top:6px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
@@ -76,11 +65,9 @@
     @media (min-width:768px){ .grid{ grid-template-columns:repeat(4, 1fr) } }
     @media (min-width:1200px){ .grid{ grid-template-columns:repeat(6, 1fr) } }
 
-    .card{
-      position:relative; display:flex; flex-direction:column; overflow:hidden; border-radius:16px;
+    .card{position:relative; display:flex; flex-direction:column; overflow:hidden; border-radius:16px;
       background:var(--card); border:1px solid var(--line); box-shadow:var(--shadow);
-      transition:transform .2s, border-color .2s ease;
-    }
+      transition:transform .2s, border-color .2s ease}
     .card:hover{ transform:translateY(-2px); border-color:rgba(34,197,94,.45) }
     .thumb{ aspect-ratio:4/3; width:100%; object-fit:cover; display:block; background:#0b1020 }
     .content{ padding:12px }
@@ -90,17 +77,15 @@
     .pill{position:absolute; bottom:10px; right:10px; font-size:11px; color:var(--muted); padding:6px 8px; border:1px dashed var(--line); border-radius:999px; background:rgba(0,0,0,.2)}
 
     /* Favoritar */
-    .fav{
-      position:absolute; top:10px; right:10px; width:36px; height:36px; border-radius:999px;
-      display:grid; place-items:center; background:rgba(0,0,0,.35); color:#fff; cursor:pointer; border:1px solid rgba(255,255,255,.2);
-    }
+    .fav{position:absolute; top:10px; right:10px; width:36px; height:36px; border-radius:999px;
+      display:grid; place-items:center; background:rgba(0,0,0,.35); color:#fff; cursor:pointer; border:1px solid rgba(255,255,255,.2)}
     .fav .fill{ fill:transparent; stroke:#fff; stroke-width:1.5 }
     .fav.active .fill{ fill:var(--heart); stroke:var(--heart) }
 
     footer{color:var(--muted); font-size:12px; text-align:center; padding:24px 12px}
     .list-meta{margin:6px 2px 0; font-size:12px; color:var(--muted)}
 
-    /* Overlays fullscreen */
+    /* Overlays */
     .overlay{position:fixed; inset:0; z-index:9999; background:var(--overlay); display:none; align-items:center; justify-content:center; width:100vw; height:100svh; -webkit-backdrop-filter:blur(2px); backdrop-filter:blur(2px)}
     .overlay.open{ display:flex }
 
@@ -120,16 +105,6 @@
     .composer{position:absolute; left:0; right:0; bottom:0; z-index:5; padding:12px 10px calc(10px + env(safe-area-inset-bottom)); background:linear-gradient(180deg, rgba(0,0,0,0), rgba(0,0,0,.55) 40%, rgba(0,0,0,.85)); display:flex; gap:8px; align-items:center}
     .composer input{flex:1; border:1px solid rgba(255,255,255,.25); background:rgba(0,0,0,.35); color:#fff; border-radius:12px; padding:10px 12px; font-size:14px; outline:none}
     .composer button{min-width:120px; appearance:none; border:0; border-radius:12px; padding:10px 12px; cursor:pointer; font-weight:800; font-size:12px; display:inline-flex; align-items:center; justify-content:center; background:linear-gradient(180deg,var(--brand-2),var(--brand)); color:#fff; box-shadow:0 10px 20px rgba(34,197,94,.22), inset 0 -2px 0 rgba(0,0,0,.2)}
-
-    /* Modal Detalhes */
-    .details-card{position:relative; width:min(96vw, 520px); max-height:92svh; background:var(--card); border:1px solid var(--line); border-radius:18px; box-shadow:var(--shadow); overflow:auto}
-    .details-media{width:100%; aspect-ratio:9/16; object-fit:cover; display:block; background:#000}
-    .details-body{padding:14px}
-    .details-title{margin:0 0 8px; font-size:18px}
-    .details-price{color:var(--brand); font-weight:800; margin-bottom:8px}
-    .details-desc{color:var(--muted); font-size:14px; line-height:1.5}
-    .details-actions{display:flex; gap:8px; padding:12px; border-top:1px solid var(--line)}
-    .details-close{margin-left:auto}
   </style>
 </head>
 <body>
@@ -142,7 +117,6 @@
       </div>
     </div>
 
-    <!-- Busca + coração no topo -->
     <div class="top-tools">
       <div class="search-wrap">
         <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 19a8 8 0 1 1 5.293-14.293A8 8 0 0 1 11 19zm10 3-6-6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
@@ -156,19 +130,15 @@
       </button>
     </div>
 
-    <div></div><!-- spacer -->
+    <div></div>
   </header>
 
   <main class="container">
-    <!-- STORIES -->
     <section aria-label="Stories">
       <div id="storiesStrip" class="stories-strip"></div>
     </section>
 
-    <!-- Meta da lista -->
     <div class="list-meta"><span id="count"></span></div>
-
-    <!-- GRID -->
     <section id="grid" class="grid" aria-live="polite"></section>
   </main>
 
@@ -176,7 +146,7 @@
     © <span id="year"></span> Bazar • Feito com ❤️ | Estoque sujeito a confirmação.
   </footer>
 
-  <!-- OVERLAY: STORIES -->
+  <!-- STORIES FULLSCREEN -->
   <div id="storiesOverlay" class="overlay" role="dialog" aria-modal="true" aria-label="Stories">
     <div class="story-viewer" id="storyViewer">
       <div class="progress" id="storyProgress"></div>
@@ -193,122 +163,136 @@
     </div>
   </div>
 
-  <!-- OVERLAY: DETALHES -->
-  <div id="detailsOverlay" class="overlay" role="dialog" aria-modal="true" aria-label="Detalhes do produto">
-    <article class="details-card" id="detailsCard">
-      <img id="detailsImg" class="details-media" alt="Imagem do produto" />
-      <div class="details-body">
-        <h2 class="details-title" id="detailsTitle"></h2>
-        <div class="details-price" id="detailsPrice"></div>
-        <p class="details-desc" id="detailsDesc"></p>
-      </div>
-      <div class="details-actions">
-        <button class="btn" id="detailsWhats">Chamar no WhatsApp</button>
-        <button class="btn secondary details-close" id="detailsClose">Fechar</button>
-      </div>
-    </article>
-  </div>
-
   <script>
-    /* ============== CONFIG ============== */
-    // Troque pelo seu endpoint do Google Apps Script (Web App publicado)
-    const URL_API = "https://script.google.com/macros/s/AKfycbyVUcV4Z9x3tQZy4z0SDg37lTCy0aHcjoyOeVQsQU4ClJxrMQhxYEwwLqATWGK27Wv4aQ/exec"; // <-- TROCAR
+    /* =============== CONFIG: PLANILHA =============== */
+    // 1) Coloque o ID da sua planilha:
+    const SHEET_ID = "COLOQUE_AQUI_O_ID_DA_SUA_PLANILHA";
+    // 2) Se necessário, ajuste os nomes das abas:
+    const SHEETS = { config: "Config", produtos: "Produtos", stories: "Stories" };
 
-    /* ============== ESTADO ============== */
-    let CONFIG   = { whatsapp:"", storyDurationSec:7 }; // vem da planilha
-    let PRODUCTS = [];     // [{id,nome,preco,descricao,foto,whatsapp?,story?}]
-    let STORIES  = [];     // [{id,title,thumb,slides:[{productId,src}]}]
+    /* =============== ESTADO =============== */
+    let CONFIG   = { whatsapp:"", storyDurationSec:7 };
+    let PRODUCTS = []; // [{id,nome,preco,descricao,foto,whatsapp,story}]
+    let STORIES  = []; // [{id,title,thumb,slides:[{productId,src}]}]
     let FILTER_FAVS_ONLY = false;
     let FAVORITES = new Set(JSON.parse(localStorage.getItem("bazar_favs") || "[]"));
 
-    /* ============== UTIL ============== */
+    /* =============== UTILS =============== */
     const onlyDigits = s => String(s||"").replace(/\D+/g,"");
-    const fmtBRL = (v) => {
-      const n = typeof v === "number" ? v : parseFloat(String(v).replace(/\./g, "").replace(",", "."));
-      return isNaN(n) ? "-" : n.toLocaleString("pt-BR", {style:"currency", currency:"BRL"});
+    const fmtBRL = (v)=>{
+      const n = typeof v === "number" ? v : parseFloat(String(v).replace(/\./g,"").replace(",","."));
+      return (isNaN(n) ? 0 : n).toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
     };
     const pageLink = (id) => location.origin + location.pathname + "#" + id;
-    const saveFavs = () => localStorage.setItem("bazar_favs", JSON.stringify([...FAVORITES]));
-    const isFav = (id) => FAVORITES.has(id);
-    const getPhoneFor = (prod) => onlyDigits(prod?.whatsapp || CONFIG.whatsapp || "");
-    const buildWaLink = (phone, text) =>
-      phone ? `https://wa.me/${phone}?text=${encodeURIComponent(text)}` :
-              `https://wa.me/?text=${encodeURIComponent(text)}`; // fallback sem número
+    const saveFavs = ()=> localStorage.setItem("bazar_favs", JSON.stringify([...FAVORITES]));
+    const isFav = (id)=> FAVORITES.has(id);
+    const csvURL = (sheet)=> `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(sheet)}`;
 
-    // Bloqueio de rolagem do fundo durante overlays
-    let scrollPos = 0;
     function lockBody(){
-      scrollPos = window.scrollY || document.documentElement.scrollTop;
       document.documentElement.style.overflow = 'hidden';
       document.body.style.position = 'fixed';
-      document.body.style.top = `-${scrollPos}px`;
+      document.body.style.top = `-${window.scrollY}px`;
       document.body.style.width = '100%';
     }
     function unlockBody(){
+      const y = -parseInt(document.body.style.top || '0', 10) || 0;
       document.documentElement.style.overflow = '';
       document.body.style.position = '';
       document.body.style.top = '';
       document.body.style.width = '';
-      window.scrollTo(0, scrollPos);
+      window.scrollTo(0, y);
     }
 
-    /* ============== CARREGAR DADOS (GAS) ============== */
+    // CSV parser básico (suporta aspas e vírgulas)
+    function parseCSV(text){
+      const rows = [];
+      let row = [], cell = "", inQuotes = false;
+      for(let i=0;i<text.length;i++){
+        const ch = text[i], next=text[i+1];
+        if(ch === '"'){
+          if(inQuotes && next === '"'){ cell += '"'; i++; }
+          else inQuotes = !inQuotes;
+        }else if(ch === ',' && !inQuotes){ row.push(cell); cell=""; }
+        else if((ch === '\n' || ch === '\r') && !inQuotes){
+          if(cell !== "" || row.length) { row.push(cell); rows.push(row); row=[]; cell=""; }
+          if(ch === '\r' && next === '\n') i++; // CRLF
+        }else cell += ch;
+      }
+      if(cell !== "" || row.length) { row.push(cell); rows.push(row); }
+      if(!rows.length) return [];
+      const header = rows[0].map(h=>h.trim());
+      return rows.slice(1).filter(r => r.some(x => String(x).trim() !== "")).map(r=>{
+        const o={}; header.forEach((h,idx)=> o[h]= r[idx] ?? ""); return o;
+      });
+    }
+
+    async function fetchCSV(sheet){
+      const res = await fetch(csvURL(sheet), {cache:"no-store"});
+      if(!res.ok) throw new Error(`Falha ao carregar aba ${sheet}`);
+      const text = await res.text();
+      return parseCSV(text);
+    }
+
+    /* =============== CARREGAR PLANILHA =============== */
     async function loadData(){
-      const res = await fetch(`${URL_API}?acao=listar`, {cache:"no-store"});
-      const data = await res.json();
-      if(data.status !== "ok") throw new Error(data.msg || "Resposta inválida");
+      // CONFIG
+      try{
+        const cfgRows = await fetchCSV(SHEETS.config);
+        if(cfgRows.length){
+          const c = cfgRows[0];
+          CONFIG.whatsapp = onlyDigits(c.whatsapp || c.WhatsApp || "");
+          CONFIG.storyDurationSec = Number(c.storyDurationSec || c.DuracaoStories || 7) || 7;
+        }
+      }catch(e){ console.warn("Sem Config:", e.message); }
 
-      // Config
-      CONFIG.whatsapp = onlyDigits(data.config?.whatsapp || data.config?.WhatsApp || "");
-      CONFIG.storyDurationSec = Number(data.config?.storyDurationSec || data.config?.DuracaoStories || 7) || 7;
-
-      // Produtos
-      PRODUCTS = (data.produtos || []).map(p => {
-        const idBase = p.id || p.ID || p.Nome || p.nome || ('id-' + Math.random().toString(36).slice(2,9));
+      // PRODUTOS
+      const pRows = await fetchCSV(SHEETS.produtos);
+      PRODUCTS = pRows.map(p=>{
+        const idBase = p.id || p.ID || p.nome || p.Nome || ('id-' + Math.random().toString(36).slice(2,9));
         return {
           id: String(idBase).toLowerCase().trim().replace(/\s+/g,"-").replace(/[^a-z0-9\-]/g,""),
           nome: p.nome || p.Nome || "Produto",
-          preco: p.preco ?? p.Preco ?? p.Valor ?? 0,
+          preco: p.preco || p.Preco || p.Valor || 0,
           descricao: p.descricao || p.Descricao || "",
           foto: p.foto || p.Foto || "",
           whatsapp: p.whatsapp || p.WhatsApp || "",
-          story: p.story || p.StoryGrupo || null
+          story: p.story || p.StoryGrupo || ""
         };
       });
 
-      // Stories (se vierem prontos)
-      if(Array.isArray(data.stories) && data.stories.length){
-        STORIES = data.stories.map((g,i)=>{
-          const title = g.grupo || g.title || `Stories ${i+1}`;
-          const normalizedSlides = (g.slides || []).map(s=>{
-            if(typeof s === "string"){
-              const prod = PRODUCTS.find(p=>p.id===s || p.id===String(s).toLowerCase());
+      // STORIES (opcional)
+      try{
+        const sRows = await fetchCSV(SHEETS.stories);
+        if(sRows.length){
+          STORIES = sRows.map((r,i)=>{
+            const title = r.grupo || r.Grupo || r.title || `Stories ${i+1}`;
+            const thumb = r.thumb || r.Thumb || "";
+            const slidesRaw = r.slides || r.Slides || "";
+            const ids = String(slidesRaw).split(/[,|]/).map(s=>s.trim()).filter(Boolean);
+            const slides = ids.map(pid=>{
+              const prod = PRODUCTS.find(p=>p.id===pid || p.nome.toLowerCase()===pid.toLowerCase());
               return prod ? {productId: prod.id, src: prod.foto} : null;
-            }else{
-              const pid = s.productId || s.id;
-              const prod = PRODUCTS.find(p=>p.id===pid || p.id===String(pid).toLowerCase());
-              const src = s.src || (prod ? prod.foto : "");
-              return prod ? {productId: prod.id, src} : null;
-            }
-          }).filter(Boolean);
-          const thumb = g.thumb || (normalizedSlides[0]?.src || "");
-          return { id: title.toLowerCase().replace(/\s+/g,"-"), title, thumb, slides: normalizedSlides };
-        }).filter(s=>s.slides.length);
-      }else{
-        // Fallback: agrupar pelos campos "story"/"StoryGrupo" dos produtos
+            }).filter(Boolean);
+            return { id: title.toLowerCase().replace(/\s+/g,"-"), title, thumb: thumb || (slides[0]?.src || ""), slides };
+          }).filter(g=>g.slides.length);
+        }
+      }catch(e){
+        console.warn("Sem aba Stories, vou agrupar pelos produtos:", e.message);
+      }
+
+      if(!STORIES.length){
         const groups = {};
         for(const p of PRODUCTS){
           const g = p.story || "Destaques";
-          groups[g] ??= [];
-          groups[g].push({productId: p.id, src: p.foto});
+          (groups[g] ||= []).push({productId:p.id, src:p.foto});
         }
         STORIES = Object.entries(groups).map(([g,slides])=>({
-          id: g.toLowerCase().replace(/\s+/g,"-"), title:g, thumb: slides[0]?.src || "", slides
+          id:g.toLowerCase().replace(/\s+/g,"-"), title:g, thumb: slides[0]?.src || "", slides
         }));
       }
     }
 
-    /* ============== STORIES STRIP ============== */
+    /* =============== STORIES UI =============== */
     const storiesStrip = document.getElementById("storiesStrip");
     function renderStories(){
       storiesStrip.innerHTML = "";
@@ -316,17 +300,13 @@
         const el = document.createElement("div");
         el.className = "story-pill";
         el.innerHTML = `
-          <div class="story-ring">
-            <img class="story-thumb" src="${st.thumb}" alt="${st.title}" loading="lazy" />
-          </div>
-          <div class="story-title">${st.title}</div>
-        `;
+          <div class="story-ring"><img class="story-thumb" src="${st.thumb}" alt="${st.title}" loading="lazy" /></div>
+          <div class="story-title">${st.title}</div>`;
         el.addEventListener("click", ()=> openStories(st));
         storiesStrip.appendChild(el);
       }
     }
 
-    /* ============== STORY VIEWER ============== */
     const storiesOverlay = document.getElementById("storiesOverlay");
     const storyViewer   = document.getElementById("storyViewer");
     const storyProgress = document.getElementById("storyProgress");
@@ -336,20 +316,20 @@
     const closeStories  = document.getElementById("closeStories");
     const tapLeft  = document.getElementById("tapLeft");
     const tapRight = document.getElementById("tapRight");
+    let currentStory=null, currentIndex=0, timer=null;
 
-    let currentStory = null;
-    let currentIndex = 0;
-    let timer = null;
+    function getPhoneFor(prod){ return onlyDigits(prod?.whatsapp || CONFIG.whatsapp || ""); }
+    function buildWaLink(phone, text){
+      return phone ? `https://wa.me/${phone}?text=${encodeURIComponent(text)}` :
+                     `https://wa.me/?text=${encodeURIComponent(text)}`;
+    }
 
     function clearViewer(){
       [...storyViewer.querySelectorAll("img.story-img")].forEach(n=>n.remove());
-      storyProgress.innerHTML = "";
-      storyMsg.value = "";
-      if(timer){ clearTimeout(timer); timer = null; }
+      storyProgress.innerHTML = ""; storyMsg.value = "";
+      if(timer){ clearTimeout(timer); timer=null; }
     }
-
-    function productById(id){ return PRODUCTS.find(p=>p.id===id) }
-
+    const productById = (id)=> PRODUCTS.find(p=>p.id===id);
     function labelCurrent(){
       const slide = currentStory.slides[currentIndex];
       const prod  = productById(slide.productId);
@@ -357,45 +337,30 @@
     }
 
     function openStories(story){
-      clearViewer();
-      currentStory = story;
-      currentIndex = 0;
+      clearViewer(); currentStory = story; currentIndex=0;
 
-      // cria imagens e barras
-      currentStory.slides.forEach((sl, i)=>{
+      currentStory.slides.forEach((sl,i)=>{
         const img = document.createElement("img");
-        img.className = "story-img" + (i===0 ? " active":"");
-        img.src = sl.src;
-        img.alt = `${story.title} • ${i+1}/${currentStory.slides.length}`;
+        img.className = "story-img" + (i===0 ? " active" : "");
+        img.src = sl.src; img.alt = `${story.title} • ${i+1}/${currentStory.slides.length}`;
         storyViewer.appendChild(img);
 
-        const bar = document.createElement("div");
-        bar.className = "bar";
-        const fill = document.createElement("div");
-        fill.className = "fill";
-        bar.appendChild(fill);
-        storyProgress.appendChild(bar);
+        const bar = document.createElement("div"); bar.className="bar";
+        const fill = document.createElement("div"); fill.className="fill";
+        bar.appendChild(fill); storyProgress.appendChild(bar);
       });
 
-      // Enviar dentro do story
       storySend.onclick = ()=>{
         const slide = currentStory.slides[currentIndex];
         const prod  = productById(slide.productId);
         if(!prod) return;
         const custom = storyMsg.value.trim();
-        const msg = [
-          custom ? `Mensagem: ${custom}` : null,
-          `Item: ${prod.nome}`,
-          `Link: ${pageLink(prod.id)}`
-        ].filter(Boolean).join("\n");
-        const url = buildWaLink(getPhoneFor(prod), msg);
-        window.open(url, "_blank", "noopener");
+        const msg = [ custom ? `Mensagem: ${custom}` : null, `Item: ${prod.nome}`, `Link: ${pageLink(prod.id)}` ].filter(Boolean).join("\n");
+        window.open(buildWaLink(getPhoneFor(prod), msg), "_blank", "noopener");
       };
 
-      storiesOverlay.classList.add("open");
-      lockBody();
-      runStep();
-      labelCurrent();
+      storiesOverlay.classList.add("open"); lockBody();
+      runStep(); labelCurrent();
     }
 
     function runStep(){
@@ -406,174 +371,90 @@
       fills.forEach((f,i)=>{ f.style.transition="none"; f.style.width = i < currentIndex ? "100%" : "0%" });
 
       const dur = Math.max(1, Number(CONFIG.storyDurationSec || 7)) * 1000;
-      requestAnimationFrame(()=>{
-        const f = fills[currentIndex];
-        if(f){ f.style.transition = `width ${dur}ms linear`; f.style.width = "100%" }
-      });
-
+      requestAnimationFrame(()=>{ const f = fills[currentIndex]; if(f){ f.style.transition=`width ${dur}ms linear`; f.style.width="100%"; }});
       if(timer) clearTimeout(timer);
-      timer = setTimeout(()=> nextStory(), dur);
+      timer = setTimeout(nextStory, dur);
     }
-
-    function nextStory(){
-      if(currentIndex < currentStory.slides.length - 1){
-        currentIndex++; runStep(); labelCurrent();
-      }else{
-        closeStoriesOverlay();
-      }
-    }
-    function prevStory(){
-      if(currentIndex > 0){
-        currentIndex--; runStep(); labelCurrent();
-      }else{
-        runStep(); // reinicia barra no primeiro
-      }
-    }
-    function closeStoriesOverlay(){
-      storiesOverlay.classList.remove("open");
-      clearViewer();
-      unlockBody();
-    }
+    function nextStory(){ if(currentIndex < currentStory.slides.length-1){ currentIndex++; runStep(); labelCurrent(); } else { closeStoriesOverlay(); } }
+    function prevStory(){ if(currentIndex>0){ currentIndex--; runStep(); labelCurrent(); } else { runStep(); } }
+    function closeStoriesOverlay(){ storiesOverlay.classList.remove("open"); clearViewer(); unlockBody(); }
     tapRight.addEventListener("click", nextStory);
     tapLeft.addEventListener("click", prevStory);
     closeStories.addEventListener("click", closeStoriesOverlay);
-    storiesOverlay.addEventListener("click", (e)=>{ if(e.target === storiesOverlay) closeStoriesOverlay() });
+    storiesOverlay.addEventListener("click", (e)=>{ if(e.target === storiesOverlay) closeStoriesOverlay(); });
 
-    /* ============== GRID (cards) ============== */
+    /* =============== GRID (cards) =============== */
     const grid  = document.getElementById("grid");
     const countEl = document.getElementById("count");
     const searchTop = document.getElementById("searchTop");
     const heartTop  = document.getElementById("heartTop");
     const favCount  = document.getElementById("favCount");
 
-    function updateFavBadge(){
-      const n = FAVORITES.size;
-      favCount.textContent = n;
-      favCount.style.display = n ? "grid" : "none";
-      heartTop.classList.toggle("active", FILTER_FAVS_ONLY);
-    }
-
+    function updateFavBadge(){ const n=FAVORITES.size; favCount.textContent=n; favCount.style.display=n?"grid":"none"; heartTop.classList.toggle("active", FILTER_FAVS_ONLY); }
     function filteredList(){
-      const q = (searchTop.value || "").trim().toLowerCase();
-      let list = PRODUCTS;
-      if(FILTER_FAVS_ONLY) list = list.filter(p=> isFav(p.id));
-      if(q) list = list.filter(p =>
-        (p.nome||"").toLowerCase().includes(q) || (p.descricao||"").toLowerCase().includes(q)
-      );
+      const q=(searchTop.value||"").trim().toLowerCase();
+      let list=PRODUCTS; if(FILTER_FAVS_ONLY) list=list.filter(p=>isFav(p.id));
+      if(q) list=list.filter(p=> (p.nome||"").toLowerCase().includes(q) || (p.descricao||"").toLowerCase().includes(q));
       return list;
     }
-
     function render(){
-      const list = filteredList();
-      countEl.textContent = `${list.length} item(ns)`;
-      grid.innerHTML = "";
+      const list = filteredList(); countEl.textContent = `${list.length} item(ns)`; grid.innerHTML="";
       for(const p of list){
-        const el = document.createElement("article");
-        el.className = "card";
-        el.id = p.id;
+        const el=document.createElement("article"); el.className="card"; el.id=p.id;
         const favActive = isFav(p.id) ? "active" : "";
-
         el.innerHTML = `
           <button class="fav ${favActive}" data-fav="${p.id}" title="Favoritar">
             <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path class="fill" d="M12.1 20.3s-7.6-4.4-9.2-9.3C1.9 6.8 5 4.1 8 5.1c1.5.5 2.7 1.8 4 4 1.3-2.2 2.5-3.5 4-4 3-.9 6.1 1.7 5.1 5.9-1.5 4.9-9.1 9.3-9.1 9.3z"/></svg>
           </button>
-
           <img class="thumb" src="${p.foto}" alt="${p.nome}" loading="lazy" />
           <div class="content">
             <h2 class="title">${p.nome}</h2>
             <div class="price">${fmtBRL(p.preco)}</div>
             <p class="desc">${p.descricao||""}</p>
           </div>
-          <div class="actions" style="padding:0 12px 12px">
-            <button class="btn secondary" data-details="${p.id}">Detalhes</button>
-          </div>
-          <span class="pill">Usado</span>
-        `;
+          <span class="pill">Usado</span>`;
         grid.appendChild(el);
       }
       updateFavBadge();
     }
-
-    // Toggle favoritos e detalhes
-    grid.addEventListener("click", (e)=>{
-      const favBtn = e.target.closest("[data-fav]");
-      if(favBtn){
-        const id = favBtn.dataset.fav;
-        if(FAVORITES.has(id)) FAVORITES.delete(id); else FAVORITES.add(id);
-        saveFavs(); render(); return;
-      }
-      const detBtn = e.target.closest("[data-details]");
-      if(detBtn){
-        const id = detBtn.dataset.details;
-        const prod = PRODUCTS.find(p=>p.id===id);
-        if(prod) openDetails(prod);
-      }
+    grid.addEventListener("click",(e)=>{
+      const favBtn=e.target.closest("[data-fav]");
+      if(favBtn){ const id=favBtn.dataset.fav; FAVORITES.has(id)?FAVORITES.delete(id):FAVORITES.add(id); saveFavs(); render(); }
     });
-
-    heartTop.addEventListener("click", ()=>{
-      FILTER_FAVS_ONLY = !FILTER_FAVS_ONLY;
-      render();
-    });
+    heartTop.addEventListener("click", ()=>{ FILTER_FAVS_ONLY=!FILTER_FAVS_ONLY; render(); });
     searchTop.addEventListener("input", render);
 
-    /* ============== DETALHES (modal) ============== */
-    const detailsOverlay = document.getElementById("detailsOverlay");
-    const detailsImg   = document.getElementById("detailsImg");
-    const detailsTitle = document.getElementById("detailsTitle");
-    const detailsPrice = document.getElementById("detailsPrice");
-    const detailsDesc  = document.getElementById("detailsDesc");
-    const detailsWhats = document.getElementById("detailsWhats");
-    const detailsClose = document.getElementById("detailsClose");
-    let currentProd = null;
-
-    function openDetails(prod){
-      currentProd = prod;
-      detailsImg.src = prod.foto;
-      detailsImg.alt = prod.nome;
-      detailsTitle.textContent = prod.nome;
-      detailsPrice.textContent = fmtBRL(prod.preco);
-      detailsDesc.textContent  = prod.descricao;
-
-      detailsWhats.onclick = ()=>{
-        const msg = [`Item: ${prod.nome}`, `Link: ${pageLink(prod.id)}`].join("\n");
-        const url = buildWaLink(getPhoneFor(prod), msg);
-        window.open(url, "_blank", "noopener");
-      };
-
-      detailsOverlay.classList.add("open");
-      lockBody();
-    }
-    function closeDetails(){
-      detailsOverlay.classList.remove("open");
-      unlockBody();
-    }
-    detailsClose.addEventListener("click", closeDetails);
-    detailsOverlay.addEventListener("click", (e)=>{ if(e.target === detailsOverlay) closeDetails() });
-
-    /* ============== INIT ============== */
+    /* =============== INIT =============== */
     document.getElementById("year").textContent = new Date().getFullYear();
-    document.getElementById("today").textContent = new Date().toLocaleDateString("pt-BR", {weekday:"long", day:"2-digit", month:"2-digit"});
+    document.getElementById("today").textContent = new Date().toLocaleDateString("pt-BR",{weekday:"long", day:"2-digit", month:"2-digit"});
 
     (async function init(){
       try{
+        if(!SHEET_ID || SHEET_ID.includes("COLOQUE_AQUI")) throw new Error("Defina o SHEET_ID no topo do arquivo.");
         await loadData();
-        renderStories();
-        render();
+        if(!PRODUCTS.length) throw new Error("Produtos vazios.");
+        renderStories(); render();
       }catch(err){
-        console.error(err);
-        document.querySelector("main").innerHTML = `
-          <div style="padding:24px; background:var(--surface); border:1px solid var(--line); border-radius:12px">
-            <h2 style="margin:0 0 8px">Não foi possível carregar os dados</h2>
-            <p style="color:var(--muted)">Verifique o <b>URL_API</b> e o retorno do seu Google Apps Script (<code>?acao=listar</code>).</p>
-          </div>`;
+        console.error("[Fallback]", err);
+        // Fallback de exemplo (para não ficar “nada carregando”)
+        CONFIG = { whatsapp:"5571999999999", storyDurationSec:7 };
+        PRODUCTS = [
+          {id:"cadeira-executiva", nome:"Cadeira Executiva", preco:320, descricao:"Ajuste de altura, apoio lombar.", foto:"https://images.unsplash.com/photo-1582582621959-48d283e84f60?q=80&w=1080&auto=format&fit=crop"},
+          {id:"notebook-i5", nome:"Notebook i5 8GB/256GB", preco:1650, descricao:"Ótimo p/ estudo e trabalho.", foto:"https://images.unsplash.com/photo-1498050108023-c5249f4df085?q=80&w=1080&auto=format&fit=crop"},
+          {id:"bike-aro29", nome:"Bicicleta Aro 29", preco:990, descricao:"21v revisado, freio a disco.", foto:"https://images.unsplash.com/photo-1518655048521-f130df041f66?q=80&w=1080&auto=format&fit=crop"}
+        ];
+        STORIES = [{
+          id:"destaques", title:"Destaques", thumb:PRODUCTS[0].foto,
+          slides: PRODUCTS.map(p=>({productId:p.id, src:p.foto}))
+        }];
+        renderStories(); render();
+        const main = document.querySelector("main");
+        const warn = document.createElement("div");
+        warn.style.cssText="margin:12px 0;padding:12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--muted);font-size:12px";
+        warn.innerHTML = "Aviso: usando dados de exemplo. Edite <b>SHEET_ID</b> e publique as abas no Google Sheets para carregar seus dados.";
+        main.prepend(warn);
       }
     })();
-
-    // Deep-link para card
-    if(location.hash){
-      const el = document.querySelector(location.hash);
-      if(el){ el.scrollIntoView({behavior:"smooth", block:"center"}); }
-    }
   </script>
 </body>
 </html>
