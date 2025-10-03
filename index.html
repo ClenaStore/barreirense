@@ -1,343 +1,162 @@
 <!doctype html>
-<html lang="pt-BR" data-theme="dark">
+<html lang="pt-BR">
 <head>
-  <meta charset="utf-8" />
+  <meta charset="utf-8">
   <title>Bazar • Produtos Usados</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="color-scheme" content="light dark" />
-  <meta name="description" content="Bazar de produtos usados — fotos, nome, valor e descrição. Chame no WhatsApp para comprar!" />
-  <meta property="og:title" content="Bazar • Produtos Usados" />
-  <meta property="og:description" content="Veja as ofertas do nosso bazar e fale no WhatsApp para combinar a retirada/entrega." />
-  <meta property="og:type" content="website" />
-  <meta property="og:image" content="https://images.unsplash.com/photo-1512436991641-6745cdb1723f?q=80&w=1200&auto=format&fit=crop" />
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
-
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
-    :root{
-      --bg:#0c101a; --surface:#0f172a; --card:#111827; --ink:#e6edf6; --muted:#93a3b8; --line:#1f2937;
-      --brand:#16a34a; --brand-2:#22c55e; --danger:#ef4444; --radius:16px; --shadow:0 10px 30px rgba(2,6,23,.35);
-    }
-    @media (prefers-color-scheme: light){
-      :root{ --bg:#f5f7fb; --surface:#ffffff; --card:#ffffff; --ink:#0f172a; --muted:#64748b; --line:#e5e7eb;
-             --brand:#16a34a; --brand-2:#22c55e; --shadow:0 10px 24px rgba(15,23,42,.08); }
-    }
-    *{box-sizing:border-box}
-    html,body{margin:0;height:100%}
-    body{font-family:Inter,system-ui,Arial;background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased}
+    body{font-family:Arial, sans-serif;background:#f8fafc;margin:0;color:#111}
+    header{padding:16px;background:#16a34a;color:#fff;text-align:center}
 
-    header{
-      position:sticky; top:0; z-index:50;
-      background:linear-gradient(180deg,var(--bg),rgba(0,0,0,0)) , var(--surface);
-      border-bottom:1px solid var(--line);
-      padding:16px 20px;
-      display:flex; align-items:center; justify-content:space-between; gap:12px;
-      backdrop-filter:saturate(120%) blur(6px);
-    }
-    .brand{display:flex;align-items:center;gap:12px}
-    .brand-logo{
-      width:40px;height:40px;border-radius:12px;
-      background:radial-gradient(120% 120% at 20% 20%, var(--brand-2), var(--brand));
-      box-shadow:inset 0 0 20px rgba(255,255,255,.15);
-    }
-    .brand h1{font-size:18px;margin:0}
-    .tag{font-size:12px;color:var(--muted)}
-
-    .container{max-width:1200px;margin:0 auto;padding:20px}
-
-    /* Banner (slider) */
-    .banner{
-      position:relative; height:280px; border-radius:18px; overflow:hidden;
-      box-shadow:var(--shadow); border:1px solid var(--line); background:#000;
-      margin-bottom:22px;
-    }
-    .slide{
-      position:absolute; inset:0; opacity:0; transition:opacity 1s ease;
-      background-position:center; background-size:cover;
-    }
+    /* Banner */
+    .banner{position:relative;height:220px;overflow:hidden}
+    .slide{position:absolute;inset:0;opacity:0;transition:opacity 1s ease;background-position:center;background-size:cover}
     .slide.active{opacity:1}
-    .banner-dots{
-      position:absolute; left:0; right:0; bottom:12px; display:flex; gap:8px; justify-content:center;
-    }
-    .dot{width:8px;height:8px;border-radius:50%; background:rgba(255,255,255,.35)}
+    .banner-dots{position:absolute;bottom:12px;left:0;right:0;display:flex;gap:6px;justify-content:center}
+    .dot{width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,.5);cursor:pointer}
     .dot.active{background:#fff}
 
-    /* Grid de produtos */
-    .grid{
-      display:grid; gap:14px;
-      grid-template-columns:repeat(2, 1fr); /* 2 itens por linha (celular) */
-    }
-    @media (min-width:768px){
-      .grid{ grid-template-columns:repeat(4, 1fr); }
-    }
-    @media (min-width:1200px){
-      .grid{ grid-template-columns:repeat(6, 1fr); } /* 6 itens por linha (desktop grande) */
-    }
+    /* Toolbar */
+    .toolbar{display:flex;gap:10px;align-items:center;padding:10px 16px;background:#fff;border-bottom:1px solid #e5e7eb}
+    .search{flex:1;padding:8px;border:1px solid #ccc;border-radius:6px}
+    .filter{padding:8px;border:1px solid #ccc;border-radius:6px}
 
-    .card{
-      display:flex; flex-direction:column; overflow:hidden; border-radius:16px;
-      background:var(--card); border:1px solid var(--line); box-shadow:var(--shadow);
-      transition:transform .2s ease, box-shadow .2s ease, border-color .2s ease;
-    }
-    .card:hover{ transform:translateY(-2px); border-color:rgba(34,197,94,.5) }
+    /* Grid */
+    .grid{display:grid;gap:12px;padding:16px;
+          grid-template-columns:repeat(2,1fr);}
+    @media(min-width:900px){.grid{grid-template-columns:repeat(6,1fr);}}
+    .card{background:#fff;border:1px solid #e5e7eb;border-radius:10px;overflow:hidden;cursor:pointer;transition:.2s;display:flex;flex-direction:column}
+    .card:hover{transform:scale(1.02)}
+    .card img{width:100%;height:120px;object-fit:cover}
+    .card .info{padding:8px;flex:1}
+    .card h3{margin:0;font-size:14px}
+    .card .price{color:#16a34a;font-weight:bold;margin:4px 0}
+    .flag{font-size:11px;color:#555;border:1px dashed #ccc;border-radius:999px;padding:2px 6px;display:inline-block;margin-top:4px}
 
-    .thumb{
-      aspect-ratio: 4/3; width:100%; object-fit:cover; display:block;
-      background:#0b1020;
-    }
-    .content{ padding:12px }
-    .title{font-size:14px; font-weight:700; margin:0 0 6px; line-height:1.25}
-    .price{font-size:15px; font-weight:800; color:var(--brand); margin-bottom:6px}
-    .desc{font-size:12px; color:var(--muted); line-height:1.4; margin:0 0 10px; min-height:2.8em; overflow:hidden}
-    .actions{display:flex; gap:8px; align-items:center; margin-top:auto; padding:0 12px 12px}
-    .btn{
-      appearance:none; border:0; border-radius:12px; padding:10px 12px; cursor:pointer;
-      font-weight:700; font-size:12px; letter-spacing:.2px; display:inline-flex; align-items:center; gap:8px;
-      background:linear-gradient(180deg,var(--brand-2),var(--brand)); color:#fff;
-      box-shadow:0 10px 20px rgba(34,197,94,.22), inset 0 -2px 0 rgba(0,0,0,.2);
-      text-decoration:none;
-    }
-    .btn:hover{ filter:saturate(110%) brightness(1.02) }
-    .btn:active{ transform:translateY(1px) }
-
-    .pill{
-      margin-left:auto; font-size:11px; color:var(--muted); padding:6px 8px; border:1px dashed var(--line); border-radius:999px;
-    }
-
-    /* Rodapé */
-    footer{color:var(--muted); font-size:12px; text-align:center; padding:24px 12px}
-
-    /* Campo de busca (opcional) */
-    .toolbar{
-      display:flex; gap:10px; align-items:center; margin:10px 0 18px;
-      background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:10px 12px;
-    }
-    .search{
-      flex:1; background:transparent; border:0; outline:0; color:var(--ink); font-size:14px;
-    }
-    .count{font-size:12px; color:var(--muted)}
+    /* Modal */
+    .modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);align-items:center;justify-content:center;z-index:100}
+    .modal.active{display:flex}
+    .modal-content{background:#fff;padding:20px;border-radius:12px;max-width:400px;width:90%;text-align:center;position:relative}
+    .modal-content img{width:100%;border-radius:8px;margin-bottom:12px}
+    .close{position:absolute;top:10px;right:12px;font-size:20px;cursor:pointer}
+    .btn{background:#16a34a;color:#fff;padding:10px 14px;border:none;border-radius:8px;cursor:pointer;text-decoration:none;display:inline-block;margin-top:10px}
   </style>
 </head>
 <body>
-
   <header>
-    <div class="brand">
-      <div class="brand-logo" aria-hidden="true"></div>
-      <div>
-        <h1>Bazar</h1>
-        <div class="tag">Produtos usados com preço justo</div>
-      </div>
-    </div>
-    <div class="tag" id="today"></div>
+    <h1>Bazar de Usados</h1>
   </header>
 
-  <main class="container">
-    <!-- Banner com fade -->
-    <section class="banner" id="banner" aria-label="Ofertas em destaque">
-      <div class="slide active" style="background-image:url('https://images.unsplash.com/photo-1483985988355-763728e1935b?q=80&w=1600&auto=format&fit=crop');"></div>
-      <div class="slide" style="background-image:url('https://images.unsplash.com/photo-1520975622034-763f2f2997c7?q=80&w=1600&auto=format&fit=crop');"></div>
-      <div class="slide" style="background-image:url('https://images.unsplash.com/photo-1517630800677-932d836ab680?q=80&w=1600&auto=format&fit=crop');"></div>
-      <div class="banner-dots" aria-hidden="true">
-        <div class="dot active"></div><div class="dot"></div><div class="dot"></div>
-      </div>
-    </section>
-
-    <!-- Busca -->
-    <div class="toolbar">
-      <input class="search" id="search" type="search" placeholder="Buscar por nome ou descrição..." />
-      <span class="count" id="count"></span>
+  <!-- Banner -->
+  <section class="banner" id="banner">
+    <div class="slide active" style="background-image:url('https://images.unsplash.com/photo-1483985988355-763728e1935b?q=80&w=1600&auto=format&fit=crop');"></div>
+    <div class="slide" style="background-image:url('https://images.unsplash.com/photo-1520975622034-763f2f2997c7?q=80&w=1600&auto=format&fit=crop');"></div>
+    <div class="slide" style="background-image:url('https://images.unsplash.com/photo-1517630800677-932d836ab680?q=80&w=1600&auto=format&fit=crop');"></div>
+    <div class="banner-dots">
+      <div class="dot active"></div>
+      <div class="dot"></div>
+      <div class="dot"></div>
     </div>
+  </section>
 
-    <!-- Grid de produtos -->
-    <section id="grid" class="grid" aria-live="polite"></section>
+  <!-- Barra de pesquisa + filtro -->
+  <div class="toolbar">
+    <input id="search" class="search" type="search" placeholder="Buscar produto...">
+    <select id="filter" class="filter">
+      <option value="Todos">Todos</option>
+      <option value="Novo">Novo</option>
+      <option value="Usado">Usado</option>
+    </select>
+  </div>
+
+  <main>
+    <div id="grid" class="grid"></div>
   </main>
 
-  <footer>
-    © <span id="year"></span> Bazar • Feito com ❤️ | Estoque sujeito a confirmação.
-  </footer>
+  <!-- Modal -->
+  <div id="modal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal()">&times;</span>
+      <img id="mFoto" src="">
+      <h2 id="mNome"></h2>
+      <div id="mPreco"></div>
+      <p id="mDesc"></p>
+      <span id="mFlag" class="flag"></span>
+      <br>
+      <a id="mWhats" class="btn" target="_blank">Falar no WhatsApp</a>
+    </div>
+  </div>
 
   <script>
-    // ========= CONFIG =========
-    // Coloque seu número do WhatsApp (SOMENTE DÍGITOS) com DDI + DDD, ex.: 5571999999999
-    const WHATSAPP_NUMBER = "5571999999999";
+    const GRID = document.getElementById("grid");
+    const MODAL = document.getElementById("modal");
+    const API_URL = "https://script.google.com/macros/s/AKfycbwVmZ1sNLXTAL45p5uvSdBRCFNC3PCyvjYyf_bX0V-j1PnzIr4ib58Ho9H3ioOoplHXCA/exec"; // link do GAS
+    let produtos = [];
 
-    // Produtos de exemplo — edite/duplique à vontade
-    const PRODUCTS = [
-      {
-        id:"cadeira-executiva",
-        nome:"Cadeira Executiva Ergonômica",
-        preco: 320.00,
-        descricao:"Ajuste de altura, apoio lombar e rodízios silenciosos. Em ótimo estado.",
-        foto:"https://images.unsplash.com/photo-1582582621959-48d283e84f60?q=80&w=1200&auto=format&fit=crop"
-      },
-      {
-        id:"liquidificador",
-        nome:"Liquidificador Inox 900W",
-        preco: 140.00,
-        descricao:"3 velocidades + pulsar, jarra de vidro sem rachaduras. Pouco uso.",
-        foto:"https://images.unsplash.com/photo-1526116980809-6f6f0d6a62d2?q=80&w=1200&auto=format&fit=crop"
-      },
-      {
-        id:"ventilador-turbo",
-        nome:"Ventilador Turbo 40cm",
-        preco: 110.00,
-        descricao:"Silencioso, pouco tempo de uso. Grade sem amassados.",
-        foto:"https://images.unsplash.com/photo-1636887560048-23ead929dbd3?q=80&w=1200&auto=format&fit=crop"
-      },
-      {
-        id:"prancha-cabelo",
-        nome:"Prancha de Cabelo Cerâmica",
-        preco: 75.00,
-        descricao:"Aquece rápido, cabo giratório. Funcionando perfeitamente.",
-        foto:"https://images.unsplash.com/photo-1512496015851-a90fb38ba796?q=80&w=1200&auto=format&fit=crop"
-      },
-      {
-        id:"microondas",
-        nome:"Micro-ondas 20L",
-        preco: 280.00,
-        descricao:"Display perfeito, interior limpo. Apenas marcas leves de uso.",
-        foto:"https://images.unsplash.com/photo-1594035910387-fea47794261f?q=80&w=1200&auto=format&fit=crop"
-      },
-      {
-        id:"lampada-decor",
-        nome:"Luminária Decorativa de Mesa",
-        preco: 55.00,
-        descricao:"Luz quente aconchegante. Sem riscos, acompanha lâmpada.",
-        foto:"https://images.unsplash.com/photo-1519710164239-da123dc03ef4?q=80&w=1200&auto=format&fit=crop"
-      },
-      {
-        id:"bike-aro29",
-        nome:"Bicicleta Aro 29",
-        preco: 990.00,
-        descricao:"Câmbio 21v revisado, freio a disco. Quadro M.",
-        foto:"https://images.unsplash.com/photo-1518655048521-f130df041f66?q=80&w=1200&auto=format&fit=crop"
-      },
-      {
-        id:"notebook-i5",
-        nome:"Notebook i5 8GB/256GB",
-        preco: 1650.00,
-        descricao:"Bateria boa, tela 14”. Ideal para estudos e trabalho.",
-        foto:"https://images.unsplash.com/photo-1498050108023-c5249f4df085?q=80&w=1200&auto=format&fit=crop"
-      },
-      {
-        id:"mesa-centro",
-        nome:"Mesa de Centro Madeira",
-        preco: 180.00,
-        descricao:"Madeira maciça envernizada, sem lascas. 100×60×40cm.",
-        foto:"https://images.unsplash.com/photo-1519710122415-b83b1d53f6c6?q=80&w=1200&auto=format&fit=crop"
-      },
-      {
-        id:"cafeteira",
-        nome:"Cafeteira Elétrica",
-        preco: 120.00,
-        descricao:"Filtro permanente e jarra de vidro. Uso doméstico.",
-        foto:"https://images.unsplash.com/photo-1503481766315-7a586b20f66f?q=80&w=1200&auto=format&fit=crop"
-      },
-      {
-        id:"monitor-24",
-        nome:"Monitor 24” Full HD",
-        preco: 590.00,
-        descricao:"Cores vivas e sem dead pixels. HDMI/DisplayPort.",
-        foto:"https://images.unsplash.com/photo-1517336714731-489689fd1ca8?q=80&w=1200&auto=format&fit=crop"
-      },
-      {
-        id:"mochila",
-        nome:"Mochila Casual 25L",
-        preco: 80.00,
-        descricao:"Vários bolsos e zíper reforçado. Tecido sem furos.",
-        foto:"https://images.unsplash.com/photo-1547949003-9792a18a2601?q=80&w=1200&auto=format&fit=crop"
-      }
-    ];
-
-    // ========= UTIL =========
-    const fmtBRL = (v) => v.toLocaleString("pt-BR", {style:"currency", currency:"BRL"});
-
-    function slug(id){ return `#${id}` }
-
-    function buildWhatsAppLink(prod){
-      const page = location.origin + location.pathname + slug(prod.id);
-      const msg = [
-        `Olá! Tenho interesse neste produto do bazar:`,
-        `• Nome: ${prod.nome}`,
-        `• Valor: ${fmtBRL(prod.preco)}`,
-        `• Descrição: ${prod.descricao}`,
-        `• Link: ${page}`
-      ].join("\n");
-      return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`;
-    }
-
-    // ========= RENDER =========
-    const grid = document.getElementById("grid");
-    function render(list){
-      grid.innerHTML = "";
-      document.getElementById("count").textContent = `${list.length} item(ns)`;
-      for(const p of list){
-        const card = document.createElement("article");
-        card.className = "card";
-        card.id = p.id;
-
-        card.innerHTML = `
-          <a href="${slug(p.id)}" aria-label="${p.nome}">
-            <img class="thumb" src="${p.foto}" alt="${p.nome}" loading="lazy" />
-          </a>
-          <div class="content">
-            <h2 class="title">${p.nome}</h2>
-            <div class="price">${fmtBRL(p.preco)}</div>
-            <p class="desc">${p.descricao}</p>
-          </div>
-          <div class="actions">
-            <a class="btn" href="${buildWhatsAppLink(p)}" target="_blank" rel="noopener">
-              <!-- simples ícone de mensagem -->
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                <path d="M4 20l1.3-4.55A7.96 7.96 0 1 1 12 20a8.3 8.3 0 0 1-3.6-.8L4 20z" stroke="currentColor" stroke-width="1.6"/>
-                <circle cx="9" cy="11" r="1.2" fill="currentColor"/>
-                <circle cx="12" cy="11" r="1.2" fill="currentColor"/>
-                <circle cx="15" cy="11" r="1.2" fill="currentColor"/>
-              </svg>
-              WhatsApp
-            </a>
-            <span class="pill">Usado</span>
-          </div>
-        `;
-        grid.appendChild(card);
-      }
-    }
-
-    // Busca
-    const search = document.getElementById("search");
-    search.addEventListener("input", (e)=>{
-      const q = e.target.value.trim().toLowerCase();
-      const filtered = PRODUCTS.filter(p =>
-        p.nome.toLowerCase().includes(q) || p.descricao.toLowerCase().includes(q)
-      );
-      render(filtered);
-    });
-
-    // Banner: fade loop
-    (function bannerLoop(){
+    // Banner rotativo
+    (function(){
       const slides = [...document.querySelectorAll(".slide")];
-      const dots =  [...document.querySelectorAll(".dot")];
-      let i = 0;
+      const dots = [...document.querySelectorAll(".dot")];
+      let i=0;
       setInterval(()=>{
         slides[i].classList.remove("active");
         dots[i].classList.remove("active");
-        i = (i + 1) % slides.length;
+        i = (i+1)%slides.length;
         slides[i].classList.add("active");
         dots[i].classList.add("active");
-      }, 4200);
+      },4000);
     })();
 
-    // Data e rodapé
-    document.getElementById("year").textContent = new Date().getFullYear();
-    document.getElementById("today").textContent = new Date().toLocaleDateString("pt-BR", {weekday:"long", day:"2-digit", month:"2-digit"});
+    // Buscar dados da planilha
+    fetch(API_URL)
+      .then(r=>r.json())
+      .then(data=>{
+        produtos = data;
+        render(produtos);
+      });
 
-    // Primeira renderização
-    render(PRODUCTS);
+    function render(list){
+      GRID.innerHTML = "";
+      list.forEach((p)=>{
+        const card = document.createElement("div");
+        card.className="card";
+        card.innerHTML=`
+          <img src="${p.foto}" alt="${p.nome}">
+          <div class="info">
+            <h3>${p.nome}</h3>
+            <div class="price">R$ ${Number(p.preco).toFixed(2)}</div>
+            <span class="flag">${p.flag}</span>
+          </div>`;
+        card.onclick = ()=> openModal(p);
+        GRID.appendChild(card);
+      });
+    }
 
-    // Se acessar com #id, rola suave para o produto
-    if(location.hash){
-      const el = document.querySelector(location.hash);
-      if(el){ el.scrollIntoView({behavior:"smooth", block:"center"}); }
+    function openModal(p){
+      document.getElementById("mFoto").src=p.foto;
+      document.getElementById("mNome").textContent=p.nome;
+      document.getElementById("mPreco").textContent="R$ "+Number(p.preco).toFixed(2);
+      document.getElementById("mDesc").textContent=p.descricao;
+      document.getElementById("mFlag").textContent=p.flag;
+      const msg=`Olá! Tenho interesse neste produto:\n\n${p.nome}\nValor: R$ ${Number(p.preco).toFixed(2)}\n${p.descricao}`;
+      document.getElementById("mWhats").href=`https://wa.me/${p.whatsapp}?text=${encodeURIComponent(msg)}`;
+      MODAL.classList.add("active");
+    }
+    function closeModal(){ MODAL.classList.remove("active"); }
+
+    // Filtro de pesquisa + flag
+    document.getElementById("search").addEventListener("input", applyFilters);
+    document.getElementById("filter").addEventListener("change", applyFilters);
+
+    function applyFilters(){
+      const q = document.getElementById("search").value.toLowerCase();
+      const f = document.getElementById("filter").value;
+      const filtered = produtos.filter(p=>{
+        const matchesSearch = p.nome.toLowerCase().includes(q) || p.descricao.toLowerCase().includes(q);
+        const matchesFlag = (f==="Todos") || (p.flag===f);
+        return matchesSearch && matchesFlag;
+      });
+      render(filtered);
     }
   </script>
 </body>
