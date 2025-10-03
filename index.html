@@ -8,7 +8,7 @@
   <meta name="theme-color" content="#000000" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="mobile-web-app-capable" content="yes" />
-  <meta name="description" content="Bazar de usados — stories, produtos, mensagem no WhatsApp." />
+  <meta name="description" content="Bazar de usados — stories, produtos, favoritos e contato por WhatsApp." />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
 
@@ -16,7 +16,7 @@
     :root{
       --bg:#0b0f18; --surface:#0f172a; --card:#111827; --ink:#e6edf6; --muted:#93a3b8; --line:#1f2937;
       --brand:#16a34a; --brand-2:#22c55e; --danger:#ef4444; --radius:16px; --shadow:0 10px 30px rgba(2,6,23,.35);
-      --overlay:rgba(0,0,0,.88);
+      --overlay:rgba(0,0,0,.9); --heart:#ef4444;
     }
     @media (prefers-color-scheme: light){
       :root{ --bg:#f5f7fb; --surface:#ffffff; --card:#ffffff; --ink:#0f172a; --muted:#64748b; --line:#e5e7eb;
@@ -24,39 +24,43 @@
     }
     *{box-sizing:border-box}
     html,body{margin:0;height:100%}
-    body{
-      font-family:Inter,system-ui,Arial;background:var(--bg);color:var(--ink);
-      -webkit-font-smoothing:antialiased; overscroll-behavior:none;
-    }
-    /* esconder barras de rolagem */
-    ::-webkit-scrollbar{width:0;height:0}
-    *{scrollbar-width:none}
+    body{font-family:Inter,system-ui,Arial;background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased;overscroll-behavior:none}
+    ::-webkit-scrollbar{width:0;height:0} *{scrollbar-width:none}
 
+    /* Header + busca e coração */
     header{
-      position:sticky; top:0; z-index:10;
-      background:linear-gradient(180deg,var(--bg),rgba(0,0,0,0)) , var(--surface);
-      border-bottom:1px solid var(--line); padding:12px 16px;
-      display:flex; align-items:center; justify-content:space-between; gap:12px;
+      position:sticky; top:0; z-index:20;
+      background:linear-gradient(180deg,var(--bg),rgba(0,0,0,0)),var(--surface);
+      border-bottom:1px solid var(--line); padding:10px 14px;
+      display:grid; grid-template-columns:auto 1fr auto; align-items:center; gap:10px;
       backdrop-filter:saturate(120%) blur(6px);
     }
-    .brand{display:flex;align-items:center;gap:12px}
-    .brand-logo{
-      width:40px;height:40px;border-radius:12px;
-      background:radial-gradient(120% 120% at 20% 20%, var(--brand-2), var(--brand));
-      box-shadow:inset 0 0 20px rgba(255,255,255,.15);
-    }
-    .brand h1{font-size:18px;margin:0}
+    .brand{display:flex;align-items:center;gap:10px}
+    .brand-logo{width:36px;height:36px;border-radius:10px;background:radial-gradient(120% 120% at 20% 20%, var(--brand-2), var(--brand))}
+    .brand h1{font-size:16px;margin:0}
     .tag{font-size:12px;color:var(--muted)}
-    .container{max-width:1200px;margin:0 auto;padding:16px}
+    .container{max-width:1200px;margin:0 auto;padding:14px}
 
-    /* STORIES STRIP */
-    .stories-strip{
-      display:flex; gap:10px; overflow-x:auto; padding:8px 4px 4px;
-      -webkit-overflow-scrolling:touch; scroll-snap-type:x mandatory;
+    .top-tools{display:flex; align-items:center; gap:8px; justify-content:flex-end}
+    .search-wrap{
+      display:flex; align-items:center; gap:6px; padding:8px 10px; border:1px solid var(--line);
+      background:var(--surface); border-radius:12px; min-width:180px; max-width:420px; flex:1;
     }
-    .story-pill{
-      flex:0 0 auto; width:76px; scroll-snap-align:start; text-align:center; cursor:pointer;
+    .search{flex:1; background:transparent; border:0; outline:0; color:var(--ink); font-size:14px}
+    .heart-btn{
+      position:relative; width:40px; height:40px; border-radius:12px; border:1px solid var(--line);
+      display:grid; place-items:center; background:var(--surface); cursor:pointer;
     }
+    .heart-btn.active{ outline:2px solid rgba(239,68,68,.35) }
+    .badge{
+      position:absolute; top:-6px; right:-6px; background:var(--heart); color:#fff; font-weight:800;
+      width:18px; height:18px; border-radius:999px; font-size:11px; display:grid; place-items:center;
+      box-shadow:0 4px 10px rgba(239,68,68,.4);
+    }
+
+    /* Stories strip */
+    .stories-strip{display:flex; gap:10px; overflow-x:auto; padding:8px 2px 2px; -webkit-overflow-scrolling:touch; scroll-snap-type:x mandatory;}
+    .story-pill{ flex:0 0 auto; width:76px; scroll-snap-align:start; text-align:center; cursor:pointer; }
     .story-ring{
       width:76px;height:76px;border-radius:50%;
       padding:3px; background:
@@ -64,103 +68,62 @@
         conic-gradient(from 0deg, var(--brand-2), var(--brand)) border-box;
       display:grid; place-items:center;
     }
-    .story-thumb{
-      width:68px;height:68px;border-radius:50%; object-fit:cover; border:2px solid var(--bg);
-    }
+    .story-thumb{ width:68px;height:68px;border-radius:50%; object-fit:cover; border:2px solid var(--bg) }
     .story-title{font-size:12px;margin-top:6px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
-    /* GRID */
-    .grid{
-      display:grid; gap:14px; margin-top:14px;
-      grid-template-columns:repeat(2, 1fr); /* 2 por linha mobile */
-    }
-    @media (min-width:768px){ .grid{ grid-template-columns:repeat(4, 1fr); } }
-    @media (min-width:1200px){ .grid{ grid-template-columns:repeat(6, 1fr); } }
+    /* Grid */
+    .grid{display:grid; gap:14px; margin-top:12px; grid-template-columns:repeat(2, 1fr)}
+    @media (min-width:768px){ .grid{ grid-template-columns:repeat(4, 1fr) } }
+    @media (min-width:1200px){ .grid{ grid-template-columns:repeat(6, 1fr) } }
 
     .card{
-      display:flex; flex-direction:column; overflow:hidden; border-radius:16px;
+      position:relative; display:flex; flex-direction:column; overflow:hidden; border-radius:16px;
       background:var(--card); border:1px solid var(--line); box-shadow:var(--shadow);
       transition:transform .2s, border-color .2s ease;
     }
     .card:hover{ transform:translateY(-2px); border-color:rgba(34,197,94,.45) }
-    .thumb{ aspect-ratio:4/3; width:100%; object-fit:cover; display:block; background:#0b1020; }
+    .thumb{ aspect-ratio:4/3; width:100%; object-fit:cover; display:block; background:#0b1020 }
     .content{ padding:12px }
     .title{font-size:14px; font-weight:800; margin:0 0 6px; line-height:1.25}
     .price{font-size:15px; font-weight:800; color:var(--brand); margin-bottom:6px}
     .desc{font-size:12px; color:var(--muted); line-height:1.45; margin:0 0 10px; min-height:2.8em; overflow:hidden}
+    .pill{position:absolute; bottom:10px; right:10px; font-size:11px; color:var(--muted); padding:6px 8px; border:1px dashed var(--line); border-radius:999px; background:rgba(0,0,0,.2)}
 
-    .actions{display:flex; flex-direction:column; gap:8px; padding:0 12px 12px}
-    .msg-row{display:flex; gap:6px}
-    .msg-input{
-      flex:1; border:1px solid var(--line); background:transparent; color:var(--ink);
-      border-radius:10px; padding:8px 10px; font-size:12px; outline:none;
+    /* Favoritar */
+    .fav{
+      position:absolute; top:10px; right:10px; width:36px; height:36px; border-radius:999px;
+      display:grid; place-items:center; background:rgba(0,0,0,.35); color:#fff; cursor:pointer; border:1px solid rgba(255,255,255,.2);
     }
-    .btn{
-      appearance:none; border:0; border-radius:12px; padding:10px 12px; cursor:pointer;
-      font-weight:800; font-size:12px; letter-spacing:.2px; display:inline-flex; align-items:center; gap:8px;
-      background:linear-gradient(180deg,var(--brand-2),var(--brand)); color:#fff;
-      box-shadow:0 10px 20px rgba(34,197,94,.22), inset 0 -2px 0 rgba(0,0,0,.2);
-      text-decoration:none; justify-content:center;
-    }
-    .btn.secondary{
-      background:linear-gradient(180deg,#2d3748,#111827); color:#e5e7eb; border:1px solid var(--line);
-      box-shadow:none; font-weight:700;
-    }
-    .pill{margin-left:auto; font-size:11px; color:var(--muted); padding:6px 8px; border:1px dashed var(--line); border-radius:999px}
+    .fav .fill{ fill:transparent; stroke:#fff; stroke-width:1.5 }
+    .fav.active .fill{ fill:var(--heart); stroke:var(--heart) }
 
     footer{color:var(--muted); font-size:12px; text-align:center; padding:24px 12px}
+    .list-meta{margin:6px 2px 0; font-size:12px; color:var(--muted)}
 
-    .toolbar{display:flex; gap:10px; align-items:center; margin:10px 0 6px; background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:10px 12px}
-    .search{flex:1; background:transparent; border:0; outline:0; color:var(--ink); font-size:14px}
-    .count{font-size:12px; color:var(--muted)}
-
-    /* OVERLAYS FULLSCREEN (stories e detalhes) */
-    .overlay{
-      position:fixed; inset:0; z-index:9999; background:var(--overlay);
-      display:none; align-items:center; justify-content:center;
-      width:100vw; height:100dvh; /* cobre tudo, inclusive barras */
-      -webkit-backdrop-filter: blur(2px);
-      backdrop-filter: blur(2px);
-    }
+    /* Overlays fullscreen */
+    .overlay{position:fixed; inset:0; z-index:9999; background:var(--overlay); display:none; align-items:center; justify-content:center; width:100vw; height:100svh; -webkit-backdrop-filter:blur(2px); backdrop-filter:blur(2px)}
     .overlay.open{ display:flex }
 
-    /* STORY VIEWER */
-    .story-viewer{
-      position:relative; width:min(100vw, 420px); height:100dvh; background:#000; border-radius:0; overflow:hidden;
-      display:flex; align-items:center; justify-content:center;
-    }
-    .story-img{
-      position:absolute; inset:0; object-fit:contain; width:100%; height:100%;
-      opacity:0; transition:opacity 0.8s ease;
-    }
+    /* Story viewer */
+    .story-viewer{position:relative; width:min(100vw, 420px); height:100svh; background:#000; overflow:hidden; display:flex; align-items:center; justify-content:center}
+    .story-img{position:absolute; inset:0; object-fit:cover; width:100%; height:100%; opacity:0; transition:opacity .8s ease}
     .story-img.active{ opacity:1 }
-    .progress{
-      position:absolute; top:calc(env(safe-area-inset-top) + 8px); left:8px; right:8px; display:flex; gap:5px; z-index:2;
-    }
-    .bar{
-      flex:1; height:3px; border-radius:999px; background:rgba(255,255,255,.25); overflow:hidden;
-    }
-    .bar .fill{
-      width:0%; height:100%; background:#fff; transition:width linear;
-    }
-    .controls{
-      position:absolute; inset:0; display:flex; z-index:3;
-    }
-    .tap-left, .tap-right{ flex:1 1 50%; }
-    .tap-left{ background:rgba(0,0,0,0); }
-    .tap-right{ background:rgba(0,0,0,0); }
-    .close-btn{
-      position:absolute; top:calc(env(safe-area-inset-top) + 10px); right:10px; z-index:4;
-      width:36px;height:36px;border-radius:999px;border:1px solid rgba(255,255,255,.2);
-      display:grid;place-items:center;background:rgba(0,0,0,.35); color:#fff; cursor:pointer;
-    }
+    .progress{position:absolute; top:calc(env(safe-area-inset-top) + 8px); left:8px; right:8px; display:flex; gap:5px; z-index:3}
+    .bar{ flex:1; height:3px; border-radius:999px; background:rgba(255,255,255,.25); overflow:hidden }
+    .bar .fill{ width:0%; height:100%; background:#fff; transition:width linear }
+    .controls{ position:absolute; inset:0; display:flex; z-index:2 }
+    .tap-left,.tap-right{ flex:1 1 50% }
+    .close-btn{ position:absolute; top:calc(env(safe-area-inset-top) + 10px); right:10px; z-index:4; width:36px;height:36px;border-radius:999px;border:1px solid rgba(255,255,255,.2); display:grid;place-items:center;background:rgba(0,0,0,.35); color:#fff; cursor:pointer }
 
-    /* MODAL DETALHES */
-    .details-card{
-      position:relative; width:min(96vw, 520px); max-height:92dvh; background:var(--card);
-      border:1px solid var(--line); border-radius:18px; box-shadow:var(--shadow); overflow:auto;
-    }
-    .details-media{width:100%; aspect-ratio: 9/16; object-fit:cover; display:block; background:#000}
+    /* Tag do item + composer */
+    .story-tag{position:absolute; left:12px; bottom:82px; z-index:4; background:rgba(0,0,0,.55); color:#fff; padding:6px 10px; border-radius:10px; font-size:12px; border:1px solid rgba(255,255,255,.15); max-width:90%; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+    .composer{position:absolute; left:0; right:0; bottom:0; z-index:5; padding:12px 10px calc(10px + env(safe-area-inset-bottom)); background:linear-gradient(180deg, rgba(0,0,0,0), rgba(0,0,0,.55) 40%, rgba(0,0,0,.85)); display:flex; gap:8px; align-items:center}
+    .composer input{flex:1; border:1px solid rgba(255,255,255,.25); background:rgba(0,0,0,.35); color:#fff; border-radius:12px; padding:10px 12px; font-size:14px; outline:none}
+    .composer button{min-width:120px; appearance:none; border:0; border-radius:12px; padding:10px 12px; cursor:pointer; font-weight:800; font-size:12px; display:inline-flex; align-items:center; justify-content:center; background:linear-gradient(180deg,var(--brand-2),var(--brand)); color:#fff; box-shadow:0 10px 20px rgba(34,197,94,.22), inset 0 -2px 0 rgba(0,0,0,.2)}
+
+    /* Modal Detalhes */
+    .details-card{position:relative; width:min(96vw, 520px); max-height:92svh; background:var(--card); border:1px solid var(--line); border-radius:18px; box-shadow:var(--shadow); overflow:auto}
+    .details-media{width:100%; aspect-ratio:9/16; object-fit:cover; display:block; background:#000}
     .details-body{padding:14px}
     .details-title{margin:0 0 8px; font-size:18px}
     .details-price{color:var(--brand); font-weight:800; margin-bottom:8px}
@@ -175,23 +138,35 @@
       <div class="brand-logo" aria-hidden="true"></div>
       <div>
         <h1>Bazar</h1>
-        <div class="tag">Stories + produtos • fale no WhatsApp</div>
+        <div class="tag" id="today"></div>
       </div>
     </div>
-    <div class="tag" id="today"></div>
+
+    <!-- Busca + coração no topo -->
+    <div class="top-tools">
+      <div class="search-wrap">
+        <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 19a8 8 0 1 1 5.293-14.293A8 8 0 0 1 11 19zm10 3-6-6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        <input class="search" id="searchTop" type="search" placeholder="Buscar..." />
+      </div>
+      <button id="heartTop" class="heart-btn" title="Mostrar apenas favoritos">
+        <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true">
+          <path class="stroke" d="M12.1 20.3s-7.6-4.4-9.2-9.3C1.9 6.8 5 4.1 8 5.1c1.5.5 2.7 1.8 4 4 1.3-2.2 2.5-3.5 4-4 3-.9 6.1 1.7 5.1 5.9-1.5 4.9-9.1 9.3-9.1 9.3z" fill="none" stroke="currentColor" stroke-width="1.5"/>
+        </svg>
+        <span id="favCount" class="badge" style="display:none">0</span>
+      </button>
+    </div>
+
+    <div></div><!-- spacer -->
   </header>
 
   <main class="container">
-    <!-- STORIES (sem banner) -->
+    <!-- STORIES -->
     <section aria-label="Stories">
       <div id="storiesStrip" class="stories-strip"></div>
     </section>
 
-    <!-- Busca -->
-    <div class="toolbar">
-      <input class="search" id="search" type="search" placeholder="Buscar por nome ou descrição..." />
-      <span class="count" id="count"></span>
-    </div>
+    <!-- Meta da lista -->
+    <div class="list-meta"><span id="count"></span></div>
 
     <!-- GRID -->
     <section id="grid" class="grid" aria-live="polite"></section>
@@ -209,8 +184,12 @@
         <div class="tap-left" id="tapLeft"></div>
         <div class="tap-right" id="tapRight"></div>
       </div>
+      <div class="story-tag" id="storyTag"></div>
+      <div class="composer">
+        <input id="storyMsg" type="text" maxlength="160" placeholder="Escreva sua mensagem..." />
+        <button id="storySend">Enviar</button>
+      </div>
       <button class="close-btn" id="closeStories" aria-label="Fechar stories">✕</button>
-      <!-- imagens são injetadas via JS -->
     </div>
   </div>
 
@@ -231,64 +210,32 @@
   </div>
 
   <script>
-    // ========= CONFIG =========
-    const WHATSAPP_NUMBER = "5571999999999"; // <= TROQUE AQUI
+    /* ============== CONFIG ============== */
+    // Troque pelo seu endpoint do Google Apps Script (Web App publicado)
+    const URL_API = "https://script.google.com/macros/s/AKfycbyVUcV4Z9x3tQZy4z0SDg37lTCy0aHcjoyOeVQsQU4ClJxrMQhxYEwwLqATWGK27Wv4aQ/exec"; // <-- TROCAR
 
-    // STORIES (exemplo: cada story tem lista de imagens verticais)
-    const STORIES = [
-      {
-        id:"st-vitrine",
-        title:"Vitrine",
-        thumb:"https://images.unsplash.com/photo-1512436991641-6745cdb1723f?q=80&w=400&auto=format&fit=crop",
-        photos:[
-          "https://images.unsplash.com/photo-1520975622034-763f2f2997c7?q=80&w=1080&auto=format&fit=crop",
-          "https://images.unsplash.com/photo-1517630800677-932d836ab680?q=80&w=1080&auto=format&fit=crop",
-          "https://images.unsplash.com/photo-1503342217505-b0a15cf70489?q=80&w=1080&auto=format&fit=crop"
-        ]
-      },
-      {
-        id:"st-ofertas",
-        title:"Ofertas",
-        thumb:"https://images.unsplash.com/photo-1519710164239-da123dc03ef4?q=80&w=400&auto=format&fit=crop",
-        photos:[
-          "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?q=80&w=1080&auto=format&fit=crop",
-          "https://images.unsplash.com/photo-1514996937319-344454492b37?q=80&w=1080&auto=format&fit=crop"
-        ]
-      },
-      {
-        id:"st-novidades",
-        title:"Novidades",
-        thumb:"https://images.unsplash.com/photo-1530133532239-eda6f53fcf01?q=80&w=400&auto=format&fit=crop",
-        photos:[
-          "https://images.unsplash.com/photo-1547949003-9792a18a2601?q=80&w=1080&auto=format&fit=crop",
-          "https://images.unsplash.com/photo-1535051045119-bf3249d062db?q=80&w=1080&auto=format&fit=crop",
-          "https://images.unsplash.com/photo-1555529771-35a38dc55b38?q=80&w=1080&auto=format&fit=crop",
-          "https://images.unsplash.com/photo-1520975622034-763f2f2997c7?q=80&w=1080&auto=format&fit=crop"
-        ]
-      }
-    ];
+    /* ============== ESTADO ============== */
+    let CONFIG   = { whatsapp:"", storyDurationSec:7 }; // vem da planilha
+    let PRODUCTS = [];     // [{id,nome,preco,descricao,foto,whatsapp?,story?}]
+    let STORIES  = [];     // [{id,title,thumb,slides:[{productId,src}]}]
+    let FILTER_FAVS_ONLY = false;
+    let FAVORITES = new Set(JSON.parse(localStorage.getItem("bazar_favs") || "[]"));
 
-    // Produtos
-    const PRODUCTS = [
-      { id:"cadeira-executiva", nome:"Cadeira Executiva Ergonômica", preco:320.00, descricao:"Ajuste de altura, apoio lombar e rodízios silenciosos.", foto:"https://images.unsplash.com/photo-1582582621959-48d283e84f60?q=80&w=1200&auto=format&fit=crop" },
-      { id:"liquidificador", nome:"Liquidificador Inox 900W", preco:140.00, descricao:"3 velocidades + pulsar, jarra de vidro sem rachaduras.", foto:"https://images.unsplash.com/photo-1526116980809-6f6f0d6a62d2?q=80&w=1200&auto=format&fit=crop" },
-      { id:"ventilador-turbo", nome:"Ventilador Turbo 40cm", preco:110.00, descricao:"Silencioso, pouco tempo de uso. Grade sem amassados.", foto:"https://images.unsplash.com/photo-1636887560048-23ead929dbd3?q=80&w=1200&auto=format&fit=crop" },
-      { id:"prancha-cabelo", nome:"Prancha de Cabelo Cerâmica", preco:75.00, descricao:"Aquece rápido, cabo giratório. Funcionando perfeitamente.", foto:"https://images.unsplash.com/photo-1512496015851-a90fb38ba796?q=80&w=1200&auto=format&fit=crop" },
-      { id:"microondas", nome:"Micro-ondas 20L", preco:280.00, descricao:"Display perfeito, interior limpo. Marcas leves de uso.", foto:"https://images.unsplash.com/photo-1594035910387-fea47794261f?q=80&w=1200&auto=format&fit=crop" },
-      { id:"lampada-decor", nome:"Luminária Decorativa de Mesa", preco:55.00, descricao:"Luz quente aconchegante. Acompanha lâmpada.", foto:"https://images.unsplash.com/photo-1519710164239-da123dc03ef4?q=80&w=1200&auto=format&fit=crop" },
-      { id:"bike-aro29", nome:"Bicicleta Aro 29", preco:990.00, descricao:"Câmbio 21v revisado, freio a disco. Quadro M.", foto:"https://images.unsplash.com/photo-1518655048521-f130df041f66?q=80&w=1200&auto=format&fit=crop" },
-      { id:"notebook-i5", nome:"Notebook i5 8GB/256GB", preco:1650.00, descricao:"Bateria boa, tela 14”. Ideal para estudos e trabalho.", foto:"https://images.unsplash.com/photo-1498050108023-c5249f4df085?q=80&w=1200&auto=format&fit=crop" },
-      { id:"mesa-centro", nome:"Mesa de Centro Madeira", preco:180.00, descricao:"Madeira maciça envernizada, sem lascas.", foto:"https://images.unsplash.com/photo-1519710122415-b83b1d53f6c6?q=80&w=1200&auto=format&fit=crop" },
-      { id:"cafeteira", nome:"Cafeteira Elétrica", preco:120.00, descricao:"Filtro permanente e jarra de vidro. Uso doméstico.", foto:"https://images.unsplash.com/photo-1503481766315-7a586b20f66f?q=80&w=1200&auto=format&fit=crop" },
-      { id:"monitor-24", nome:"Monitor 24” Full HD", preco:590.00, descricao:"Cores vivas, sem dead pixels. HDMI/DP.", foto:"https://images.unsplash.com/photo-1517336714731-489689fd1ca8?q=80&w=1200&auto=format&fit=crop" },
-      { id:"mochila", nome:"Mochila Casual 25L", preco:80.00, descricao:"Vários bolsos, zíper reforçado. Tecido sem furos.", foto:"https://images.unsplash.com/photo-1547949003-9792a18a2601?q=80&w=1200&auto=format&fit=crop" }
-    ];
-
-    // ========= UTIL =========
-    const fmtBRL = (v) => v.toLocaleString("pt-BR", {style:"currency", currency:"BRL"});
+    /* ============== UTIL ============== */
+    const onlyDigits = s => String(s||"").replace(/\D+/g,"");
+    const fmtBRL = (v) => {
+      const n = typeof v === "number" ? v : parseFloat(String(v).replace(/\./g, "").replace(",", "."));
+      return isNaN(n) ? "-" : n.toLocaleString("pt-BR", {style:"currency", currency:"BRL"});
+    };
     const pageLink = (id) => location.origin + location.pathname + "#" + id;
+    const saveFavs = () => localStorage.setItem("bazar_favs", JSON.stringify([...FAVORITES]));
+    const isFav = (id) => FAVORITES.has(id);
+    const getPhoneFor = (prod) => onlyDigits(prod?.whatsapp || CONFIG.whatsapp || "");
+    const buildWaLink = (phone, text) =>
+      phone ? `https://wa.me/${phone}?text=${encodeURIComponent(text)}` :
+              `https://wa.me/?text=${encodeURIComponent(text)}`; // fallback sem número
 
-    // Bloqueio de rolagem do fundo (quando overlays estão abertos)
+    // Bloqueio de rolagem do fundo durante overlays
     let scrollPos = 0;
     function lockBody(){
       scrollPos = window.scrollY || document.documentElement.scrollTop;
@@ -305,7 +252,63 @@
       window.scrollTo(0, scrollPos);
     }
 
-    // ========= RENDER STORIES STRIP =========
+    /* ============== CARREGAR DADOS (GAS) ============== */
+    async function loadData(){
+      const res = await fetch(`${URL_API}?acao=listar`, {cache:"no-store"});
+      const data = await res.json();
+      if(data.status !== "ok") throw new Error(data.msg || "Resposta inválida");
+
+      // Config
+      CONFIG.whatsapp = onlyDigits(data.config?.whatsapp || data.config?.WhatsApp || "");
+      CONFIG.storyDurationSec = Number(data.config?.storyDurationSec || data.config?.DuracaoStories || 7) || 7;
+
+      // Produtos
+      PRODUCTS = (data.produtos || []).map(p => {
+        const idBase = p.id || p.ID || p.Nome || p.nome || ('id-' + Math.random().toString(36).slice(2,9));
+        return {
+          id: String(idBase).toLowerCase().trim().replace(/\s+/g,"-").replace(/[^a-z0-9\-]/g,""),
+          nome: p.nome || p.Nome || "Produto",
+          preco: p.preco ?? p.Preco ?? p.Valor ?? 0,
+          descricao: p.descricao || p.Descricao || "",
+          foto: p.foto || p.Foto || "",
+          whatsapp: p.whatsapp || p.WhatsApp || "",
+          story: p.story || p.StoryGrupo || null
+        };
+      });
+
+      // Stories (se vierem prontos)
+      if(Array.isArray(data.stories) && data.stories.length){
+        STORIES = data.stories.map((g,i)=>{
+          const title = g.grupo || g.title || `Stories ${i+1}`;
+          const normalizedSlides = (g.slides || []).map(s=>{
+            if(typeof s === "string"){
+              const prod = PRODUCTS.find(p=>p.id===s || p.id===String(s).toLowerCase());
+              return prod ? {productId: prod.id, src: prod.foto} : null;
+            }else{
+              const pid = s.productId || s.id;
+              const prod = PRODUCTS.find(p=>p.id===pid || p.id===String(pid).toLowerCase());
+              const src = s.src || (prod ? prod.foto : "");
+              return prod ? {productId: prod.id, src} : null;
+            }
+          }).filter(Boolean);
+          const thumb = g.thumb || (normalizedSlides[0]?.src || "");
+          return { id: title.toLowerCase().replace(/\s+/g,"-"), title, thumb, slides: normalizedSlides };
+        }).filter(s=>s.slides.length);
+      }else{
+        // Fallback: agrupar pelos campos "story"/"StoryGrupo" dos produtos
+        const groups = {};
+        for(const p of PRODUCTS){
+          const g = p.story || "Destaques";
+          groups[g] ??= [];
+          groups[g].push({productId: p.id, src: p.foto});
+        }
+        STORIES = Object.entries(groups).map(([g,slides])=>({
+          id: g.toLowerCase().replace(/\s+/g,"-"), title:g, thumb: slides[0]?.src || "", slides
+        }));
+      }
+    }
+
+    /* ============== STORIES STRIP ============== */
     const storiesStrip = document.getElementById("storiesStrip");
     function renderStories(){
       storiesStrip.innerHTML = "";
@@ -323,39 +326,49 @@
       }
     }
 
-    // ========= STORY VIEWER LOGIC =========
+    /* ============== STORY VIEWER ============== */
     const storiesOverlay = document.getElementById("storiesOverlay");
     const storyViewer   = document.getElementById("storyViewer");
     const storyProgress = document.getElementById("storyProgress");
+    const storyTag      = document.getElementById("storyTag");
+    const storyMsg      = document.getElementById("storyMsg");
+    const storySend     = document.getElementById("storySend");
     const closeStories  = document.getElementById("closeStories");
     const tapLeft  = document.getElementById("tapLeft");
     const tapRight = document.getElementById("tapRight");
-    let currentPhotos = [];
+
+    let currentStory = null;
     let currentIndex = 0;
     let timer = null;
-    const DURATION_MS = 7000; // 7s
 
     function clearViewer(){
-      // remove imagens antigas
       [...storyViewer.querySelectorAll("img.story-img")].forEach(n=>n.remove());
       storyProgress.innerHTML = "";
+      storyMsg.value = "";
       if(timer){ clearTimeout(timer); timer = null; }
+    }
+
+    function productById(id){ return PRODUCTS.find(p=>p.id===id) }
+
+    function labelCurrent(){
+      const slide = currentStory.slides[currentIndex];
+      const prod  = productById(slide.productId);
+      storyTag.textContent = prod ? prod.nome : "";
     }
 
     function openStories(story){
       clearViewer();
-      currentPhotos = story.photos;
+      currentStory = story;
       currentIndex = 0;
 
-      // cria imagens
-      currentPhotos.forEach((src, i)=>{
+      // cria imagens e barras
+      currentStory.slides.forEach((sl, i)=>{
         const img = document.createElement("img");
         img.className = "story-img" + (i===0 ? " active":"");
-        img.src = src;
-        img.alt = `${story.title} • ${i+1}/${currentPhotos.length}`;
+        img.src = sl.src;
+        img.alt = `${story.title} • ${i+1}/${currentStory.slides.length}`;
         storyViewer.appendChild(img);
 
-        // barras
         const bar = document.createElement("div");
         bar.className = "bar";
         const fill = document.createElement("div");
@@ -364,143 +377,146 @@
         storyProgress.appendChild(bar);
       });
 
+      // Enviar dentro do story
+      storySend.onclick = ()=>{
+        const slide = currentStory.slides[currentIndex];
+        const prod  = productById(slide.productId);
+        if(!prod) return;
+        const custom = storyMsg.value.trim();
+        const msg = [
+          custom ? `Mensagem: ${custom}` : null,
+          `Item: ${prod.nome}`,
+          `Link: ${pageLink(prod.id)}`
+        ].filter(Boolean).join("\n");
+        const url = buildWaLink(getPhoneFor(prod), msg);
+        window.open(url, "_blank", "noopener");
+      };
+
       storiesOverlay.classList.add("open");
       lockBody();
-      runStep(); // inicia
+      runStep();
+      labelCurrent();
     }
 
     function runStep(){
-      // ativa imagem atual e anima barra
-      const imgs = [...storyViewer.querySelectorAll(".story-img")];
+      const imgs  = [...storyViewer.querySelectorAll(".story-img")];
       const fills = [...storyProgress.querySelectorAll(".fill")];
 
       imgs.forEach((n,i)=> n.classList.toggle("active", i===currentIndex));
-      fills.forEach((f,i)=>{
-        f.style.transition = "none";
-        f.style.width = i < currentIndex ? "100%" : "0%";
-      });
+      fills.forEach((f,i)=>{ f.style.transition="none"; f.style.width = i < currentIndex ? "100%" : "0%" });
 
-      requestAnimationFrame(()=>{ // força reflow antes de animar
+      const dur = Math.max(1, Number(CONFIG.storyDurationSec || 7)) * 1000;
+      requestAnimationFrame(()=>{
         const f = fills[currentIndex];
-        if(f){
-          // fade control via CSS em .story-img.active
-          f.style.transition = `width ${DURATION_MS}ms linear`;
-          f.style.width = "100%";
-        }
+        if(f){ f.style.transition = `width ${dur}ms linear`; f.style.width = "100%" }
       });
 
-      if(timer){ clearTimeout(timer); }
-      timer = setTimeout(()=> nextStory(), DURATION_MS);
+      if(timer) clearTimeout(timer);
+      timer = setTimeout(()=> nextStory(), dur);
     }
 
     function nextStory(){
-      if(currentIndex < currentPhotos.length - 1){
-        currentIndex++;
-        runStep();
+      if(currentIndex < currentStory.slides.length - 1){
+        currentIndex++; runStep(); labelCurrent();
       }else{
         closeStoriesOverlay();
       }
     }
     function prevStory(){
       if(currentIndex > 0){
-        currentIndex--;
-        runStep();
+        currentIndex--; runStep(); labelCurrent();
       }else{
-        // se estiver no início, só reinicia a barra
-        runStep();
+        runStep(); // reinicia barra no primeiro
       }
     }
-
     function closeStoriesOverlay(){
       storiesOverlay.classList.remove("open");
       clearViewer();
       unlockBody();
     }
-
     tapRight.addEventListener("click", nextStory);
     tapLeft.addEventListener("click", prevStory);
     closeStories.addEventListener("click", closeStoriesOverlay);
-    storiesOverlay.addEventListener("click", (e)=>{
-      // impedir clique “atrás” de fechar indevidamente
-      if(e.target === storiesOverlay) closeStoriesOverlay();
-    });
+    storiesOverlay.addEventListener("click", (e)=>{ if(e.target === storiesOverlay) closeStoriesOverlay() });
 
-    // ========= RENDER GRID =========
-    const grid = document.getElementById("grid");
-    function buildMsgLink(prod, customMsg){
-      const msgLines = [];
-      if(customMsg?.trim()){
-        msgLines.push(`Mensagem: ${customMsg.trim()}`);
-      }
-      msgLines.push(`Item: ${prod.nome}`);
-      msgLines.push(`Link: ${pageLink(prod.id)}`);
-      const txt = encodeURIComponent(msgLines.join("\n"));
-      return `https://wa.me/${WHATSAPP_NUMBER}?text=${txt}`;
+    /* ============== GRID (cards) ============== */
+    const grid  = document.getElementById("grid");
+    const countEl = document.getElementById("count");
+    const searchTop = document.getElementById("searchTop");
+    const heartTop  = document.getElementById("heartTop");
+    const favCount  = document.getElementById("favCount");
+
+    function updateFavBadge(){
+      const n = FAVORITES.size;
+      favCount.textContent = n;
+      favCount.style.display = n ? "grid" : "none";
+      heartTop.classList.toggle("active", FILTER_FAVS_ONLY);
     }
 
-    function render(list){
+    function filteredList(){
+      const q = (searchTop.value || "").trim().toLowerCase();
+      let list = PRODUCTS;
+      if(FILTER_FAVS_ONLY) list = list.filter(p=> isFav(p.id));
+      if(q) list = list.filter(p =>
+        (p.nome||"").toLowerCase().includes(q) || (p.descricao||"").toLowerCase().includes(q)
+      );
+      return list;
+    }
+
+    function render(){
+      const list = filteredList();
+      countEl.textContent = `${list.length} item(ns)`;
       grid.innerHTML = "";
-      document.getElementById("count").textContent = `${list.length} item(ns)`;
       for(const p of list){
-        const card = document.createElement("article");
-        card.className = "card";
-        card.id = p.id;
+        const el = document.createElement("article");
+        el.className = "card";
+        el.id = p.id;
+        const favActive = isFav(p.id) ? "active" : "";
 
-        const msgId = `msg-${p.id}`;
+        el.innerHTML = `
+          <button class="fav ${favActive}" data-fav="${p.id}" title="Favoritar">
+            <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path class="fill" d="M12.1 20.3s-7.6-4.4-9.2-9.3C1.9 6.8 5 4.1 8 5.1c1.5.5 2.7 1.8 4 4 1.3-2.2 2.5-3.5 4-4 3-.9 6.1 1.7 5.1 5.9-1.5 4.9-9.1 9.3-9.1 9.3z"/></svg>
+          </button>
 
-        card.innerHTML = `
           <img class="thumb" src="${p.foto}" alt="${p.nome}" loading="lazy" />
           <div class="content">
             <h2 class="title">${p.nome}</h2>
             <div class="price">${fmtBRL(p.preco)}</div>
-            <p class="desc">${p.descricao}</p>
+            <p class="desc">${p.descricao||""}</p>
           </div>
-
-          <div class="actions">
-            <div class="msg-row">
-              <input id="${msgId}" class="msg-input" type="text" maxlength="160" placeholder="Escreva sua mensagem..." />
-              <button class="btn" data-action="send" data-id="${p.id}">Enviar</button>
-            </div>
-            <div class="msg-row">
-              <button class="btn secondary" data-action="details" data-id="${p.id}">Detalhes</button>
-              <span class="pill">Usado</span>
-            </div>
+          <div class="actions" style="padding:0 12px 12px">
+            <button class="btn secondary" data-details="${p.id}">Detalhes</button>
           </div>
+          <span class="pill">Usado</span>
         `;
-        grid.appendChild(card);
+        grid.appendChild(el);
       }
+      updateFavBadge();
     }
 
-    // Busca
-    const search = document.getElementById("search");
-    search.addEventListener("input", (e)=>{
-      const q = e.target.value.trim().toLowerCase();
-      const filtered = PRODUCTS.filter(p =>
-        p.nome.toLowerCase().includes(q) || p.descricao.toLowerCase().includes(q)
-      );
-      render(filtered);
-    });
-
-    // Delegação de eventos: enviar WhatsApp & abrir detalhes
+    // Toggle favoritos e detalhes
     grid.addEventListener("click", (e)=>{
-      const btn = e.target.closest("button");
-      if(!btn) return;
-      const id  = btn.dataset.id;
-      const act = btn.dataset.action;
-      const prod = PRODUCTS.find(x=>x.id===id);
-      if(!prod) return;
-
-      if(act==="send"){
-        const input = document.getElementById(`msg-${id}`);
-        const url = buildMsgLink(prod, input.value);
-        window.open(url, "_blank", "noopener");
+      const favBtn = e.target.closest("[data-fav]");
+      if(favBtn){
+        const id = favBtn.dataset.fav;
+        if(FAVORITES.has(id)) FAVORITES.delete(id); else FAVORITES.add(id);
+        saveFavs(); render(); return;
       }
-      if(act==="details"){
-        openDetails(prod);
+      const detBtn = e.target.closest("[data-details]");
+      if(detBtn){
+        const id = detBtn.dataset.details;
+        const prod = PRODUCTS.find(p=>p.id===id);
+        if(prod) openDetails(prod);
       }
     });
 
-    // ========= DETALHES (MODAL) =========
+    heartTop.addEventListener("click", ()=>{
+      FILTER_FAVS_ONLY = !FILTER_FAVS_ONLY;
+      render();
+    });
+    searchTop.addEventListener("input", render);
+
+    /* ============== DETALHES (modal) ============== */
     const detailsOverlay = document.getElementById("detailsOverlay");
     const detailsImg   = document.getElementById("detailsImg");
     const detailsTitle = document.getElementById("detailsTitle");
@@ -508,7 +524,6 @@
     const detailsDesc  = document.getElementById("detailsDesc");
     const detailsWhats = document.getElementById("detailsWhats");
     const detailsClose = document.getElementById("detailsClose");
-
     let currentProd = null;
 
     function openDetails(prod){
@@ -520,31 +535,41 @@
       detailsDesc.textContent  = prod.descricao;
 
       detailsWhats.onclick = ()=>{
-        const url = buildMsgLink(prod, "Olá! Tenho interesse.");
+        const msg = [`Item: ${prod.nome}`, `Link: ${pageLink(prod.id)}`].join("\n");
+        const url = buildWaLink(getPhoneFor(prod), msg);
         window.open(url, "_blank", "noopener");
       };
 
       detailsOverlay.classList.add("open");
       lockBody();
     }
-
     function closeDetails(){
       detailsOverlay.classList.remove("open");
       unlockBody();
     }
-
     detailsClose.addEventListener("click", closeDetails);
-    detailsOverlay.addEventListener("click", (e)=>{
-      if(e.target === detailsOverlay) closeDetails();
-    });
+    detailsOverlay.addEventListener("click", (e)=>{ if(e.target === detailsOverlay) closeDetails() });
 
-    // ========= INIT =========
+    /* ============== INIT ============== */
     document.getElementById("year").textContent = new Date().getFullYear();
     document.getElementById("today").textContent = new Date().toLocaleDateString("pt-BR", {weekday:"long", day:"2-digit", month:"2-digit"});
-    renderStories();
-    render(PRODUCTS);
 
-    // hash deep-link
+    (async function init(){
+      try{
+        await loadData();
+        renderStories();
+        render();
+      }catch(err){
+        console.error(err);
+        document.querySelector("main").innerHTML = `
+          <div style="padding:24px; background:var(--surface); border:1px solid var(--line); border-radius:12px">
+            <h2 style="margin:0 0 8px">Não foi possível carregar os dados</h2>
+            <p style="color:var(--muted)">Verifique o <b>URL_API</b> e o retorno do seu Google Apps Script (<code>?acao=listar</code>).</p>
+          </div>`;
+      }
+    })();
+
+    // Deep-link para card
     if(location.hash){
       const el = document.querySelector(location.hash);
       if(el){ el.scrollIntoView({behavior:"smooth", block:"center"}); }
