@@ -27,7 +27,7 @@
     .flag{position:absolute;top:10px;right:10px;background:#16a34a;color:#fff;padding:4px 8px;font-size:12px;border-radius:12px}
     .post-body{padding:10px}
     .price{color:#16a34a;font-weight:bold;margin:4px 0}
-    .btn{background:#16a34a;color:#fff;padding:6px 10px;border-radius:6px;text-decoration:none;display:inline-block;margin-top:8px;font-size:13px}
+    .btn{background:#16a34a;color:#fff;padding:6px 10px;border-radius:6px;text-decoration:none;display:inline-block;margin-top:8px;font-size:13px;cursor:pointer}
 
     /* Modal */
     .modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);align-items:center;justify-content:center;z-index:100}
@@ -59,7 +59,7 @@
   </div>
 
   <script>
-    const API_URL = "https://script.google.com/macros/s/AKfycbyVUcV4Z9x3tQZy4z0SDg37lTCy0aHcjoyOeVQsQU4ClJxrMQhxYEwwLqATWGK27Wv4aQ/exec";
+    const API_URL = "https://script.google.com/macros/s/AKfycbyVUcV4Z9x3tQZy4z0SDg37lTCy0aHcjoyOeVQsQU4ClJxrMQhxYEwwLqATWGK27Wv4aQ/exec"; // coloque aqui a URL publicada do GAS
 
     fetch(API_URL)
       .then(r=>r.json())
@@ -79,7 +79,7 @@
         let produtos = data.produtos.filter(p=> (p.status||"").toLowerCase()!=="vendido");
         produtos.sort((a,b)=> new Date(b.datahora)-new Date(a.datahora));
 
-        // Intercalar para não repetir mesma loja seguida
+        // Intercalar: não deixar 2 produtos seguidos da mesma loja
         let feedList=[];
         let lojasUsadas=new Set();
         while(produtos.length){
@@ -111,9 +111,13 @@
             <div class="post-body">
               <p>${p.descricao}</p>
               <div class="price">R$ ${Number(p.preco).toFixed(2)}</div>
-              <a href="#" class="btn" onclick="openModal(${JSON.stringify(p).replace(/"/g,'&quot;')})">Detalhes</a>
             </div>
           `;
+          const btn = document.createElement("a");
+          btn.className="btn";
+          btn.textContent="Detalhes";
+          btn.onclick = ()=>openModal(p);
+          div.querySelector(".post-body").appendChild(btn);
           feed.appendChild(div);
         });
       });
