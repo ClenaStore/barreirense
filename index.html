@@ -6,29 +6,25 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
     body{font-family:Arial, sans-serif;background:#fafafa;margin:0;color:#111}
-    header{padding:20px;background:#fff;border-bottom:1px solid #ddd;display:flex;align-items:center;gap:16px}
-    .perfil-foto{width:80px;height:80px;border-radius:50%;object-fit:cover}
-    .perfil-info h1{margin:0;font-size:20px}
-    .perfil-info p{margin:4px 0;color:#555;font-size:14px}
+    header{padding:14px;background:#fff;border-bottom:1px solid #ddd;display:flex;align-items:center;gap:12px}
+    .perfil-foto{width:60px;height:60px;border-radius:50%;object-fit:cover}
+    .perfil-info h1{margin:0;font-size:18px}
+    .perfil-info p{margin:2px 0;color:#555;font-size:13px}
 
     .stories{display:flex;gap:12px;padding:12px;overflow-x:auto;background:#fff;border-bottom:1px solid #ddd}
     .story{width:60px;height:60px;border-radius:50%;overflow:hidden;border:2px solid #ff0066;flex:0 0 auto}
     .story img{width:100%;height:100%;object-fit:cover}
 
-    .grid{display:grid;gap:4px;padding:4px;
-          grid-template-columns:repeat(3,1fr);}
-    .grid img{width:100%;aspect-ratio:1/1;object-fit:cover;cursor:pointer}
-
-    /* Modal */
-    .modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);align-items:center;justify-content:center;z-index:100}
-    .modal.active{display:flex}
-    .modal-content{background:#fff;padding:20px;border-radius:12px;max-width:400px;width:90%;box-shadow:0 6px 20px rgba(0,0,0,.3)}
-    .modal-content img{width:100%;border-radius:8px;margin-bottom:12px}
-    .modal-content h2{margin:0;font-size:18px}
-    .modal-content .price{color:#16a34a;font-weight:bold;margin:8px 0}
-    .modal-content .pubdate{font-size:12px;color:#777;margin-top:6px}
-    .btn{background:#16a34a;color:#fff;padding:10px 14px;border:none;border-radius:8px;cursor:pointer;text-decoration:none;display:inline-block;margin-top:10px}
-    .close{position:absolute;top:20px;right:20px;font-size:20px;color:#fff;cursor:pointer}
+    /* Post estilo feed */
+    .post{background:#fff;margin-bottom:20px;border:1px solid #ddd}
+    .post-header{display:flex;align-items:center;gap:8px;padding:10px}
+    .post-header img{width:32px;height:32px;border-radius:50%}
+    .post-header span{font-weight:600;font-size:14px}
+    .post img{width:100%;max-height:400px;object-fit:cover}
+    .post-body{padding:10px}
+    .price{color:#16a34a;font-weight:bold;margin:4px 0}
+    .pubdate{font-size:12px;color:#777;margin-top:4px}
+    .btn{background:#16a34a;color:#fff;padding:6px 10px;border-radius:6px;text-decoration:none;display:inline-block;margin-top:8px;font-size:13px}
   </style>
 </head>
 <body>
@@ -42,27 +38,11 @@
 
   <section class="stories" id="stories"></section>
 
-  <main>
-    <div id="grid" class="grid"></div>
-  </main>
-
-  <!-- Modal -->
-  <div id="modal" class="modal">
-    <div class="modal-content">
-      <span class="close" onclick="closeModal()">&times;</span>
-      <img id="mFoto" src="">
-      <h2 id="mNome"></h2>
-      <div id="mPreco" class="price"></div>
-      <p id="mDesc"></p>
-      <span id="mData" class="pubdate"></span>
-      <br>
-      <a id="mWhats" class="btn" target="_blank">Falar no WhatsApp</a>
-    </div>
-  </div>
+  <main id="feed" style="padding:10px;"></main>
 
   <script>
-    const API_URL = "https://script.google.com/macros/s/AKfycbwmGq7IlwVau6sIJcTponRXp70VY_nNobZEK8RvFtDb7_ZjMFV1VgnKLzxjYrZSRxdkXw/exec";
-    let lojaAtual = "loja1"; // pode trocar dinamicamente
+    const API_URL = "https://script.google.com/macros/s/AKfycbyVUcV4Z9x3tQZy4z0SDg37lTCy0aHcjoyOeVQsQU4ClJxrMQhxYEwwLqATWGK27Wv4aQ/exec";
+    let lojaAtual = "loja1"; // muda para a loja certa
 
     fetch(API_URL)
       .then(r=>r.json())
@@ -73,37 +53,40 @@
         document.getElementById("perfilBio").textContent = loja.bio;
 
         // Stories
-        const stories = loja.stories.split(",");
+        const stories = (loja.stories||"").split(",");
         const storiesDiv = document.getElementById("stories");
         stories.forEach(url=>{
-          const div=document.createElement("div");
-          div.className="story";
-          div.innerHTML=`<img src="${url}">`;
-          storiesDiv.appendChild(div);
+          if(url.trim()){
+            const div=document.createElement("div");
+            div.className="story";
+            div.innerHTML=`<img src="${url.trim()}">`;
+            storiesDiv.appendChild(div);
+          }
         });
 
-        // Produtos da loja
+        // Feed de produtos
+        const feed = document.getElementById("feed");
         const produtos = data.produtos.filter(p=>p.loja===lojaAtual);
-        const grid = document.getElementById("grid");
         produtos.forEach(p=>{
-          const img = document.createElement("img");
-          img.src = p.foto;
-          img.onclick = ()=>openModal(p);
-          grid.appendChild(img);
+          const div=document.createElement("div");
+          div.className="post";
+          div.innerHTML=`
+            <div class="post-header">
+              <img src="${loja.perfil_foto}">
+              <span>${loja.nome}</span>
+            </div>
+            <img src="${p.foto}" alt="${p.nome}">
+            <div class="post-body">
+              <strong>${p.nome}</strong><br>
+              <span class="price">R$ ${Number(p.preco).toFixed(2)}</span>
+              <p>${p.descricao}</p>
+              <div class="pubdate">${p.datahora}</div>
+              <a href="https://wa.me/${p.whatsapp}?text=${encodeURIComponent("Olá! Tenho interesse neste produto: "+p.nome+" - R$ "+p.preco)}" class="btn" target="_blank">WhatsApp</a>
+            </div>
+          `;
+          feed.appendChild(div);
         });
       });
-
-    function openModal(p){
-      document.getElementById("mFoto").src=p.foto;
-      document.getElementById("mNome").textContent=p.nome;
-      document.getElementById("mPreco").textContent="R$ "+Number(p.preco).toFixed(2);
-      document.getElementById("mDesc").textContent=p.descricao;
-      document.getElementById("mData").textContent=p.datahora;
-      const msg=`Olá! Tenho interesse neste produto:\n\n${p.nome}\nValor: R$ ${Number(p.preco).toFixed(2)}\n${p.descricao}`;
-      document.getElementById("mWhats").href=`https://wa.me/${p.whatsapp}?text=${encodeURIComponent(msg)}`;
-      document.getElementById("modal").classList.add("active");
-    }
-    function closeModal(){ document.getElementById("modal").classList.remove("active"); }
   </script>
 </body>
 </html>
