@@ -2,52 +2,55 @@
 <html lang="pt-BR">
 <head>
   <meta charset="utf-8">
-  <title>Bazar • Produtos Usados</title>
+  <title>Bazar Online</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
-    body{font-family:Arial, sans-serif;background:#f8fafc;margin:0;color:#111}
-    header{padding:16px;background:#16a34a;color:#fff;text-align:center}
+    body{font-family:Arial, sans-serif;background:#f9fafb;margin:0;color:#111}
+    header{position:absolute;top:10px;left:20px;z-index:20}
+    header img{height:50px}
 
-    /* Banner */
-    .banner{position:relative;height:220px;overflow:hidden}
+    .banner{position:relative;height:280px;overflow:hidden}
     .slide{position:absolute;inset:0;opacity:0;transition:opacity 1s ease;background-position:center;background-size:cover}
     .slide.active{opacity:1}
     .banner-dots{position:absolute;bottom:12px;left:0;right:0;display:flex;gap:6px;justify-content:center}
     .dot{width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,.5);cursor:pointer}
     .dot.active{background:#fff}
 
-    /* Toolbar */
-    .toolbar{display:flex;gap:10px;align-items:center;padding:10px 16px;background:#fff;border-bottom:1px solid #e5e7eb}
-    .search{flex:1;padding:8px;border:1px solid #ccc;border-radius:6px}
-    .filter{padding:8px;border:1px solid #ccc;border-radius:6px}
+    .toolbar{display:flex;gap:10px;align-items:center;padding:14px 16px;background:#fff;box-shadow:0 2px 4px rgba(0,0,0,.08)}
+    .search{flex:1;padding:10px;border:1px solid #ccc;border-radius:6px}
+    .filter{padding:10px;border:1px solid #ccc;border-radius:6px}
 
-    /* Grid */
-    .grid{display:grid;gap:12px;padding:16px;
+    .grid{display:grid;gap:16px;padding:20px;
           grid-template-columns:repeat(2,1fr);}
     @media(min-width:900px){.grid{grid-template-columns:repeat(6,1fr);}}
-    .card{background:#fff;border:1px solid #e5e7eb;border-radius:10px;overflow:hidden;cursor:pointer;transition:.2s;display:flex;flex-direction:column}
-    .card:hover{transform:scale(1.02)}
-    .card img{width:100%;height:120px;object-fit:cover}
-    .card .info{padding:8px;flex:1}
-    .card h3{margin:0;font-size:14px}
-    .card .price{color:#16a34a;font-weight:bold;margin:4px 0}
+    .card{background:#fff;border:1px solid #e5e7eb;border-radius:12px;overflow:hidden;cursor:pointer;transition:.2s;display:flex;flex-direction:column;box-shadow:0 4px 8px rgba(0,0,0,.05)}
+    .card:hover{transform:translateY(-2px);box-shadow:0 6px 14px rgba(0,0,0,.1)}
+    .card img{width:100%;height:130px;object-fit:cover}
+    .card .info{padding:10px;flex:1}
+    .card h3{margin:0;font-size:14px;font-weight:600}
+    .card .price{color:#16a34a;font-weight:bold;margin:6px 0}
     .flag{font-size:11px;color:#555;border:1px dashed #ccc;border-radius:999px;padding:2px 6px;display:inline-block;margin-top:4px}
+    .pubdate{font-size:11px;color:#777;margin-top:6px;display:block}
 
-    /* Modal */
     .modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);align-items:center;justify-content:center;z-index:100}
     .modal.active{display:flex}
-    .modal-content{background:#fff;padding:20px;border-radius:12px;max-width:400px;width:90%;text-align:center;position:relative}
+    .modal-content{background:#fff;padding:20px;border-radius:12px;max-width:420px;width:90%;text-align:center;position:relative;box-shadow:0 6px 20px rgba(0,0,0,.2)}
     .modal-content img{width:100%;border-radius:8px;margin-bottom:12px}
     .close{position:absolute;top:10px;right:12px;font-size:20px;cursor:pointer}
     .btn{background:#16a34a;color:#fff;padding:10px 14px;border:none;border-radius:8px;cursor:pointer;text-decoration:none;display:inline-block;margin-top:10px}
+
+    .pagination{display:flex;justify-content:center;gap:8px;margin:20px}
+    .pagination button{padding:8px 12px;border:1px solid #ccc;background:#fff;border-radius:6px;cursor:pointer}
+    .pagination button.active{background:#16a34a;color:#fff;border-color:#16a34a}
+
+    footer{background:#fff;border-top:1px solid #e5e7eb;padding:20px;text-align:center;font-size:13px;color:#555;margin-top:30px}
   </style>
 </head>
 <body>
   <header>
-    <h1>Bazar de Usados</h1>
+    <img src="SUA_LOGO_AQUI.png" alt="Logo">
   </header>
 
-  <!-- Banner -->
   <section class="banner" id="banner">
     <div class="slide active" style="background-image:url('https://images.unsplash.com/photo-1483985988355-763728e1935b?q=80&w=1600&auto=format&fit=crop');"></div>
     <div class="slide" style="background-image:url('https://images.unsplash.com/photo-1520975622034-763f2f2997c7?q=80&w=1600&auto=format&fit=crop');"></div>
@@ -59,7 +62,6 @@
     </div>
   </section>
 
-  <!-- Barra de pesquisa + filtro -->
   <div class="toolbar">
     <input id="search" class="search" type="search" placeholder="Buscar produto...">
     <select id="filter" class="filter">
@@ -71,9 +73,9 @@
 
   <main>
     <div id="grid" class="grid"></div>
+    <div id="pagination" class="pagination"></div>
   </main>
 
-  <!-- Modal -->
   <div id="modal" class="modal">
     <div class="modal-content">
       <span class="close" onclick="closeModal()">&times;</span>
@@ -82,18 +84,35 @@
       <div id="mPreco"></div>
       <p id="mDesc"></p>
       <span id="mFlag" class="flag"></span>
+      <div id="mData" class="pubdate"></div>
       <br>
       <a id="mWhats" class="btn" target="_blank">Falar no WhatsApp</a>
     </div>
   </div>
 
+  <footer>
+    <p><strong>Termos de Compras:</strong> Aqui você pode colocar suas políticas de compra, devolução e contato.</p>
+  </footer>
+
   <script>
     const GRID = document.getElementById("grid");
     const MODAL = document.getElementById("modal");
-    const API_URL = "https://script.google.com/macros/s/AKfycbwCIHLFAXNhuR0wSHoJLMh-YX3USqBEJjagGLZgoFyXR6gsEGqXyedn1z6J3gc1DCHuaA/exec"; // link do GAS
+    const PAGINATION = document.getElementById("pagination");
+    const API_URL = "https://script.google.com/macros/s/AKfycbwnqfnI5g1c-u-YJDc1QQ8wqXKx7CUOH0iR6YgbyEOmNp9ZnszKkKrPQFV6fpOM2dnKQQ/exec"; 
     let produtos = [];
+    let currentPage = 1;
+    const perPage = 20;
 
-    // Banner rotativo
+    // Formatador de data/hora
+    function formatDate(str){
+      try {
+        const d = new Date(str);
+        return d.toLocaleDateString("pt-BR")+" - "+d.toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"});
+      } catch {
+        return str; // caso já venha formatado da planilha
+      }
+    }
+
     (function(){
       const slides = [...document.querySelectorAll(".slide")];
       const dots = [...document.querySelectorAll(".dot")];
@@ -107,12 +126,11 @@
       },4000);
     })();
 
-    // Buscar dados da planilha
     fetch(API_URL)
       .then(r=>r.json())
       .then(data=>{
         produtos = data;
-        render(produtos);
+        applyFilters();
       });
 
     function render(list){
@@ -126,6 +144,7 @@
             <h3>${p.nome}</h3>
             <div class="price">R$ ${Number(p.preco).toFixed(2)}</div>
             <span class="flag">${p.flag}</span>
+            <span class="pubdate">${formatDate(p.datahora)}</span>
           </div>`;
         card.onclick = ()=> openModal(p);
         GRID.appendChild(card);
@@ -138,13 +157,30 @@
       document.getElementById("mPreco").textContent="R$ "+Number(p.preco).toFixed(2);
       document.getElementById("mDesc").textContent=p.descricao;
       document.getElementById("mFlag").textContent=p.flag;
+      document.getElementById("mData").textContent = formatDate(p.datahora);
       const msg=`Olá! Tenho interesse neste produto:\n\n${p.nome}\nValor: R$ ${Number(p.preco).toFixed(2)}\n${p.descricao}`;
       document.getElementById("mWhats").href=`https://wa.me/${p.whatsapp}?text=${encodeURIComponent(msg)}`;
       MODAL.classList.add("active");
     }
     function closeModal(){ MODAL.classList.remove("active"); }
 
-    // Filtro de pesquisa + flag
+    function paginate(list,page=1){
+      const start = (page-1)*perPage;
+      const end = start+perPage;
+      return list.slice(start,end);
+    }
+    function renderPagination(total){
+      PAGINATION.innerHTML="";
+      const pages = Math.ceil(total/perPage);
+      for(let i=1;i<=pages;i++){
+        const btn = document.createElement("button");
+        btn.textContent=i;
+        if(i===currentPage) btn.classList.add("active");
+        btn.onclick=()=>{currentPage=i;applyFilters();}
+        PAGINATION.appendChild(btn);
+      }
+    }
+
     document.getElementById("search").addEventListener("input", applyFilters);
     document.getElementById("filter").addEventListener("change", applyFilters);
 
@@ -156,7 +192,8 @@
         const matchesFlag = (f==="Todos") || (p.flag===f);
         return matchesSearch && matchesFlag;
       });
-      render(filtered);
+      render(paginate(filtered,currentPage));
+      renderPagination(filtered.length);
     }
   </script>
 </body>
