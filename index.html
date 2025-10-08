@@ -70,21 +70,29 @@ header{
 }
 .card img{
   width:100%;
-  height:120px;
+  height:150px;
   object-fit:cover;
-  object-position:top;
+  object-position:center;
   flex-shrink:0;
 }
+
+/* NOME DO JOGO NO CANTO SUPERIOR DIREITO */
 .card h3{
-  font-size:15px;
-  padding:10px;
+  position:absolute;
+  top:8px;
+  right:10px;
+  font-size:13px;
+  font-weight:600;
+  background:rgba(0,0,0,0.6);
+  padding:5px 8px;
+  border-radius:8px;
   color:var(--text);
-  margin-top:auto;
-  text-align:center;
   animation:blink 1.5s infinite ease-in-out;
+  text-shadow:0 0 8px var(--accent);
+  white-space:nowrap;
 }
 
-/* Efeito de piscar o nome */
+/* EFEITO DE PISCAR */
 @keyframes blink {
   0%, 100% {opacity:1; text-shadow:0 0 8px var(--accent);}
   50% {opacity:.4; text-shadow:none;}
@@ -133,12 +141,14 @@ footer{
 <section class="games">
   <div class="card" onclick="openGame('index.odete.html', this)">
     <img src="https://github.com/ClenaStore/barreirense/blob/main/paste/Odete.jpg?raw=true" alt="Jogo 1">
-    <h3>Quem matou Odete Roitman? 🤔</h3>
+    <h3>Odete Roitman 🤔</h3>
   </div>
+
   <div class="card" onclick="openGame('index.futebol.html', this)">
     <img src="https://github.com/ClenaStore/barreirense/blob/main/paste/futebol.jpg?raw=true" alt="Jogo 2">
-    <h3>Desafio Futebol 🔥</h3>
+    <h3>Desafio Futebol ⚽</h3>
   </div>
+
   <div class="card" onclick="openGame('index.quiz.html', this)">
     <img src="https://github.com/ClenaStore/barreirense/blob/main/paste/quiz.jpg?raw=true" alt="Jogo 3">
     <h3>Quiz dos Famosos 🧠</h3>
