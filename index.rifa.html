@@ -15,10 +15,18 @@
 
 /* ===== Banner (8 itens) ===== */
 .banner{
-  position:relative;height:180px;margin-bottom:14px;border-bottom:1px solid rgba(255,255,255,.06);
+  position:relative;height:190px;margin-bottom:14px;border-bottom:1px solid rgba(255,255,255,.06);
   display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,#0b1334,transparent);overflow:hidden
 }
-.banner img{max-height:160px;object-fit:contain;filter:drop-shadow(0 0 16px rgba(0,229,255,.55));transition:opacity .6s ease}
+.banner img{max-height:170px;object-fit:contain;filter:drop-shadow(0 0 16px rgba(0,229,255,.55));transition:opacity .6s ease}
+
+/* selo do prêmio */
+.prize{position:absolute;left:10px;top:10px;display:flex;align-items:center;gap:8px;padding:6px 8px;background:#0c1633cc;border:1px solid #1d2a44;border-radius:12px;backdrop-filter:blur(4px)}
+.prize .place{display:inline-block;background:linear-gradient(90deg,#f59e0b,#ffd089);color:#111;padding:6px 10px;border-radius:999px;font-weight:900;box-shadow:0 0 10px rgba(245,158,11,.45)}
+.prize .name{font-weight:700;color:#eaf2ff;letter-spacing:.2px}
+.prize small{display:block;color:#a8b3c7;font-weight:600;margin-top:2px}
+
+/* navegação + bolinhas */
 .banner .nav{position:absolute;inset:0;display:flex;justify-content:space-between;align-items:center;padding:0 8px}
 .banner .nav button{
   width:36px;height:36px;border:none;border-radius:50%;background:#0e1a33a8;color:#cfe3ff;cursor:pointer;backdrop-filter:blur(4px)
@@ -34,9 +42,8 @@ h1{font-family:Orbitron;margin:10px 0 6px;text-align:center;color:var(--warn);te
   background:linear-gradient(180deg,var(--panel),#0a0f1f);border:1px solid var(--line);border-radius:16px;padding:12px;
   display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;box-shadow:0 0 22px rgba(0,229,255,.07)
 }
-.badge{font-size:12px;background:#0b1223;border:1px solid var(--line);padding:6px 10px;border-radius:10px;color:var(--muted)}
+.badge{font-size:12px;background:#0b1223;border:1px solid var(--line);padding:6px 10px;border-radius:10px;color:#a7b3c8}
 .price{color:var(--warn);font-weight:800}
-.total{color:#fff;font-weight:800}
 .actions{display:flex;gap:10px}
 .btn{border:none;border-radius:10px;padding:12px 14px;font-weight:800;cursor:pointer;transition:.25s;font-size:14px}
 .btn-primary{background:linear-gradient(90deg,var(--accent2),var(--accent)); color:#06121a; box-shadow:0 0 12px rgba(0,229,255,.35)}
@@ -45,9 +52,7 @@ h1{font-family:Orbitron;margin:10px 0 6px;text-align:center;color:var(--warn);te
 .hint{font-size:12px;color:var(--muted);margin-top:6px}
 
 /* ===== Grid de números (cartões neon) ===== */
-.grid{
-  margin-top:14px; display:grid; grid-template-columns:repeat(5,1fr); gap:10px;
-}
+.grid{margin-top:14px; display:grid; grid-template-columns:repeat(5,1fr); gap:10px}
 @media(min-width:768px){ .grid{grid-template-columns:repeat(10,1fr)} }
 .cell{
   position:relative; aspect-ratio:1/1; display:flex; align-items:center; justify-content:center;
@@ -57,7 +62,7 @@ h1{font-family:Orbitron;margin:10px 0 6px;text-align:center;color:var(--warn);te
 }
 .cell:hover{transform:translateY(-2px); box-shadow:0 8px 18px rgba(0,229,255,.16), inset 0 0 0 2px rgba(0,229,255,.14)}
 .cell.selected{outline:2px solid var(--accent); box-shadow:0 0 0 4px rgba(0,229,255,.22) inset, 0 0 16px rgba(0,229,255,.24)}
-.cell.sold{background:#1a2336;color:#8793aa;border-color:#22314e; cursor:not-allowed; opacity:.8}
+.cell.sold{background:#1a2336;color:#8793aa;border-color:#22314e; cursor:not-allowed; opacity:.85}
 .cell.sold::after{
   content:"VEND"; position:absolute; bottom:6px; right:6px; font-size:10px; padding:2px 6px; border-radius:6px;
   background:#2a334a; color:#aab6cc; border:1px solid #334462;
@@ -78,23 +83,22 @@ h1{font-family:Orbitron;margin:10px 0 6px;text-align:center;color:var(--warn);te
 .box input{width:100%;background:#0b1220;color:var(--text);border:none;border-radius:10px;padding:12px;font-size:15px}
 .row{display:flex;gap:10px;margin-top:12px}
 .ok{background:linear-gradient(90deg,var(--warn),#ffb757);color:#111}
-.cancel{background:#112036;color:#c9d6ec;border:1px solid var(--line)}
-.small{font-size:12px;color:var(--muted);text-align:center;margin-top:8px}
+.cancel{background:#112036;color:#c9d6ec;border:1px solid #1f2f49}
+.small{font-size:12px;color:#a7b3c8;text-align:center;margin-top:8px}
 
-/* ===== PIX Drawer (aparece depois de confirmar) ===== */
-.pix-drawer{
-  display:none; position:fixed; left:0; right:0; bottom:0; z-index:9000;
-  background:#0b1325; border-top:1px solid #1e2a3f; padding:12px 14px; box-shadow:0 -10px 30px rgba(0,0,0,.45)
-}
+/* ===== PIX Drawer ===== */
+.pix-drawer{display:none; position:fixed; left:0; right:0; bottom:0; z-index:9000;background:#0b1325; border-top:1px solid #1e2a3f; padding:12px 14px; box-shadow:0 -10px 30px rgba(0,0,0,.45)}
 .pix-drawer .row{display:flex; gap:10px; align-items:center; justify-content:space-between; flex-wrap:wrap}
 .pix-key{background:#16243a;color:#eaf2ff;padding:10px 12px;border-radius:8px;font-weight:700;word-break:break-all;border:1px solid #20344f}
 .copy{border:none;border-radius:8px;padding:10px 12px;background:linear-gradient(90deg,var(--accent),#5cc7ff);color:#0b1220;font-weight:800;cursor:pointer}
 .total-line{color:#ffd089;font-weight:800}
 .close-drawer{border:none;background:#112036;color:#d7e4ff;border:1px solid #1f2f49;border-radius:8px;padding:10px 12px}
 
-/* Pequenos ajustes mobile */
+/* Mobile tweaks */
 @media(max-width:480px){
-  .banner{height:160px}
+  .banner{height:170px}
+  .prize{left:8px;top:8px;padding:6px}
+  .prize .name{font-size:13px}
   h1{font-size:24px}
   .btn{padding:11px 12px}
   .badge{padding:5px 8px}
@@ -106,6 +110,14 @@ h1{font-family:Orbitron;margin:10px 0 6px;text-align:center;color:var(--warn);te
 <!-- ===== 8 BANNERS ===== -->
 <div class="banner" id="banner">
   <img id="bannerImg" src="" alt="Rifa banner">
+  <!-- selo do prêmio -->
+  <div class="prize" id="prizeBox">
+    <span class="place" id="prizePlace">1º LUGAR</span>
+    <div>
+      <div class="name" id="prizeName">Prêmio</div>
+      <small id="prizeSub">Clique nas setas para ver os demais</small>
+    </div>
+  </div>
   <div class="nav">
     <button id="prev" aria-label="Anterior">‹</button>
     <button id="next" aria-label="Próximo">›</button>
@@ -129,7 +141,7 @@ h1{font-family:Orbitron;margin:10px 0 6px;text-align:center;color:var(--warn);te
     </div>
   </div>
 
-  <!-- Grade -->
+  <!-- Grid -->
   <div id="grid" class="grid" aria-live="polite"></div>
   <p class="hint">* Números marcados como “VEND” já não podem ser escolhidos.</p>
 </div>
@@ -176,21 +188,22 @@ h1{font-family:Orbitron;margin:10px 0 6px;text-align:center;color:var(--warn);te
 
 <script>
 /* ========= CONFIG ========= */
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx6m_ObJznQSCKmLMjZVPlCPWPxzRbvU_AM_-VQit4ttlM9yXr2c4dU3LVX29H-Vih3gA/exec"; // 👈 cole sua URL do GAS
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx6m_ObJznQSCKmLMjZVPlCPWPxzRbvU_AM_-VQit4ttlM9yXr2c4dU3LVX29H-Vih3gA/exec"; // sua URL do GAS
 const TOTAL_NUMEROS = 200;
 const PRECO = 10; // R$ por número
-const PIX_KEY = "storeclena@gmail.com"; // 👈 sua chave PIX
+const PIX_KEY = "77998556393"; // sua chave PIX
 
-/* ========= BANNERS (1..8) ========= */
+/* ========= BANNERS (1..8) =========
+   Troque img e name conforme seus prêmios */
 const banners = [
-  "https://picsum.photos/seed/1/1200/400",
-  "https://picsum.photos/seed/2/1200/400",
-  "https://picsum.photos/seed/3/1200/400",
-  "https://picsum.photos/seed/4/1200/400",
-  "https://picsum.photos/seed/5/1200/400",
-  "https://picsum.photos/seed/6/1200/400",
-  "https://picsum.photos/seed/7/1200/400",
-  "https://picsum.photos/seed/8/1200/400"
+  {img:"https://picsum.photos/seed/1/1200/400", place:"1º LUGAR", name:"iPhone 15 128GB"},
+  {img:"https://picsum.photos/seed/2/1200/400", place:"2º LUGAR", name:"Capacete Bluetooth"},
+  {img:"httpsum.photos/seed/3/1200/400".replace('httpsum','https://pics'), place:"3º LUGAR", name:"Perfume Zadeh"},
+  {img:"https://picsum.photos/seed/4/1200/400", place:"4º LUGAR", name:"Moletom Rally"},
+  {img:"https://picsum.photos/seed/5/1200/400", place:"5º LUGAR", name:"Taça Personalizada"},
+  {img:"https://picsum.photos/seed/6/1200/400", place:"6º LUGAR", name:"Copo Térmico"},
+  {img:"https://picsum.photos/seed/7/1200/400", place:"7º LUGAR", name:" Stanley Laranja"},
+  {img:"https://picsum.photos/seed/8/1200/400", place:"8º LUGAR", name:"Óleo Capilar"}
 ];
 
 /* ========= STATE ========= */
@@ -218,8 +231,18 @@ const pixKeyBox = document.getElementById('pixKeyBox');
 const copyPix = document.getElementById('copyPix');
 const closeDrawer = document.getElementById('closeDrawer');
 
+/* banner UI refs */
+const bannerImg  = document.getElementById('bannerImg');
+const prizePlace = document.getElementById('prizePlace');
+const prizeName  = document.getElementById('prizeName');
+const prizeSub   = document.getElementById('prizeSub');
+const dots = document.getElementById('dots');
+const prev = document.getElementById('prev');
+const next = document.getElementById('next');
+
 let vendidos = new Set();
 let selecionados = new Set();
+let bIndex = 0, bTimer;
 
 /* ========= HELPERS ========= */
 const fmt = v => v.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
@@ -253,7 +276,6 @@ function renderGrid(){
         if(selecionados.has(n)) selecionados.delete(n);
         else selecionados.add(n);
         updatePanel();
-        // visual toggle
         cell.classList.toggle('selected');
       });
     }
@@ -265,7 +287,6 @@ function renderGrid(){
 function updatePanel(){
   selCountEl.textContent = selecionados.size;
   btnConfirm.disabled = selecionados.size === 0;
-  // atualiza total no topo (tooltipzinho)
   precoTopEl.textContent = `${fmt(PRECO)} • Total: ${fmt(PRECO * selecionados.size)}`;
   precoLabel.textContent = PRECO.toLocaleString('pt-BR',{minimumFractionDigits:2});
 }
@@ -286,8 +307,7 @@ async function loadVendidos(){
     const j = await r.json();
     if(Array.isArray(j)) vendidos = new Set(j.map(x=>Number(x)));
   }catch(e){
-    // fallback de demonstração
-    vendidos = new Set([7,12,33,40,101,150]);
+    vendidos = new Set([7,12,33,40,101,150]); // demo
   }
 }
 
@@ -349,9 +369,7 @@ confirmEl.addEventListener('click', async ()=>{
 
     if(/OK/i.test(text)){
       closePopup();
-      // abre o drawer com a chave PIX + total
       openDrawer(numeros.length * PRECO);
-      // recarrega vendidos
       selecionados.clear();
       await loadVendidos();
       renderGrid(); updatePanel();
@@ -377,13 +395,7 @@ copyPix.addEventListener('click', async ()=>{
 });
 closeDrawer.addEventListener('click', closePixDrawer);
 
-/* ====== BANNERS: autoplay + setas + bolinhas ====== */
-let bIndex = 0, bTimer;
-const bannerImg = document.getElementById('bannerImg');
-const dots = document.getElementById('dots');
-const prev = document.getElementById('prev');
-const next = document.getElementById('next');
-
+/* ====== BANNERS: autoplay + setas + bolinhas + selo ====== */
 function renderDots(){
   dots.innerHTML = '';
   banners.forEach((_,i)=>{
@@ -394,19 +406,21 @@ function renderDots(){
   });
 }
 function showBanner(){
+  const b = banners[bIndex];
   bannerImg.style.opacity = 0;
   setTimeout(()=>{
-    bannerImg.src = banners[bIndex];
+    bannerImg.src = b.img;
+    bannerImg.alt = `${b.place} - ${b.name}`;
+    prizePlace.textContent = b.place;
+    prizeName.textContent  = b.name;
+    prizeSub.textContent   = `Prêmio ${bIndex+1} de ${banners.length}`;
     bannerImg.onload = ()=>bannerImg.style.opacity = 1;
     renderDots();
   },100);
 }
 function nextBanner(){ bIndex=(bIndex+1)%banners.length; showBanner(); }
 function prevBanner(){ bIndex=(bIndex-1+banners.length)%banners.length; showBanner(); }
-function resetAuto(){
-  clearInterval(bTimer);
-  bTimer = setInterval(nextBanner, 4500);
-}
+function resetAuto(){ clearInterval(bTimer); bTimer = setInterval(nextBanner, 4500); }
 function initBanners(){
   bIndex=0; showBanner(); resetAuto();
   next.addEventListener('click', ()=>{nextBanner(); resetAuto();});
