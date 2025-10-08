@@ -3,88 +3,49 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Bolão • Compra de Cotas</title>
+<title>Bolão da Sorte 💰</title>
 <style>
-  :root{
-    --bg:#0e172a;--card:#131c33;--ink:#f8fafc;--accent:#f59e0b;--muted:#94a3b8;
-  }
-  *{box-sizing:border-box}
-  body{
-    margin:0;
-    font-family:system-ui,Segoe UI,Roboto;
-    background:var(--bg);
-    color:var(--ink);
-  }
-  header{
-    text-align:center;
-    padding:20px;
-  }
-  header img.banner{
-    width:100%;
-    max-height:280px;
-    object-fit:cover;
-    border-bottom:4px solid var(--accent);
-  }
-  h1{margin-top:12px;font-size:1.8em;color:var(--accent)}
-  main{
-    max-width:600px;
-    margin:20px auto;
-    background:var(--card);
-    padding:20px;
-    border-radius:12px;
-    box-shadow:0 4px 24px rgba(0,0,0,0.4);
-  }
-  .photo-grid{
-    display:flex;
-    justify-content:space-around;
-    flex-wrap:wrap;
-    margin-bottom:20px;
-  }
-  .photo{
-    width:80px;
-    height:80px;
-    border-radius:50%;
-    overflow:hidden;
-    border:3px solid transparent;
-    cursor:pointer;
-    transition:0.3s;
-  }
-  .photo img{
-    width:100%;height:100%;object-fit:cover;
-  }
-  .photo.selected{border-color:var(--accent);transform:scale(1.1)}
-  form{display:flex;flex-direction:column;gap:12px}
-  label{font-size:0.9em;color:var(--muted)}
-  input{
-    padding:10px;
-    border-radius:8px;
-    border:none;
-    background:#1e293b;
-    color:var(--ink);
-    font-size:1em;
-  }
-  button{
-    background:var(--accent);
-    color:#000;
-    font-weight:700;
-    border:none;
-    border-radius:8px;
-    padding:12px;
-    cursor:pointer;
-  }
-  button:hover{opacity:0.9}
-  .message{text-align:center;margin-top:14px;color:var(--muted);font-size:0.9em}
+:root{
+  --bg:#0f172a;--card:#1e293b;--ink:#f8fafc;--accent:#f59e0b;--muted:#94a3b8;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,Segoe UI,Roboto;background:var(--bg);color:var(--ink)}
+header{text-align:center;padding:16px 12px}
+header img.banner{width:100%;max-height:260px;object-fit:cover;border-bottom:3px solid var(--accent)}
+h1{margin-top:10px;color:var(--accent)}
+main{max-width:600px;margin:18px auto;background:var(--card);padding:20px;border-radius:12px;box-shadow:0 4px 30px rgba(0,0,0,.4)}
+.photo-grid{display:flex;justify-content:space-around;flex-wrap:wrap;margin-bottom:20px}
+.photo{width:80px;height:80px;border-radius:50%;overflow:hidden;border:3px solid transparent;cursor:pointer;transition:.3s}
+.photo img{width:100%;height:100%;object-fit:cover}
+.photo.selected{border-color:var(--accent);transform:scale(1.1)}
+label{font-size:.9em;color:var(--muted)}
+input{width:100%;padding:10px;border:none;border-radius:8px;background:#0f172a;color:var(--ink);font-size:1em}
+button{background:var(--accent);color:#000;font-weight:700;border:none;border-radius:8px;padding:12px;cursor:pointer}
+button:hover{opacity:.9}
+.msg{text-align:center;margin-top:14px;color:var(--muted);font-size:.9em}
+#premioCard{text-align:center;background:#0b1120;padding:14px;border-radius:10px;margin-bottom:18px}
+#premioValor{font-size:1.6em;font-weight:700;color:var(--accent)}
+#qrcodeTela{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.8);color:#fff;align-items:center;justify-content:center;z-index:99}
+#qrcodeConteudo{background:#111;padding:20px;border-radius:12px;text-align:center;width:90%;max-width:380px}
+#qrcodeConteudo img{max-width:200px;border-radius:8px;margin:10px auto}
+.copyBtn{background:var(--accent);color:#000;padding:8px 12px;border:none;border-radius:8px;cursor:pointer}
 </style>
 </head>
 <body>
 
 <header>
-  <img class="banner" src="https://images.unsplash.com/photo-1606813902859-4cb0c0bfae24?q=80&w=1200&auto=format&fit=crop" alt="Banner Bolão">
+  <img class="banner" src="https://images.unsplash.com/photo-1606813902859-4cb0c0bfae24?q=80&w=1200&auto=format&fit=crop" alt="banner">
   <h1>Bolão da Sorte 🎉</h1>
-  <p>Escolha uma opção abaixo e participe! Boa sorte 🍀</p>
+  <p>Participe e concorra ao prêmio acumulado!</p>
 </header>
 
 <main>
+  <div id="premioCard">
+    <div>Total arrecadado (Aprovados):</div>
+    <div id="premioValor">R$ 0,00</div>
+    <small>Se houver mais de um ganhador, o prêmio será dividido igualmente.</small>
+  </div>
+
   <div class="photo-grid" id="photoGrid">
     <div class="photo"><img src="https://images.unsplash.com/photo-1556740749-887f6717d7e4?w=400" alt="1"></div>
     <div class="photo"><img src="https://images.unsplash.com/photo-1581091215367-59ab6d3213b1?w=400" alt="2"></div>
@@ -95,81 +56,119 @@
 
   <form id="formBolao">
     <label>Nome completo</label>
-    <input type="text" id="nome" required placeholder="Seu nome">
+    <input type="text" id="nome" required placeholder="Seu nome completo">
 
     <label>E-mail</label>
     <input type="email" id="email" required placeholder="seu@email.com">
 
     <label>Telefone / WhatsApp</label>
-    <input type="tel" id="telefone" required placeholder="(00) 00000-0000">
-
-    <label>Quantidade de cotas</label>
-    <input type="number" id="qtd" required min="1" max="50" placeholder="Ex: 2">
+    <input type="tel" id="telefone" required placeholder="(00) 00000-0000" maxlength="15">
 
     <input type="hidden" id="fotoSelecionada" value="">
-
-    <button type="submit">Enviar participação</button>
+    <input type="hidden" id="qtd" value="">
+    <button type="submit">Confirmar participação</button>
   </form>
 
-  <div class="message" id="msg"></div>
+  <div class="msg" id="msg"></div>
 </main>
 
+<!-- Tela de pagamento -->
+<div id="qrcodeTela">
+  <div id="qrcodeConteudo">
+    <h2>Pagamento via PIX</h2>
+    <img src="https://i.ibb.co/gyyxQkR/qrcode-exemplo.png" alt="QR Code PIX">
+    <p>Chave aleatória:</p>
+    <p id="pixKey" style="font-weight:bold;">00000000-0000-0000-0000-000000000000</p>
+    <button class="copyBtn" id="btnCopiar">Copiar chave</button>
+    <p style="margin-top:10px;font-size:.9em">Após o pagamento envie o comprovante para o WhatsApp <br><b>(77) 99825-3249</b></p>
+    <button onclick="fecharQr()">Fechar</button>
+  </div>
+</div>
+
 <script>
-  // URL do seu Apps Script
-  const SCRIPT_URL = "https://script.google.com/macros/s/SEU_SCRIPT_ID/exec";
+const SCRIPT_URL = "https://script.google.com/macros/s/SEU_SCRIPT_ID/exec";
+const valorCota = 5;
+const msg = document.getElementById('msg');
+const premioValor = document.getElementById('premioValor');
+const telefone = document.getElementById('telefone');
+const qrcodeTela = document.getElementById('qrcodeTela');
+const pixKey = document.getElementById('pixKey');
+const btnCopiar = document.getElementById('btnCopiar');
 
-  const grid = document.getElementById('photoGrid');
-  const fotos = grid.querySelectorAll('.photo');
-  const fotoSelecionada = document.getElementById('fotoSelecionada');
-  const form = document.getElementById('formBolao');
-  const msg = document.getElementById('msg');
+telefone.addEventListener('input', e=>{
+  let v = e.target.value.replace(/\D/g,'');
+  v = v.replace(/^(\d{2})(\d)/g,'($1) $2');
+  v = v.replace(/(\d{5})(\d)/,'$1-$2');
+  e.target.value = v;
+});
 
-  fotos.forEach(f => {
-    f.addEventListener('click', () => {
-      fotos.forEach(ff => ff.classList.remove('selected'));
-      f.classList.add('selected');
-      const src = f.querySelector('img').src;
-      fotoSelecionada.value = src;
-      const qtd = prompt('Quantas cotas deseja comprar?');
-      if(qtd && !isNaN(qtd)){
-        document.getElementById('qtd').value = qtd;
-      }
-    });
-  });
+function fecharQr(){qrcodeTela.style.display='none';}
+btnCopiar.onclick = ()=>{
+  navigator.clipboard.writeText(pixKey.textContent);
+  btnCopiar.textContent = "Chave copiada!";
+  setTimeout(()=>btnCopiar.textContent="Copiar chave",1500);
+};
 
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    msg.textContent = "Enviando...";
-    const data = {
-      action: "registrar",
-      nome: form.nome.value,
-      email: form.email.value,
-      telefone: form.telefone.value,
-      qtd: form.qtd.value,
-      foto: fotoSelecionada.value,
-      status: "PENDENTE",
-      data: new Date().toISOString()
-    };
-
-    try {
-      const res = await fetch(SCRIPT_URL, {
-        method: "POST",
-        body: JSON.stringify(data),
-        headers: { "Content-Type": "application/json" }
-      });
-      if(res.ok){
-        msg.textContent = "Cadastro enviado! Aguardando aprovação.";
-        localStorage.setItem("participante", JSON.stringify(data));
-        form.reset();
-        fotos.forEach(f=>f.classList.remove('selected'));
-      } else {
-        msg.textContent = "Erro ao enviar. Tente novamente.";
-      }
-    } catch(err){
-      msg.textContent = "Falha de conexão.";
-      console.error(err);
+// Seleção de fotos + quantidade
+document.querySelectorAll('.photo').forEach(f=>{
+  f.addEventListener('click',()=>{
+    document.querySelectorAll('.photo').forEach(x=>x.classList.remove('selected'));
+    f.classList.add('selected');
+    const src = f.querySelector('img').src;
+    document.getElementById('fotoSelecionada').value = src;
+    const qtd = prompt('Quantas cotas deseja comprar? (R$5 cada)');
+    if(qtd && !isNaN(qtd)){
+      document.getElementById('qtd').value = qtd;
     }
   });
+});
+
+// Atualiza total de prêmios aprovados
+async function atualizarPremio(){
+  try{
+    const r = await fetch(SCRIPT_URL + "?action=premio");
+    const j = await r.json();
+    premioValor.textContent = j.valor ? j.valor : "R$ 0,00";
+  }catch(err){console.warn(err);}
+}
+setInterval(atualizarPremio,10000);
+atualizarPremio();
+
+// Envio
+document.getElementById('formBolao').addEventListener('submit', async e=>{
+  e.preventDefault();
+  msg.textContent = "Verificando...";
+  const data = {
+    action: "registrar",
+    nome: nome.value.trim(),
+    email: email.value.trim(),
+    telefone: telefone.value.trim(),
+    qtd: document.getElementById('qtd').value || 1,
+    foto: document.getElementById('fotoSelecionada').value,
+    valor: valorCota,
+    status: "PENDENTE"
+  };
+  try{
+    const res = await fetch(SCRIPT_URL,{
+      method:"POST",
+      body:JSON.stringify(data),
+      headers:{"Content-Type":"application/json"}
+    });
+    const txt = await res.text();
+    if(txt.includes("duplicado")){
+      msg.textContent="Esse número de telefone já possui uma aposta!";
+      return;
+    }
+    if(res.ok){
+      msg.textContent="Aposta registrada com sucesso! Aguarde aprovação.";
+      qrcodeTela.style.display='flex';
+    }else{
+      msg.textContent="Erro ao registrar.";
+    }
+  }catch(err){
+    msg.textContent="Falha de conexão.";
+  }
+});
 </script>
 
 </body>
