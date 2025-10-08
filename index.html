@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Jogos do momento</title>
+<title>Jogos do Momento</title>
 
 <style>
 :root{
@@ -14,6 +14,22 @@ body{
   background:var(--bg);
   color:var(--text);
   overflow-x:hidden;
+}
+
+/* TÍTULO */
+header{
+  text-align:center;
+  padding:20px 10px 10px;
+  font-size:26px;
+  font-weight:700;
+  letter-spacing:1px;
+  color:var(--accent);
+  text-shadow:0 0 10px rgba(0,188,212,.5);
+  animation:fadeInDown 1s ease;
+}
+@keyframes fadeInDown{
+  from{opacity:0;transform:translateY(-20px);}
+  to{opacity:1;transform:translateY(0);}
 }
 
 /* BANNERS */
@@ -56,14 +72,14 @@ body{
   width:100%;
   height:120px;
   object-fit:cover;
-  object-position:top; /* garante que a imagem fique colada no topo */
-  flex-shrink:0; /* impede que a imagem encolha */
+  object-position:top;
+  flex-shrink:0;
 }
 .card h3{
   font-size:15px;
   padding:10px;
   color:var(--text);
-  margin-top:auto; /* empurra o título para baixo se sobrar espaço */
+  margin-top:auto;
 }
 .card:hover{
   transform:scale(1.05);
@@ -94,6 +110,8 @@ footer{
 </style>
 </head>
 <body>
+
+<header>🎮 Jogos do Momento</header>
 
 <!-- BANNERS -->
 <div class="banner-container">
