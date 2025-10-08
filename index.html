@@ -21,6 +21,7 @@ main{max-width:600px;margin:18px auto;background:var(--card);padding:20px;border
 .photo.selected{border-color:var(--accent);transform:scale(1.1)}
 label{font-size:.9em;color:var(--muted)}
 input{width:100%;padding:10px;border:none;border-radius:8px;background:#0f172a;color:var(--ink);font-size:1em}
+input[type="file"]{background:none;border:1px dashed var(--accent);color:var(--muted);padding:14px;text-align:center;cursor:pointer}
 button{background:var(--accent);color:#000;font-weight:700;border:none;border-radius:8px;padding:12px;cursor:pointer}
 button[disabled]{opacity:.6;cursor:not-allowed}
 button:hover{opacity:.9}
@@ -72,42 +73,22 @@ button:hover{opacity:.9}
     <label>E-mail</label>
     <input type="email" id="email" required placeholder="seu@email.com">
 
-    <label>Telefone / WhatsApp</label>
-    <input type="tel" id="telefone" required placeholder="(00) 00000-0000" maxlength="16">
+    <label>Comprovante de pagamento</label>
+    <input type="file" id="comprovante" accept="image/*,.pdf" required>
 
     <input type="hidden" id="fotoSelecionada" value="">
     <input type="hidden" id="qtd" value="">
-    <button id="btnEnviar" type="submit">Confirmar participação</button>
+    <button id="btnEnviar" type="submit">Enviar Comprovante e Confirmar Aposta</button>
   </form>
 
-  <div class="msg" id="msg"></div>
+  <div class="msg" id="msg">A aposta será confirmada após o envio do comprovante.</div>
 </main>
 
-<!-- Tela de pagamento -->
-<div id="qrcodeTela">
-  <div id="qrcodeConteudo">
-    <h2>Pagamento via PIX</h2>
-    <img src="https://i.ibb.co/gyyxQkR/qrcode-exemplo.png" alt="QR Code PIX">
-    <p>Chave aleatória:</p>
-    <p id="pixKey" style="font-weight:bold;">00000000-0000-0000-0000-000000000000</p>
-    <div class="totalPix">Total a pagar: <b id="pixTotal">R$ 0,00</b></div>
-    <button class="copyBtn" id="btnCopiar">Copiar chave</button>
-    <p style="margin-top:10px;font-size:.9em">Após o pagamento envie o comprovante para o WhatsApp<br><b>(77) 99825-3249</b></p>
-    <button class="closeBtn" onclick="fecharQr()">Fechar</button>
-  </div>
-</div>
-
 <script>
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz3jAN-cYKXCIjiY8tFDtvHPAI6Zl8a2CycVqVDTLHspbOFkmlEEIetbJcNyJ8YMhI3/exec";
-const valorCota = 5;
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxg_kZYx6SfeJ5ogJ3upXRQjI03ERnZvYmzm-X2g_jO_BqYe1p8lo8GEjBHyZcwbKoYlA/exec";
 const msg = document.getElementById('msg');
 const premioValor = document.getElementById('premioValor');
-const telefone = document.getElementById('telefone');
-const qrcodeTela = document.getElementById('qrcodeTela');
-const pixKey = document.getElementById('pixKey');
-const pixTotal = document.getElementById('pixTotal');
-const btnCopiar = document.getElementById('btnCopiar');
-const btnEnviar = document.getElementById('btnEnviar');
+const comprovante = document.getElementById('comprovante');
 
 // Banner rotativo
 let banners = document.querySelectorAll('.banner');
@@ -116,121 +97,60 @@ setInterval(()=>{
   banners[atual].classList.remove('active');
   atual = (atual + 1) % banners.length;
   banners[atual].classList.add('active');
-}, 4000);
+},4000);
 
-// Telefone máscara
-telefone.addEventListener('input', e=>{
-  let v = e.target.value.replace(/\D/g,'').slice(0,11);
-  if(v.length > 10){
-    v = v.replace(/^(\d{2})(\d{5})(\d{4}).*/,'($1) $2-$3');
-  }else{
-    v = v.replace(/^(\d{2})(\d{4})(\d{0,4}).*/,'($1) $2-$3');
-  }
-  e.target.value = v.trim();
-});
+// Atualiza prêmio
+async function atualizarPremio(){
+  try{
+    const r = await fetch(SCRIPT_URL + "?action=premio",{cache:'no-store'});
+    const j = await r.json();
+    premioValor.textContent = j.valor || "R$ 0,00";
+  }catch(e){console.warn(e);}
+}
+setInterval(atualizarPremio,5000);
+atualizarPremio();
 
-// PIX
-function fecharQr(){qrcodeTela.style.display='none';}
-btnCopiar.onclick = ()=>{
-  navigator.clipboard.writeText(pixKey.textContent);
-  btnCopiar.textContent = "Chave copiada!";
-  setTimeout(()=>btnCopiar.textContent="Copiar chave",1500);
-};
-
-// Seleção de fotos + quantidade
+// Seleção de fotos
 document.querySelectorAll('.photo').forEach(f=>{
   f.addEventListener('click',()=>{
     document.querySelectorAll('.photo').forEach(x=>x.classList.remove('selected'));
     f.classList.add('selected');
-    const src = f.querySelector('img').src;
-    document.getElementById('fotoSelecionada').value = src;
-    let qtd;
-    do{
-      const ans = prompt('Quantas cotas deseja comprar? (R$5 cada)');
-      if(ans === null) break;
-      qtd = parseInt(ans, 10);
-    }while(isNaN(qtd) || qtd < 1);
-    if(qtd) document.getElementById('qtd').value = qtd;
+    document.getElementById('fotoSelecionada').value = f.querySelector('img').src;
   });
 });
 
-// Atualiza prêmio líquido (-25%)
-async function atualizarPremio(){
-  try{
-    const r = await fetch(SCRIPT_URL + "?action=premio", {cache:'no-store'});
-    if(!r.ok) throw new Error('HTTP ' + r.status);
-    const j = await r.json();
-    premioValor.textContent = j.valor || "R$ 0,00";
-  }catch(err){
-    console.warn('Erro ao buscar prêmio:', err);
-  }
-}
-setInterval(atualizarPremio, 5000);
-atualizarPremio();
-
-// Envio (POST simples sem preflight)
+// Envio do comprovante
 document.getElementById('formBolao').addEventListener('submit', async e=>{
   e.preventDefault();
-  msg.textContent = "";
-  btnEnviar.disabled = true;
+  const nome = document.getElementById('nome').value.trim();
+  const email = document.getElementById('email').value.trim();
+  const foto = document.getElementById('fotoSelecionada').value;
+  const file = comprovante.files[0];
+  if(!file){msg.textContent="Envie o comprovante.";return;}
+  if(!foto){msg.textContent="Selecione uma das imagens acima.";return;}
 
-  // validações mínimas
-  if(!document.getElementById('fotoSelecionada').value){
-    msg.textContent = "Selecione uma das 5 opções acima.";
-    btnEnviar.disabled = false; return;
-  }
-  if(!document.getElementById('qtd').value){
-    msg.textContent = "Informe a quantidade de cotas.";
-    btnEnviar.disabled = false; return;
-  }
-
-  const data = {
-    action:"registrar",
-    nome:document.getElementById('nome').value.trim(),
-    email:document.getElementById('email').value.trim(),
-    telefone:telefone.value.trim(),
-    qtd:document.getElementById('qtd').value,
-    foto:document.getElementById('fotoSelecionada').value,
-    valor:valorCota,
-    status:"PENDENTE"
-  };
+  msg.textContent="📤 Enviando comprovante...";
+  const formData = new FormData();
+  formData.append("action","upload");
+  formData.append("nome",nome);
+  formData.append("email",email);
+  formData.append("foto",foto);
+  formData.append("file",file);
 
   try{
-    const res = await fetch(SCRIPT_URL, {
-      method:"POST",
-      // Envia JSON mas com Content-Type 'text/plain' para evitar preflight CORS no GAS
-      headers:{ "Content-Type":"text/plain;charset=utf-8" },
-      body: JSON.stringify(data),
-      redirect: "follow",
-      cache: "no-store"
-    });
-
-    const txt = await res.text().catch(()=> "");
-    if(txt.includes("duplicado")){
-      msg.textContent = "⚠️ Esse número de telefone já possui uma aposta!";
-      btnEnviar.disabled = false;
-      return;
-    }
-
-    if(res.ok || txt === "OK"){
-      msg.textContent = "✅ Aposta registrada com sucesso! Aguarde aprovação.";
-      const total = Number(data.qtd) * valorCota;
-      pixTotal.textContent = total.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
-      qrcodeTela.style.display='flex';
-      // limpa campos (mantém telefone)
-      document.getElementById('nome').value = "";
-      document.getElementById('email').value = "";
-      document.getElementById('qtd').value = "";
-      document.getElementById('fotoSelecionada').value = "";
+    const res = await fetch(SCRIPT_URL,{method:"POST",body:formData});
+    const txt = await res.text();
+    if(txt.includes("OK")){
+      msg.textContent="✅ Comprovante enviado! Sua aposta será confirmada em breve.";
+      document.getElementById('nome').value="";
+      document.getElementById('email').value="";
+      comprovante.value="";
       document.querySelectorAll('.photo').forEach(x=>x.classList.remove('selected'));
     }else{
-      msg.textContent = "Não consegui salvar. Verifique se o Apps Script está publicado como Web App (acesso: qualquer pessoa).";
+      msg.textContent="❌ Erro ao enviar comprovante.";
     }
   }catch(err){
-    console.error(err);
-    msg.textContent = "Falha de conexão. Confira o link do Apps Script e a publicação.";
-  }finally{
-    btnEnviar.disabled = false;
+    msg.textContent="Falha de conexão. Confira o link do Apps Script.";
   }
 });
 </script>
