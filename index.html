@@ -49,16 +49,21 @@ body{
   overflow:hidden;
   transition:transform .3s, box-shadow .3s;
   position:relative;
+  display:flex;
+  flex-direction:column;
 }
 .card img{
   width:100%;
   height:120px;
   object-fit:cover;
+  object-position:top; /* garante que a imagem fique colada no topo */
+  flex-shrink:0; /* impede que a imagem encolha */
 }
 .card h3{
   font-size:15px;
   padding:10px;
   color:var(--text);
+  margin-top:auto; /* empurra o título para baixo se sobrar espaço */
 }
 .card:hover{
   transform:scale(1.05);
@@ -103,7 +108,6 @@ footer{
     <img src="https://github.com/ClenaStore/barreirense/blob/main/paste/Odete.jpg?raw=true" alt="Jogo 1">
     <h3>Quem matou Odete Roitman?</h3>
   </div>
-  
 </section>
 
 <footer>© 2025 Games Hub</footer>
