@@ -18,10 +18,39 @@ h1{color:var(--accent);text-align:center;margin:0 0 8px;font-size:28px}
 .premio{background:#0f172a;border:1px solid #1e293b;border-radius:12px;text-align:center;padding:14px;margin-bottom:18px}
 .premio small{color:var(--muted)}
 .valor{color:var(--accent);font-size:28px;font-weight:800;margin-top:6px}
-.grid{display:flex;gap:10px;justify-content:space-between;margin-bottom:16px}
-.photo{width:72px;height:72px;border-radius:50%;overflow:hidden;border:3px solid transparent;cursor:pointer;transition:.25s}
+
+/* ====== FOTOS ====== */
+.grid{
+  display:flex;
+  gap:10px;
+  justify-content:space-between;
+  margin-bottom:16px;
+  flex-wrap:wrap;
+}
+.photo-item{
+  text-align:center;
+  width:calc(25% - 8px);
+}
+.photo{
+  width:72px;
+  height:72px;
+  border-radius:50%;
+  overflow:hidden;
+  border:3px solid transparent;
+  cursor:pointer;
+  transition:.25s;
+  margin:0 auto 6px;
+}
 .photo img{width:100%;height:100%;object-fit:cover}
 .photo.sel{border-color:var(--accent);transform:scale(1.06)}
+.photo-name{
+  font-size:13px;
+  color:var(--muted);
+  text-align:center;
+  word-wrap:break-word;
+}
+
+/* ===== FORM ===== */
 label{display:block;color:var(--muted);font-size:13px;margin:10px 0 6px}
 input{width:100%;background:#0b1220;color:var(--ink);border:none;border-radius:10px;padding:12px;font-size:15px}
 button{width:100%;border:none;border-radius:10px;padding:14px;font-weight:800;font-size:15px;cursor:pointer;transition:.2s}
@@ -80,10 +109,22 @@ button{width:100%;border:none;border-radius:10px;padding:14px;font-weight:800;fo
     </div>
 
     <div class="grid" id="grid">
-      <div class="photo"><img src="https://images.unsplash.com/photo-1556740749-887f6717d7e4?w=400" alt=""></div>
-      <div class="photo"><img src="https://images.unsplash.com/photo-1581091215367-59ab6d3213b1?w=400" alt=""></div>
-      <div class="photo"><img src="https://images.unsplash.com/photo-1564869733280-233b6fbc55d0?w=400" alt=""></div>
-      <div class="photo"><img src="https://images.unsplash.com/photo-1550510537-0b38c0d62f5a?w=400" alt=""></div>
+      <div class="photo-item">
+        <div class="photo"><img src="https://images.unsplash.com/photo-1556740749-887f6717d7e4?w=400" alt=""></div>
+        <div class="photo-name">Pedro</div>
+      </div>
+      <div class="photo-item">
+        <div class="photo"><img src="https://images.unsplash.com/photo-1581091215367-59ab6d3213b1?w=400" alt=""></div>
+        <div class="photo-name">Mariana</div>
+      </div>
+      <div class="photo-item">
+        <div class="photo"><img src="https://images.unsplash.com/photo-1564869733280-233b6fbc55d0?w=400" alt=""></div>
+        <div class="photo-name">João</div>
+      </div>
+      <div class="photo-item">
+        <div class="photo"><img src="https://images.unsplash.com/photo-1550510537-0b38c0d62f5a?w=400" alt=""></div>
+        <div class="photo-name">Camila</div>
+      </div>
     </div>
 
     <form id="f">
