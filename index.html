@@ -21,6 +21,7 @@ main{max-width:600px;margin:18px auto;background:var(--card);padding:20px;border
 .photo.selected{border-color:var(--accent);transform:scale(1.1)}
 label{font-size:.9em;color:var(--muted)}
 input{width:100%;padding:10px;border:none;border-radius:8px;background:#0f172a;color:var(--ink);font-size:1em}
+input[type="file"]{border:1px dashed var(--accent);background:none;color:var(--muted);cursor:pointer}
 button{background:var(--accent);color:#000;font-weight:700;border:none;border-radius:8px;padding:12px;cursor:pointer}
 button[disabled]{opacity:.6;cursor:not-allowed}
 button:hover{opacity:.9}
@@ -42,7 +43,6 @@ button:hover{opacity:.9}
 <body>
 
 <header>
-  <!-- Banner rotativo -->
   <img class="banner active" src="https://images.unsplash.com/photo-1606813902859-4cb0c0bfae24?q=80&w=1200&auto=format&fit=crop" alt="banner1">
   <img class="banner" src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?q=80&w=1200&auto=format&fit=crop" alt="banner2">
   <img class="banner" src="https://images.unsplash.com/photo-1542831371-d531d36971e6?q=80&w=1200&auto=format&fit=crop" alt="banner3">
@@ -65,7 +65,7 @@ button:hover{opacity:.9}
     <div class="photo"><img src="https://images.unsplash.com/photo-1593642532973-d31b6557fa68?w=400" alt="5"></div>
   </div>
 
-  <form id="formBolao">
+  <form id="formBolao" enctype="multipart/form-data">
     <label>Nome completo</label>
     <input type="text" id="nome" required placeholder="Seu nome completo">
 
@@ -77,7 +77,11 @@ button:hover{opacity:.9}
 
     <input type="hidden" id="fotoSelecionada" value="">
     <input type="hidden" id="qtd" value="">
-    <button id="btnEnviar" type="submit">Confirmar participação</button>
+
+    <label>Comprovante de pagamento (imagem ou print)</label>
+    <input type="file" id="comprovante" accept="image/*" required>
+
+    <button id="btnEnviar" type="submit">Enviar Comprovante e Confirmar Aposta</button>
   </form>
 
   <div class="msg" id="msg"></div>
@@ -92,17 +96,18 @@ button:hover{opacity:.9}
     <p id="pixKey" style="font-weight:bold;">00000000-0000-0000-0000-000000000000</p>
     <div class="totalPix">Total a pagar: <b id="pixTotal">R$ 0,00</b></div>
     <button class="copyBtn" id="btnCopiar">Copiar chave</button>
-    <p style="margin-top:10px;font-size:.9em">Após o pagamento envie o comprovante para o WhatsApp<br><b>(77) 99825-3249</b></p>
+    <p style="margin-top:10px;font-size:.9em">Após o pagamento envie o comprovante para confirmar sua aposta!</p>
     <button class="closeBtn" onclick="fecharQr()">Fechar</button>
   </div>
 </div>
 
 <script>
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz3jAN-cYKXCIjiY8tFDtvHPAI6Zl8a2CycVqVDTLHspbOFkmlEEIetbJcNyJ8YMhI3/exec";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwC5jo91_gBi1KmWJcCZWo0DCXtmhE_ptzRvqMV50BSTtN3uFwG1bB6vJ1CqRGdoLpq/exec";
 const valorCota = 5;
 const msg = document.getElementById('msg');
 const premioValor = document.getElementById('premioValor');
 const telefone = document.getElementById('telefone');
+const comprovante = document.getElementById('comprovante');
 const qrcodeTela = document.getElementById('qrcodeTela');
 const pixKey = document.getElementById('pixKey');
 const pixTotal = document.getElementById('pixTotal');
@@ -116,121 +121,88 @@ setInterval(()=>{
   banners[atual].classList.remove('active');
   atual = (atual + 1) % banners.length;
   banners[atual].classList.add('active');
-}, 4000);
+},4000);
 
-// Telefone máscara
+// Máscara telefone
 telefone.addEventListener('input', e=>{
-  let v = e.target.value.replace(/\D/g,'').slice(0,11);
-  if(v.length > 10){
-    v = v.replace(/^(\d{2})(\d{5})(\d{4}).*/,'($1) $2-$3');
-  }else{
-    v = v.replace(/^(\d{2})(\d{4})(\d{0,4}).*/,'($1) $2-$3');
-  }
-  e.target.value = v.trim();
+  let v=e.target.value.replace(/\D/g,'').slice(0,11);
+  if(v.length>10){v=v.replace(/^(\d{2})(\d{5})(\d{4}).*/,'($1) $2-$3');}
+  else{v=v.replace(/^(\d{2})(\d{4})(\d{0,4}).*/,'($1) $2-$3');}
+  e.target.value=v;
 });
 
-// PIX
 function fecharQr(){qrcodeTela.style.display='none';}
-btnCopiar.onclick = ()=>{
-  navigator.clipboard.writeText(pixKey.textContent);
-  btnCopiar.textContent = "Chave copiada!";
-  setTimeout(()=>btnCopiar.textContent="Copiar chave",1500);
-};
+btnCopiar.onclick=()=>{navigator.clipboard.writeText(pixKey.textContent);btnCopiar.textContent="Chave copiada!";setTimeout(()=>btnCopiar.textContent="Copiar chave",1500);};
 
-// Seleção de fotos + quantidade
+// Seleção de fotos
 document.querySelectorAll('.photo').forEach(f=>{
   f.addEventListener('click',()=>{
     document.querySelectorAll('.photo').forEach(x=>x.classList.remove('selected'));
     f.classList.add('selected');
-    const src = f.querySelector('img').src;
-    document.getElementById('fotoSelecionada').value = src;
+    const src=f.querySelector('img').src;
+    document.getElementById('fotoSelecionada').value=src;
     let qtd;
     do{
-      const ans = prompt('Quantas cotas deseja comprar? (R$5 cada)');
-      if(ans === null) break;
-      qtd = parseInt(ans, 10);
-    }while(isNaN(qtd) || qtd < 1);
-    if(qtd) document.getElementById('qtd').value = qtd;
+      const ans=prompt('Quantas cotas deseja comprar? (R$5 cada)');
+      if(ans===null)break;
+      qtd=parseInt(ans,10);
+    }while(isNaN(qtd)||qtd<1);
+    if(qtd)document.getElementById('qtd').value=qtd;
   });
 });
 
-// Atualiza prêmio líquido (-25%)
+// Atualiza prêmio
 async function atualizarPremio(){
   try{
-    const r = await fetch(SCRIPT_URL + "?action=premio", {cache:'no-store'});
-    if(!r.ok) throw new Error('HTTP ' + r.status);
-    const j = await r.json();
-    premioValor.textContent = j.valor || "R$ 0,00";
-  }catch(err){
-    console.warn('Erro ao buscar prêmio:', err);
-  }
+    const r=await fetch(SCRIPT_URL+"?action=premio",{cache:'no-store'});
+    const j=await r.json();
+    premioValor.textContent=j.valor||"R$ 0,00";
+  }catch(e){console.warn(e);}
 }
-setInterval(atualizarPremio, 5000);
+setInterval(atualizarPremio,5000);
 atualizarPremio();
 
-// Envio (POST simples sem preflight)
-document.getElementById('formBolao').addEventListener('submit', async e=>{
+// Envio do formulário com comprovante
+document.getElementById('formBolao').addEventListener('submit',async e=>{
   e.preventDefault();
-  msg.textContent = "";
-  btnEnviar.disabled = true;
+  msg.textContent="";
+  btnEnviar.disabled=true;
+  const foto=document.getElementById('fotoSelecionada').value;
+  if(!foto){msg.textContent="Selecione uma das 5 opções acima.";btnEnviar.disabled=false;return;}
+  const qtd=document.getElementById('qtd').value;
+  if(!qtd){msg.textContent="Informe a quantidade de cotas.";btnEnviar.disabled=false;return;}
+  const file=comprovante.files[0];
+  if(!file){msg.textContent="Envie o comprovante para confirmar.";btnEnviar.disabled=false;return;}
 
-  // validações mínimas
-  if(!document.getElementById('fotoSelecionada').value){
-    msg.textContent = "Selecione uma das 5 opções acima.";
-    btnEnviar.disabled = false; return;
-  }
-  if(!document.getElementById('qtd').value){
-    msg.textContent = "Informe a quantidade de cotas.";
-    btnEnviar.disabled = false; return;
-  }
-
-  const data = {
-    action:"registrar",
-    nome:document.getElementById('nome').value.trim(),
-    email:document.getElementById('email').value.trim(),
-    telefone:telefone.value.trim(),
-    qtd:document.getElementById('qtd').value,
-    foto:document.getElementById('fotoSelecionada').value,
-    valor:valorCota,
-    status:"PENDENTE"
-  };
+  msg.textContent="📤 Enviando...";
+  const formData=new FormData();
+  formData.append("action","upload");
+  formData.append("nome",document.getElementById('nome').value.trim());
+  formData.append("email",document.getElementById('email').value.trim());
+  formData.append("telefone",telefone.value.trim());
+  formData.append("foto",foto);
+  formData.append("qtd",qtd);
+  formData.append("file",file);
 
   try{
-    const res = await fetch(SCRIPT_URL, {
-      method:"POST",
-      // Envia JSON mas com Content-Type 'text/plain' para evitar preflight CORS no GAS
-      headers:{ "Content-Type":"text/plain;charset=utf-8" },
-      body: JSON.stringify(data),
-      redirect: "follow",
-      cache: "no-store"
-    });
-
-    const txt = await res.text().catch(()=> "");
-    if(txt.includes("duplicado")){
-      msg.textContent = "⚠️ Esse número de telefone já possui uma aposta!";
-      btnEnviar.disabled = false;
-      return;
-    }
-
-    if(res.ok || txt === "OK"){
-      msg.textContent = "✅ Aposta registrada com sucesso! Aguarde aprovação.";
-      const total = Number(data.qtd) * valorCota;
-      pixTotal.textContent = total.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+    const res=await fetch(SCRIPT_URL,{method:"POST",body:formData});
+    const txt=await res.text();
+    if(txt.includes("OK")){
+      msg.innerHTML=`✅ Aposta registrada! Valor total <b>R$ ${(qtd*valorCota).toFixed(2).replace('.',',')}</b>. Aguarde confirmação.`;
+      const total=Number(qtd)*valorCota;
+      pixTotal.textContent=total.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
       qrcodeTela.style.display='flex';
-      // limpa campos (mantém telefone)
-      document.getElementById('nome').value = "";
-      document.getElementById('email').value = "";
-      document.getElementById('qtd').value = "";
-      document.getElementById('fotoSelecionada').value = "";
+      e.target.reset();
       document.querySelectorAll('.photo').forEach(x=>x.classList.remove('selected'));
+    }else if(txt.includes("duplicado")){
+      msg.textContent="⚠️ Esse telefone já possui aposta registrada.";
     }else{
-      msg.textContent = "Não consegui salvar. Verifique se o Apps Script está publicado como Web App (acesso: qualquer pessoa).";
+      msg.textContent="❌ Erro ao enviar. Tente novamente.";
     }
   }catch(err){
-    console.error(err);
-    msg.textContent = "Falha de conexão. Confira o link do Apps Script e a publicação.";
+    msg.textContent="Erro de conexão com o servidor.";
   }finally{
-    btnEnviar.disabled = false;
+    btnEnviar.disabled=false;
   }
 });
 </script>
