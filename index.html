@@ -6,7 +6,11 @@
 <title>Bolão da Sorte 💰</title>
 <style>
 :root{
-  --bg:#0f172a;--card:#1e293b;--ink:#f8fafc;--accent:#f59e0b;--muted:#94a3b8;
+  --bg:#0f172a;
+  --card:#1e293b;
+  --ink:#f8fafc;
+  --accent:#f59e0b;
+  --muted:#94a3b8;
 }
 *{box-sizing:border-box}
 body{margin:0;font-family:system-ui,Segoe UI,Roboto;background:var(--bg);color:var(--ink)}
@@ -34,6 +38,7 @@ button:hover{opacity:.9}
 <body>
 
 <header>
+  <!-- Banner rotativo -->
   <img class="banner active" src="https://images.unsplash.com/photo-1606813902859-4cb0c0bfae24?q=80&w=1200&auto=format&fit=crop" alt="banner1">
   <img class="banner" src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?q=80&w=1200&auto=format&fit=crop" alt="banner2">
   <img class="banner" src="https://images.unsplash.com/photo-1542831371-d531d36971e6?q=80&w=1200&auto=format&fit=crop" alt="banner3">
@@ -42,11 +47,13 @@ button:hover{opacity:.9}
 </header>
 
 <main>
+  <!-- Card com o total do prêmio -->
   <div id="premioCard">
     <div>Total do prêmio aprovado:</div>
     <div id="premioValor">R$ 0,00</div>
   </div>
 
+  <!-- Seleção de fotos (opções do bolão) -->
   <div class="photo-grid" id="photoGrid">
     <div class="photo"><img src="https://images.unsplash.com/photo-1556740749-887f6717d7e4?w=400" alt="1"></div>
     <div class="photo"><img src="https://images.unsplash.com/photo-1581091215367-59ab6d3213b1?w=400" alt="2"></div>
@@ -54,6 +61,7 @@ button:hover{opacity:.9}
     <div class="photo"><img src="https://images.unsplash.com/photo-1550510537-0b38c0d62f5a?w=400" alt="4"></div>
   </div>
 
+  <!-- Formulário principal -->
   <form id="formBolao">
     <label>Nome completo</label>
     <input type="text" id="nome" required placeholder="Seu nome completo">
@@ -76,19 +84,22 @@ button:hover{opacity:.9}
 </main>
 
 <script>
+/* ===================== CONFIG ===================== */
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwCUjlbcjqCl-xX4bIIekWnrdedLk6vZcCEs4ijO2CvkxxfW4_fnvmQb-pk2ZdrvkyI/exec";
-const NUMERO_WHATSAPP = "5577998253249"; // Número oficial
+const NUMERO_WHATSAPP = "5577998253249"; // Número oficial de envio
 const valorCota = 5;
+
+/* ===================== ELEMENTOS ===================== */
 const msg = document.getElementById('msg');
 const premioValor = document.getElementById('premioValor');
 const btnEnviar = document.getElementById('btnEnviar');
 const btnWhatsapp = document.getElementById('btnWhatsapp');
 
-// Banner rotativo
+/* ===================== BANNER ROTATIVO ===================== */
 let banners=document.querySelectorAll('.banner');let atual=0;
 setInterval(()=>{banners[atual].classList.remove('active');atual=(atual+1)%banners.length;banners[atual].classList.add('active');},4000);
 
-// Máscara telefone
+/* ===================== MÁSCARA TELEFONE ===================== */
 document.getElementById('telefone').addEventListener('input',e=>{
   let v=e.target.value.replace(/\D/g,'').slice(0,11);
   if(v.length>10){v=v.replace(/^(\d{2})(\d{5})(\d{4}).*/,'($1) $2-$3');}
@@ -96,7 +107,7 @@ document.getElementById('telefone').addEventListener('input',e=>{
   e.target.value=v;
 });
 
-// Seleção de fotos
+/* ===================== SELEÇÃO DE FOTO ===================== */
 document.querySelectorAll('.photo').forEach(f=>{
   f.addEventListener('click',()=>{
     document.querySelectorAll('.photo').forEach(x=>x.classList.remove('selected'));
@@ -105,7 +116,7 @@ document.querySelectorAll('.photo').forEach(f=>{
   });
 });
 
-// Atualiza valor do prêmio aprovado (-25%)
+/* ===================== ATUALIZA PREMIO ===================== */
 async function atualizarPremio(){
   try{
     const r=await fetch(SCRIPT_URL+"?action=premio",{cache:'no-store'});
@@ -118,7 +129,7 @@ async function atualizarPremio(){
 setInterval(atualizarPremio,5000);
 atualizarPremio();
 
-// Envio da aposta
+/* ===================== ENVIO DO FORMULÁRIO ===================== */
 document.getElementById('formBolao').addEventListener('submit',async e=>{
   e.preventDefault();
   msg.textContent="";
@@ -130,22 +141,31 @@ document.getElementById('formBolao').addEventListener('submit',async e=>{
   const qtd=document.getElementById('qtd').value;
   const foto=document.getElementById('fotoSelecionada').value;
 
-  if(!foto){msg.textContent="Selecione uma das opções acima.";btnEnviar.disabled=false;return;}
+  if(!foto){
+    msg.textContent="Selecione uma das opções acima.";
+    btnEnviar.disabled=false;
+    return;
+  }
 
   const data={action:"registrar",nome,email,telefone,qtd,foto,valor:valorCota,status:"PENDENTE"};
+
   try{
     const res=await fetch(SCRIPT_URL,{
       method:"POST",
       headers:{"Content-Type":"text/plain;charset=utf-8"},
       body:JSON.stringify(data)
     });
+
     const txt=await res.text();
     if(txt.includes("OK")){
       const total=Number(qtd)*valorCota;
       msg.textContent="✅ Aposta registrada! Agora envie seu comprovante pelo WhatsApp.";
       btnWhatsapp.style.display='block';
+
       btnWhatsapp.onclick=()=>{
-        const mensagem=encodeURIComponent(`Olá! Enviando meu comprovante do Bolão da Sorte.\n\n👤 Nome: ${nome}\n📞 Telefone: ${telefone}\n📧 E-mail: ${email}\n💰 ${qtd} cotas | Total: R$ ${(total).toFixed(2).replace('.',',')}`);
+        const mensagem=encodeURIComponent(
+          `Olá! Enviando meu comprovante do Bolão da Sorte.\n\n👤 Nome: ${nome}\n📞 Telefone: ${telefone}\n📧 E-mail: ${email}\n💰 ${qtd} cotas | Total: R$ ${(total).toFixed(2).replace('.',',')}`
+        );
         window.open(`https://wa.me/${NUMERO_WHATSAPP}?text=${mensagem}`,'_blank');
         msg.textContent="✅ Comprovante enviado. Boa sorte!";
       };
