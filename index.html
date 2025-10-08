@@ -3,130 +3,138 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Jogos do Momento</title>
+<title>🎮 Jogos do Momento</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 
 <style>
 :root{
-  --bg:#0a0a0f;--card:#13131a;--accent:#00bcd4;--text:#f5f5f5;--muted:#aaa;
+  --bg1:#06060a;
+  --bg2:#101020;
+  --card:#141424;
+  --accent:#00e5ff;
+  --accent2:#7c3aed;
+  --text:#f5f5f5;
+  --muted:#aaa;
 }
-*{box-sizing:border-box;margin:0;padding:0;font-family:Poppins,system-ui}
+*{box-sizing:border-box;margin:0;padding:0;}
 body{
-  background:var(--bg);
+  background:linear-gradient(180deg,var(--bg1),var(--bg2));
   color:var(--text);
+  font-family:Poppins,system-ui;
   overflow-x:hidden;
+  min-height:100vh;
 }
 
-/* TÍTULO */
+/* HEADER */
 header{
   text-align:center;
-  padding:20px 10px 10px;
-  font-size:26px;
+  padding:18px;
+  font-size:22px;
   font-weight:700;
-  letter-spacing:1px;
   color:var(--accent);
-  text-shadow:0 0 10px rgba(0,188,212,.5);
-  animation:fadeInDown 1s ease;
-}
-@keyframes fadeInDown{
-  from{opacity:0;transform:translateY(-20px);}
-  to{opacity:1;transform:translateY(0);}
+  font-family:'Orbitron',sans-serif;
+  letter-spacing:1px;
+  text-shadow:0 0 10px var(--accent);
+  background:rgba(0,0,0,0.3);
+  border-bottom:1px solid rgba(255,255,255,0.05);
+  backdrop-filter:blur(6px);
 }
 
 /* BANNERS */
 .banner-container{
   position:relative;
   width:100%;
-  height:200px;
+  height:180px;
   overflow:hidden;
+  border-bottom:1px solid rgba(255,255,255,0.1);
 }
 .banner-container img{
   width:100%;
-  height:200px;
+  height:100%;
   object-fit:cover;
   position:absolute;
-  top:0;
-  left:0;
+  top:0;left:0;
   opacity:0;
-  transition:opacity 1s ease;
+  transition:opacity 1.2s ease;
+  filter:brightness(.85);
 }
 .banner-container img.active{opacity:1}
 
-/* GRID DE JOGOS */
+/* GAMES GRID */
 .games{
   display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(150px,1fr));
-  gap:15px;
-  padding:20px;
+  grid-template-columns:repeat(auto-fill,minmax(160px,1fr));
+  gap:18px;
+  padding:25px 20px 60px;
 }
 .card{
-  background:var(--card);
-  border-radius:16px;
-  box-shadow:0 0 10px rgba(0,0,0,.3);
+  background:linear-gradient(180deg,var(--card),#0a0a14);
+  border-radius:18px;
+  box-shadow:0 0 15px rgba(0,0,0,.5);
   overflow:hidden;
-  transition:transform .3s, box-shadow .3s;
   position:relative;
-  display:flex;
-  flex-direction:column;
+  transition:transform .3s, box-shadow .3s;
+  cursor:pointer;
+}
+.card:hover{
+  transform:translateY(-5px) scale(1.03);
+  box-shadow:0 0 20px var(--accent);
 }
 .card img{
   width:100%;
-  height:120px;
+  height:130px;
   object-fit:cover;
-  object-position:top;
-  flex-shrink:0;
+  display:block;
 }
 .card h3{
-  font-size:15px;
-  padding:10px;
+  padding:12px;
+  font-size:14px;
+  text-align:center;
   color:var(--text);
-  margin-top:auto;
 }
 
 /* FLAG “JOGUE AGORA” */
 .flag{
   position:absolute;
-  top:8px;
-  right:8px;
-  background:linear-gradient(135deg, var(--accent), #00e5ff);
+  top:10px;
+  right:-35px;
+  background:linear-gradient(135deg,var(--accent2),var(--accent));
   color:#fff;
   font-size:11px;
-  font-weight:600;
-  padding:5px 8px;
-  border-radius:8px;
-  box-shadow:0 0 10px rgba(0,188,212,.7);
-  animation:blink 1.6s infinite ease-in-out;
-  text-transform:uppercase;
+  font-weight:700;
+  padding:6px 40px;
+  transform:rotate(45deg);
+  text-align:center;
+  box-shadow:0 0 10px var(--accent);
+  animation:glow 1.6s infinite ease-in-out;
 }
-@keyframes blink{
-  0%,100%{opacity:1; box-shadow:0 0 10px rgba(0,188,212,.8);}
-  50%{opacity:.5; box-shadow:none;}
-}
-
-.card:hover{
-  transform:scale(1.05);
-  box-shadow:0 0 15px var(--accent);
-}
-.card:active{
-  transform:scale(.95);
-  filter:brightness(1.4);
+@keyframes glow{
+  0%,100%{filter:brightness(1);}
+  50%{filter:brightness(1.5);}
 }
 
-/* ANIMAÇÃO DE CLIQUE */
-@keyframes pulse {
-  0% {transform: scale(1);}
-  50% {transform: scale(1.1);}
-  100% {transform: scale(1);}
-}
-.card.clicked {
-  animation: pulse .4s ease;
-}
-
-/* RODAPÉ */
+/* FOOTER */
 footer{
   text-align:center;
-  padding:20px;
+  padding:15px;
   font-size:12px;
   color:var(--muted);
+  background:rgba(0,0,0,0.4);
+  border-top:1px solid rgba(255,255,255,0.05);
+  backdrop-filter:blur(6px);
+}
+
+/* RESPONSIVIDADE */
+@media(max-width:768px){
+  header{font-size:20px;padding:15px;}
+  .banner-container{height:150px;}
+  .card img{height:120px;}
+  .card h3{font-size:13px;}
+}
+@media(max-width:480px){
+  .games{grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:14px;}
+  .card img{height:110px;}
+  .flag{top:8px;right:-32px;font-size:10px;}
 }
 </style>
 </head>
@@ -134,19 +142,29 @@ footer{
 
 <header>🎮 Jogos do Momento</header>
 
-<!-- BANNERS -->
 <div class="banner-container">
   <img src="https://github.com/ClenaStore/barreirense/blob/main/paste/capa%201.jpg?raw=true" class="active" alt="Banner 1">
   <img src="https://github.com/ClenaStore/barreirense/blob/main/paste/capa%201.jpg?raw=true" alt="Banner 2">
   <img src="https://github.com/ClenaStore/barreirense/blob/main/paste/capa%201.jpg?raw=true" alt="Banner 3">
 </div>
 
-<!-- LISTA DE JOGOS -->
 <section class="games">
   <div class="card" onclick="openGame('index.odete.html', this)">
-    <span class="flag">Jogue agora</span>
+    <span class="flag">🎯 JOGUE AGORA</span>
     <img src="https://github.com/ClenaStore/barreirense/blob/main/paste/Odete.jpg?raw=true" alt="Jogo 1">
     <h3>Quem matou Odete Roitman? 🤔</h3>
+  </div>
+
+  <div class="card" onclick="openGame('index.futebol.html', this)">
+    <span class="flag">🎯 JOGUE AGORA</span>
+    <img src="https://github.com/ClenaStore/barreirense/blob/main/paste/futebol.jpg?raw=true" alt="Jogo 2">
+    <h3>Desafio Futebol ⚽</h3>
+  </div>
+
+  <div class="card" onclick="openGame('index.quiz.html', this)">
+    <span class="flag">🎯 JOGUE AGORA</span>
+    <img src="https://github.com/ClenaStore/barreirense/blob/main/paste/quiz.jpg?raw=true" alt="Jogo 3">
+    <h3>Quiz dos Famosos 🧠</h3>
   </div>
 </section>
 
@@ -162,11 +180,12 @@ setInterval(()=>{
   banners[index].classList.add('active');
 },4000);
 
-// Abrir jogo com efeito
+// Animação de clique
 function openGame(url, card){
-  card.classList.add('clicked');
-  setTimeout(()=>{window.location.href = url;},300);
+  card.style.transform='scale(0.97)';
+  setTimeout(()=>{window.location.href=url;},250);
 }
 </script>
+
 </body>
 </html>
