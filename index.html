@@ -80,7 +80,16 @@ header{
   padding:10px;
   color:var(--text);
   margin-top:auto;
+  text-align:center;
+  animation:blink 1.5s infinite ease-in-out;
 }
+
+/* Efeito de piscar o nome */
+@keyframes blink {
+  0%, 100% {opacity:1; text-shadow:0 0 8px var(--accent);}
+  50% {opacity:.4; text-shadow:none;}
+}
+
 .card:hover{
   transform:scale(1.05);
   box-shadow:0 0 15px var(--accent);
@@ -125,6 +134,14 @@ footer{
   <div class="card" onclick="openGame('index.odete.html', this)">
     <img src="https://github.com/ClenaStore/barreirense/blob/main/paste/Odete.jpg?raw=true" alt="Jogo 1">
     <h3>Quem matou Odete Roitman? 🤔</h3>
+  </div>
+  <div class="card" onclick="openGame('index.futebol.html', this)">
+    <img src="https://github.com/ClenaStore/barreirense/blob/main/paste/futebol.jpg?raw=true" alt="Jogo 2">
+    <h3>Desafio Futebol 🔥</h3>
+  </div>
+  <div class="card" onclick="openGame('index.quiz.html', this)">
+    <img src="https://github.com/ClenaStore/barreirense/blob/main/paste/quiz.jpg?raw=true" alt="Jogo 3">
+    <h3>Quiz dos Famosos 🧠</h3>
   </div>
 </section>
 
