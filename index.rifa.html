@@ -7,77 +7,73 @@
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&family=Inter:wght@400;600&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg1:#060818; --bg2:#0a0f2c; --card:#0f172a; --line:#1e2a3f;
+  --bg1:#060818; --bg2:#0a0f2c; --panel:#0f172a; --line:#1e2a3f;
   --text:#eaf2ff; --muted:#a7b3c8; --accent:#00e5ff; --accent2:#7c3aed; --ok:#16a34a; --warn:#f59e0b; --bad:#ef4444;
 }
-*{box-sizing:border-box} body{margin:0;font-family:Inter,system-ui;background:radial-gradient(1000px 600px at 50% -150px,var(--bg2),#040612 70%);color:var(--text)}
-.wrap{max-width:980px;margin:0 auto;padding:16px 16px 60px}
+*{box-sizing:border-box} body{margin:0;background:radial-gradient(900px 700px at 50% -150px,var(--bg2),#020412 75%);color:var(--text);font-family:Inter,system-ui}
+.wrap{max-width:980px;margin:0 auto;padding:12px 14px 80px}
 
-/* Banner topo (use PNG sem fundo) */
+/* ===== Banner (8 itens) ===== */
 .banner{
-  height:180px; display:flex; align-items:center; justify-content:center;
-  background:linear-gradient(180deg,#0b1334,transparent); position:relative; overflow:hidden;
-  border-bottom:1px solid rgba(255,255,255,.06);
+  position:relative;height:180px;margin-bottom:14px;border-bottom:1px solid rgba(255,255,255,.06);
+  display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,#0b1334,transparent);overflow:hidden
 }
-.banner img{max-height:160px;object-fit:contain;filter:drop-shadow(0 0 14px rgba(0,229,255,.6)); animation:float 5s ease-in-out infinite}
-@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+.banner img{max-height:160px;object-fit:contain;filter:drop-shadow(0 0 16px rgba(0,229,255,.55));transition:opacity .6s ease}
+.banner .nav{position:absolute;inset:0;display:flex;justify-content:space-between;align-items:center;padding:0 8px}
+.banner .nav button{
+  width:36px;height:36px;border:none;border-radius:50%;background:#0e1a33a8;color:#cfe3ff;cursor:pointer;backdrop-filter:blur(4px)
+}
+.banner .dots{position:absolute;bottom:8px;left:0;right:0;display:flex;gap:6px;justify-content:center}
+.banner .dots span{width:6px;height:6px;border-radius:50%;background:#93a7c2;opacity:.45}
+.banner .dots .on{opacity:1;background:#fff}
 
-/* Header */
-h1{font-family:Orbitron,system-ui;font-size:28px;text-align:center;margin:14px 0 6px;color:var(--warn);text-shadow:0 0 10px rgba(245,158,11,.6)}
-.sub{text-align:center;color:var(--muted);margin-bottom:14px}
-
-/* Painel topo */
+/* ===== Título e painel ===== */
+h1{font-family:Orbitron;margin:10px 0 6px;text-align:center;color:var(--warn);text-shadow:0 0 10px rgba(245,158,11,.6);font-size:26px}
+.sub{text-align:center;color:var(--muted);margin-bottom:12px}
 .panel{
-  background:linear-gradient(180deg,var(--card),#0a0f1f);
-  border:1px solid var(--line); border-radius:16px; padding:14px; display:flex; flex-wrap:wrap; gap:12px; align-items:center; justify-content:space-between;
-  box-shadow:0 0 22px rgba(0,229,255,.08);
+  background:linear-gradient(180deg,var(--panel),#0a0f1f);border:1px solid var(--line);border-radius:16px;padding:12px;
+  display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;box-shadow:0 0 22px rgba(0,229,255,.07)
 }
-.kpi{display:flex;align-items:center;gap:10px}
 .badge{font-size:12px;background:#0b1223;border:1px solid var(--line);padding:6px 10px;border-radius:10px;color:var(--muted)}
 .price{color:var(--warn);font-weight:800}
-.total{color:var(--warn);font-weight:800}
-.actions{display:flex;gap:10px;align-items:center}
-.btn{
-  border:none;border-radius:10px;padding:12px 14px;font-weight:800;cursor:pointer;transition:.25s;font-size:14px
-}
+.total{color:#fff;font-weight:800}
+.actions{display:flex;gap:10px}
+.btn{border:none;border-radius:10px;padding:12px 14px;font-weight:800;cursor:pointer;transition:.25s;font-size:14px}
 .btn-primary{background:linear-gradient(90deg,var(--accent2),var(--accent)); color:#06121a; box-shadow:0 0 12px rgba(0,229,255,.35)}
 .btn-primary:disabled{filter:grayscale(1) brightness(.6); cursor:not-allowed; box-shadow:none}
 .btn-clear{background:#102038;color:#dbe7ff;border:1px solid var(--line)}
-.hint{font-size:12px;color:var(--muted)}
+.hint{font-size:12px;color:var(--muted);margin-top:6px}
 
-/* Grid */
+/* ===== Grid de números (cartões neon) ===== */
 .grid{
-  margin-top:16px;
-  display:grid; grid-template-columns:repeat(10,1fr);
-  gap:10px; background:linear-gradient(180deg,#0b1328,#080e1d); padding:16px;border:1px solid var(--line); border-radius:16px;
-  box-shadow:inset 0 0 12px rgba(0,229,255,.06);
+  margin-top:14px; display:grid; grid-template-columns:repeat(5,1fr); gap:10px;
 }
+@media(min-width:768px){ .grid{grid-template-columns:repeat(10,1fr)} }
 .cell{
   position:relative; aspect-ratio:1/1; display:flex; align-items:center; justify-content:center;
-  background:#0c152b; border:1px solid #13213a; color:#d9e6ff; border-radius:12px; font-weight:700; user-select:none; cursor:pointer;
-  transition:.2s;
+  background:linear-gradient(180deg,#0c152b,#0a1020); border:1px solid #13213a; color:#e1ecff; border-radius:14px; font-weight:800;
+  user-select:none; cursor:pointer; transition:.2s; font-size:16px; text-shadow:0 0 6px rgba(0,229,255,.25);
+  box-shadow:inset 0 0 0 2px rgba(0,229,255,.06);
 }
-.cell:hover{transform:translateY(-2px); box-shadow:0 6px 16px rgba(0,229,255,.18)}
-.cell.selected{outline:2px solid var(--accent); box-shadow:0 0 0 4px rgba(0,229,255,.18) inset, 0 0 16px rgba(0,229,255,.3)}
-.cell.sold{background:#1a2336;color:#8793aa;border-color:#22314e; cursor:not-allowed; position:relative; opacity:.75}
+.cell:hover{transform:translateY(-2px); box-shadow:0 8px 18px rgba(0,229,255,.16), inset 0 0 0 2px rgba(0,229,255,.14)}
+.cell.selected{outline:2px solid var(--accent); box-shadow:0 0 0 4px rgba(0,229,255,.22) inset, 0 0 16px rgba(0,229,255,.24)}
+.cell.sold{background:#1a2336;color:#8793aa;border-color:#22314e; cursor:not-allowed; opacity:.8}
 .cell.sold::after{
-  content:"VENDIDO"; position:absolute; bottom:6px; right:6px; font-size:9px; padding:2px 6px; border-radius:6px;
+  content:"VEND"; position:absolute; bottom:6px; right:6px; font-size:10px; padding:2px 6px; border-radius:6px;
   background:#2a334a; color:#aab6cc; border:1px solid #334462;
 }
 
-/* Overlay de carregamento */
+/* ===== Overlay + Popup ===== */
 .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9999;align-items:center;justify-content:center;flex-direction:column}
 .loader{width:64px;height:64px;border-radius:50%;border:4px solid #23304a;border-top-color:var(--warn);animation:spin 1s linear infinite;margin-bottom:12px}
-.overlay p{color:#b9c6dc}
-@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes spin{to{transform:rotate(360deg)}} .overlay p{color:#bed0ee}
 
-/* Popup */
 .popup{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:10000;align-items:center;justify-content:center}
 .box{
-  width:min(92vw,420px); background:linear-gradient(180deg,var(--card),#0a0f1c);
+  width:min(92vw,420px); background:linear-gradient(180deg,var(--panel),#0a0f1c);
   border:1px solid var(--line); border-radius:14px; padding:16px; box-shadow:0 0 18px rgba(0,229,255,.25)
 }
-.box h3{margin:0 0 8px;color:var(--warn);font-family:Orbitron,system-ui;font-size:18px;text-align:center}
+.box h3{margin:0 0 8px;color:var(--warn);font-family:Orbitron;text-align:center}
 .box label{display:block;color:var(--muted);font-size:13px;margin:10px 0 6px}
 .box input{width:100%;background:#0b1220;color:var(--text);border:none;border-radius:10px;padding:12px;font-size:15px}
 .row{display:flex;gap:10px;margin-top:12px}
@@ -85,30 +81,44 @@ h1{font-family:Orbitron,system-ui;font-size:28px;text-align:center;margin:14px 0
 .cancel{background:#112036;color:#c9d6ec;border:1px solid var(--line)}
 .small{font-size:12px;color:var(--muted);text-align:center;margin-top:8px}
 
-/* Responsivo */
-@media (max-width:768px){
-  .grid{grid-template-columns:repeat(5,1fr)}
-  .banner{height:150px}
+/* ===== PIX Drawer (aparece depois de confirmar) ===== */
+.pix-drawer{
+  display:none; position:fixed; left:0; right:0; bottom:0; z-index:9000;
+  background:#0b1325; border-top:1px solid #1e2a3f; padding:12px 14px; box-shadow:0 -10px 30px rgba(0,0,0,.45)
 }
-@media (max-width:480px){
-  .grid{grid-template-columns:repeat(4,1fr)}
+.pix-drawer .row{display:flex; gap:10px; align-items:center; justify-content:space-between; flex-wrap:wrap}
+.pix-key{background:#16243a;color:#eaf2ff;padding:10px 12px;border-radius:8px;font-weight:700;word-break:break-all;border:1px solid #20344f}
+.copy{border:none;border-radius:8px;padding:10px 12px;background:linear-gradient(90deg,var(--accent),#5cc7ff);color:#0b1220;font-weight:800;cursor:pointer}
+.total-line{color:#ffd089;font-weight:800}
+.close-drawer{border:none;background:#112036;color:#d7e4ff;border:1px solid #1f2f49;border-radius:8px;padding:10px 12px}
+
+/* Pequenos ajustes mobile */
+@media(max-width:480px){
+  .banner{height:160px}
   h1{font-size:24px}
+  .btn{padding:11px 12px}
+  .badge{padding:5px 8px}
 }
 </style>
 </head>
 <body>
 
-<!-- Banner 3D topo (troque a imagem por PNG sem fundo) -->
-<div class="banner">
-  <img src="https://upload.wikimedia.org/wikipedia/commons/4/47/PNG_transparency_demonstration_1.png" alt="Rifa 3D">
+<!-- ===== 8 BANNERS ===== -->
+<div class="banner" id="banner">
+  <img id="bannerImg" src="" alt="Rifa banner">
+  <div class="nav">
+    <button id="prev" aria-label="Anterior">‹</button>
+    <button id="next" aria-label="Próximo">›</button>
+  </div>
+  <div class="dots" id="dots"></div>
 </div>
 
 <div class="wrap">
   <h1>Rifa Solidária</h1>
-  <p class="sub">Selecione os números desejados e confirme sua participação. Valor por número: <b>R$ <span id="precoLabel">10,00</span></b>.</p>
+  <p class="sub">Selecione os números. Valor por número: <b>R$ <span id="precoLabel">10,00</span></b>.</p>
 
   <div class="panel">
-    <div class="kpi">
+    <div>
       <span class="badge">Disponíveis: <b id="disp">—</b></span>
       <span class="badge">Selecionados: <b id="selCount">0</b></span>
       <span class="badge">Preço: <span class="price" id="precoTop">R$ 10,00</span></span>
@@ -119,12 +129,12 @@ h1{font-family:Orbitron,system-ui;font-size:28px;text-align:center;margin:14px 0
     </div>
   </div>
 
-  <!-- grade -->
+  <!-- Grade -->
   <div id="grid" class="grid" aria-live="polite"></div>
-  <p class="hint">* Números marcados como “VENDIDO” não podem ser selecionados.</p>
+  <p class="hint">* Números marcados como “VEND” já não podem ser escolhidos.</p>
 </div>
 
-<!-- Overlay carregando -->
+<!-- Overlay -->
 <div id="overlay" class="overlay">
   <div class="loader"></div>
   <p>Processando...</p>
@@ -136,7 +146,7 @@ h1{font-family:Orbitron,system-ui;font-size:28px;text-align:center;margin:14px 0
     <h3>Confirmar participação</h3>
     <p class="small">Revise seus números e preencha seus dados.</p>
     <div class="badge" style="display:block;text-align:center;margin-bottom:8px">
-      Seus números: <b id="numsPreview"></b>
+      Seus números: <b id="numsPreview"></b> • Total: <b id="totalPreview"></b>
     </div>
     <label>Nome completo</label>
     <input id="nome" type="text" placeholder="Seu nome" required>
@@ -148,17 +158,42 @@ h1{font-family:Orbitron,system-ui;font-size:28px;text-align:center;margin:14px 0
       <button id="confirm" class="btn ok" type="button">Enviar</button>
       <button id="cancel" class="btn cancel" type="button">Cancelar</button>
     </div>
-    <p class="small">Após o envio, seus números serão reservados e registrados na planilha.</p>
+    <p class="small">Após o envio, seus números serão reservados e você receberá e-mail com instruções de pagamento.</p>
+  </div>
+</div>
+
+<!-- Drawer PIX -->
+<div id="pixDrawer" class="pix-drawer">
+  <div class="row">
+    <div class="total-line">Valor total: <span id="pixTotal"></span></div>
+    <div class="pix-key" id="pixKeyBox"></div>
+  </div>
+  <div class="row" style="margin-top:8px">
+    <button class="copy" id="copyPix">Copiar chave PIX</button>
+    <button class="close-drawer" id="closeDrawer">Fechar</button>
   </div>
 </div>
 
 <script>
-/* ====== CONFIG ====== */
-const RIFA_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxvPyMzoPqiHQgi6fEVJ_wD0Dsbin3658joI1ujMXFzjHspRH7bYGfipKDSPqoyaaSMHg/exec"; // 👈 troque aqui
-const TOTAL_NUMEROS = 200;    // grade 1..200
-const PRECO = 10;             // R$ por número
+/* ========= CONFIG ========= */
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx6m_ObJznQSCKmLMjZVPlCPWPxzRbvU_AM_-VQit4ttlM9yXr2c4dU3LVX29H-Vih3gA/exec"; // 👈 cole sua URL do GAS
+const TOTAL_NUMEROS = 200;
+const PRECO = 10; // R$ por número
+const PIX_KEY = "storeclena@gmail.com"; // 👈 sua chave PIX
 
-/* ====== STATE ====== */
+/* ========= BANNERS (1..8) ========= */
+const banners = [
+  "https://picsum.photos/seed/1/1200/400",
+  "https://picsum.photos/seed/2/1200/400",
+  "https://picsum.photos/seed/3/1200/400",
+  "https://picsum.photos/seed/4/1200/400",
+  "https://picsum.photos/seed/5/1200/400",
+  "https://picsum.photos/seed/6/1200/400",
+  "https://picsum.photos/seed/7/1200/400",
+  "https://picsum.photos/seed/8/1200/400"
+];
+
+/* ========= STATE ========= */
 const gridEl = document.getElementById('grid');
 const btnConfirm = document.getElementById('btnConfirm');
 const btnClear = document.getElementById('btnClear');
@@ -170,21 +205,34 @@ const precoLabel = document.getElementById('precoLabel');
 const overlay = document.getElementById('overlay');
 const popup = document.getElementById('popup');
 const numsPreview = document.getElementById('numsPreview');
+const totalPreview = document.getElementById('totalPreview');
 const nomeEl = document.getElementById('nome');
 const emailEl = document.getElementById('email');
 const telEl = document.getElementById('tel');
 const confirmEl = document.getElementById('confirm');
 const cancelEl = document.getElementById('cancel');
 
+const pixDrawer = document.getElementById('pixDrawer');
+const pixTotalEl = document.getElementById('pixTotal');
+const pixKeyBox = document.getElementById('pixKeyBox');
+const copyPix = document.getElementById('copyPix');
+const closeDrawer = document.getElementById('closeDrawer');
+
 let vendidos = new Set();
 let selecionados = new Set();
 
-/* ====== HELPERS ====== */
-const fmt = v => v.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+/* ========= HELPERS ========= */
+const fmt = v => v.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
 
 function showOverlay(s){overlay.style.display = s ? 'flex':'none'}
 function openPopup(){popup.style.display='flex'; setTimeout(()=>nomeEl.focus(),50)}
 function closePopup(){popup.style.display='none'}
+function openDrawer(total){
+  pixTotalEl.textContent = fmt(total);
+  pixKeyBox.textContent = PIX_KEY;
+  pixDrawer.style.display = "block";
+}
+function closePixDrawer(){pixDrawer.style.display = "none"}
 
 function renderGrid(){
   gridEl.innerHTML = '';
@@ -194,8 +242,6 @@ function renderGrid(){
     cell.type = 'button';
     cell.className = 'cell';
     cell.textContent = n;
-    cell.setAttribute('aria-label', 'Número ' + n);
-
     const isSold = vendidos.has(n);
     if(isSold){
       cell.classList.add('sold');
@@ -207,7 +253,8 @@ function renderGrid(){
         if(selecionados.has(n)) selecionados.delete(n);
         else selecionados.add(n);
         updatePanel();
-        renderGrid();
+        // visual toggle
+        cell.classList.toggle('selected');
       });
     }
     gridEl.appendChild(cell);
@@ -218,10 +265,13 @@ function renderGrid(){
 function updatePanel(){
   selCountEl.textContent = selecionados.size;
   btnConfirm.disabled = selecionados.size === 0;
+  // atualiza total no topo (tooltipzinho)
+  precoTopEl.textContent = `${fmt(PRECO)} • Total: ${fmt(PRECO * selecionados.size)}`;
+  precoLabel.textContent = PRECO.toLocaleString('pt-BR',{minimumFractionDigits:2});
 }
 
 /* ====== TELEFONE MÁSCARA ====== */
-telEl?.addEventListener('input', e=>{
+telEl.addEventListener('input', e=>{
   let v = e.target.value.replace(/\D/g,'').slice(0,11);
   v = v.length>10 ? v.replace(/^(\d{2})(\d{5})(\d{4}).*/, '($1) $2-$3')
                   : v.replace(/^(\d{2})(\d{4})(\d{0,4}).*/, '($1) $2-$3');
@@ -231,22 +281,23 @@ telEl?.addEventListener('input', e=>{
 /* ====== LOAD ====== */
 async function loadVendidos(){
   try{
-    const r = await fetch(`${RIFA_SCRIPT_URL}?action=vendidos`, {cache:'no-store'});
+    const r = await fetch(`${SCRIPT_URL}?action=vendidos`, {cache:'no-store'});
     if(!r.ok) throw 0;
-    const j = await r.json(); // esperado: [4,7,25,...]
+    const j = await r.json();
     if(Array.isArray(j)) vendidos = new Set(j.map(x=>Number(x)));
   }catch(e){
-    // fallback demo (comente se não quiser)
-    vendidos = new Set([4,7,25,27,41,55,98,101,170]);
+    // fallback de demonstração
+    vendidos = new Set([7,12,33,40,101,150]);
   }
 }
 
 async function init(){
-  precoTopEl.textContent = 'R$ ' + fmt(PRECO);
-  precoLabel.textContent = fmt(PRECO);
+  precoTopEl.textContent = fmt(PRECO);
+  precoLabel.textContent = PRECO.toLocaleString('pt-BR',{minimumFractionDigits:2});
   await loadVendidos();
   renderGrid();
   updatePanel();
+  initBanners();
 }
 init();
 
@@ -260,6 +311,7 @@ btnClear.addEventListener('click', ()=>{
 btnConfirm.addEventListener('click', ()=>{
   const arr = Array.from(selecionados).sort((a,b)=>a-b);
   numsPreview.textContent = arr.join(', ');
+  totalPreview.textContent = fmt(arr.length * PRECO);
   openPopup();
 });
 
@@ -282,11 +334,12 @@ confirmEl.addEventListener('click', async ()=>{
     const payload = {
       action: "registrar_rifa",
       nome, email, telefone: tel,
-      numeros, // array
+      numeros,
       quantidade: numeros.length,
-      total: numeros.length * PRECO
+      total: numeros.length * PRECO,
+      pix: PIX_KEY
     };
-    const res = await fetch(RIFA_SCRIPT_URL, {
+    const res = await fetch(SCRIPT_URL, {
       method: "POST",
       headers: {"Content-Type":"text/plain;charset=utf-8"},
       body: JSON.stringify(payload)
@@ -295,14 +348,15 @@ confirmEl.addEventListener('click', async ()=>{
     showOverlay(false);
 
     if(/OK/i.test(text)){
-      alert('✅ Participação registrada! Seus números foram reservados.');
       closePopup();
-      // recarrega status de vendidos e limpa seleção
+      // abre o drawer com a chave PIX + total
+      openDrawer(numeros.length * PRECO);
+      // recarrega vendidos
       selecionados.clear();
       await loadVendidos();
       renderGrid(); updatePanel();
-    }else if(/DUPLICADO|RESERVADO/i.test(text)){
-      alert('⚠️ Alguns números já foram reservados enquanto você preenchia. Atualizamos a lista.');
+    }else if(/RESERVADO|DUPLICADO/i.test(text)){
+      alert('⚠️ Alguns números ficaram indisponíveis durante o processo. Atualizamos a lista.');
       await loadVendidos(); renderGrid(); updatePanel(); closePopup();
     }else{
       alert('❌ Não foi possível enviar. Tente novamente.');
@@ -312,6 +366,52 @@ confirmEl.addEventListener('click', async ()=>{
     alert('Falha de conexão.');
   }
 });
+
+/* ====== PIX Drawer ====== */
+copyPix.addEventListener('click', async ()=>{
+  try{
+    await navigator.clipboard.writeText(PIX_KEY);
+    copyPix.textContent = "Copiado!";
+    setTimeout(()=>copyPix.textContent="Copiar chave PIX",1500);
+  }catch{}
+});
+closeDrawer.addEventListener('click', closePixDrawer);
+
+/* ====== BANNERS: autoplay + setas + bolinhas ====== */
+let bIndex = 0, bTimer;
+const bannerImg = document.getElementById('bannerImg');
+const dots = document.getElementById('dots');
+const prev = document.getElementById('prev');
+const next = document.getElementById('next');
+
+function renderDots(){
+  dots.innerHTML = '';
+  banners.forEach((_,i)=>{
+    const s = document.createElement('span');
+    if(i===bIndex) s.classList.add('on');
+    s.addEventListener('click',()=>{bIndex=i;showBanner();resetAuto();});
+    dots.appendChild(s);
+  });
+}
+function showBanner(){
+  bannerImg.style.opacity = 0;
+  setTimeout(()=>{
+    bannerImg.src = banners[bIndex];
+    bannerImg.onload = ()=>bannerImg.style.opacity = 1;
+    renderDots();
+  },100);
+}
+function nextBanner(){ bIndex=(bIndex+1)%banners.length; showBanner(); }
+function prevBanner(){ bIndex=(bIndex-1+banners.length)%banners.length; showBanner(); }
+function resetAuto(){
+  clearInterval(bTimer);
+  bTimer = setInterval(nextBanner, 4500);
+}
+function initBanners(){
+  bIndex=0; showBanner(); resetAuto();
+  next.addEventListener('click', ()=>{nextBanner(); resetAuto();});
+  prev.addEventListener('click', ()=>{prevBanner(); resetAuto();});
+}
 </script>
 </body>
 </html>
