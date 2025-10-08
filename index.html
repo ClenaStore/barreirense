@@ -63,9 +63,6 @@ button:hover{opacity:.9}
     <label>Data</label>
     <input type="date" id="data" required>
 
-    <label>Horário</label>
-    <input type="time" id="hora" required>
-
     <label>Nome completo</label>
     <input type="text" id="nome" required placeholder="Seu nome completo">
 
@@ -86,7 +83,7 @@ button:hover{opacity:.9}
 </main>
 
 <script>
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwFt013duL4ya4ngvr5jmGLbKlF4syg7mLGGwDxkfdmlImyXmoo7lwQToJ35N6EUKgB/exec";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzNA-r-I6z6E1d67LtVbRW_dbtsQ2r_zFio6U6cjg9JSqOiTpvn30K6XSW7jfkC_Gk/exec";
 const msg = document.getElementById('msg');
 const premioValor = document.getElementById('premioValor');
 const comprovante = document.getElementById('comprovante');
@@ -135,7 +132,6 @@ document.getElementById('formBolao').addEventListener('submit', async e=>{
   const email=document.getElementById('email').value.trim();
   const telefone=document.getElementById('telefone').value.trim();
   const data=document.getElementById('data').value;
-  const hora=document.getElementById('hora').value;
   const foto=document.getElementById('fotoSelecionada').value;
   const file=comprovante.files[0];
 
@@ -146,7 +142,6 @@ document.getElementById('formBolao').addEventListener('submit', async e=>{
   const formData=new FormData();
   formData.append("action","upload");
   formData.append("data",data);
-  formData.append("hora",hora);
   formData.append("nome",nome);
   formData.append("email",email);
   formData.append("telefone",telefone);
