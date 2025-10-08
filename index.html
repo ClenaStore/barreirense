@@ -29,6 +29,7 @@ button:hover{opacity:.9}
 #qrcodeConteudo{background:#111;padding:20px;border-radius:12px;text-align:center;width:90%;max-width:380px}
 #qrcodeConteudo img{max-width:200px;border-radius:8px;margin:10px auto}
 .copyBtn{background:var(--accent);color:#000;padding:8px 12px;border:none;border-radius:8px;cursor:pointer}
+.closeBtn{background:#ef4444;color:#fff;padding:8px 14px;border:none;border-radius:8px;cursor:pointer;margin-top:8px}
 </style>
 </head>
 <body>
@@ -41,7 +42,7 @@ button:hover{opacity:.9}
 
 <main>
   <div id="premioCard">
-    <div>Total do prémio:</div>
+    <div>Total do prêmio líquido (-25%):</div>
     <div id="premioValor">R$ 0,00</div>
     <small>Se houver mais de um ganhador, o prêmio será dividido igualmente.</small>
   </div>
@@ -80,8 +81,8 @@ button:hover{opacity:.9}
     <p>Chave aleatória:</p>
     <p id="pixKey" style="font-weight:bold;">00000000-0000-0000-0000-000000000000</p>
     <button class="copyBtn" id="btnCopiar">Copiar chave</button>
-    <p style="margin-top:10px;font-size:.9em">Após o pagamento envie o comprovante para o WhatsApp <br><b>(77) 99825-3249</b></p>
-    <button onclick="fecharQr()">Fechar</button>
+    <p style="margin-top:10px;font-size:.9em">Após o pagamento envie o comprovante para o WhatsApp<br><b>(77) 99825-3249</b></p>
+    <button class="closeBtn" onclick="fecharQr()">Fechar</button>
   </div>
 </div>
 
@@ -123,30 +124,30 @@ document.querySelectorAll('.photo').forEach(f=>{
   });
 });
 
-// Atualiza total de prêmios aprovados
+// Atualiza total de prêmios aprovados (líquido)
 async function atualizarPremio(){
   try{
     const r = await fetch(SCRIPT_URL + "?action=premio");
     const j = await r.json();
-    premioValor.textContent = j.valor ? j.valor : "R$ 0,00";
+    premioValor.textContent = j.valor || "R$ 0,00";
   }catch(err){console.warn(err);}
 }
-setInterval(atualizarPremio,10000);
+setInterval(atualizarPremio,5000);
 atualizarPremio();
 
-// Envio
+// Envio do formulário
 document.getElementById('formBolao').addEventListener('submit', async e=>{
   e.preventDefault();
-  msg.textContent = "Verificando...";
+  msg.textContent = "Enviando...";
   const data = {
-    action: "registrar",
-    nome: nome.value.trim(),
-    email: email.value.trim(),
-    telefone: telefone.value.trim(),
-    qtd: document.getElementById('qtd').value || 1,
-    foto: document.getElementById('fotoSelecionada').value,
-    valor: valorCota,
-    status: "PENDENTE"
+    action:"registrar",
+    nome:nome.value.trim(),
+    email:email.value.trim(),
+    telefone:telefone.value.trim(),
+    qtd:document.getElementById('qtd').value || 1,
+    foto:document.getElementById('fotoSelecionada').value,
+    valor:valorCota,
+    status:"PENDENTE"
   };
   try{
     const res = await fetch(SCRIPT_URL,{
@@ -156,11 +157,11 @@ document.getElementById('formBolao').addEventListener('submit', async e=>{
     });
     const txt = await res.text();
     if(txt.includes("duplicado")){
-      msg.textContent="Esse número de telefone já possui uma aposta!";
+      msg.textContent="⚠️ Esse número de telefone já possui uma aposta!";
       return;
     }
     if(res.ok){
-      msg.textContent="Aposta registrada com sucesso! Aguarde aprovação.";
+      msg.textContent="✅ Aposta registrada com sucesso! Aguarde aprovação.";
       qrcodeTela.style.display='flex';
     }else{
       msg.textContent="Erro ao registrar.";
