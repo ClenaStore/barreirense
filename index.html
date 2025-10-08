@@ -20,7 +20,7 @@ main{max-width:600px;margin:18px auto;background:var(--card);padding:20px;border
 .photo img{width:100%;height:100%;object-fit:cover}
 .photo.selected{border-color:var(--accent);transform:scale(1.1)}
 label{font-size:.9em;color:var(--muted)}
-input,select{width:100%;padding:10px;border:none;border-radius:8px;background:#0f172a;color:var(--ink);font-size:1em}
+input{width:100%;padding:10px;border:none;border-radius:8px;background:#0f172a;color:var(--ink);font-size:1em}
 input[type="file"]{background:none;border:1px dashed var(--accent);color:var(--muted);padding:14px;text-align:center;cursor:pointer}
 button{background:var(--accent);color:#000;font-weight:700;border:none;border-radius:8px;padding:12px;cursor:pointer}
 button[disabled]{opacity:.6;cursor:not-allowed}
@@ -41,7 +41,7 @@ button:hover{opacity:.9}
   <img class="banner" src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?q=80&w=1200&auto=format&fit=crop" alt="banner2">
   <img class="banner" src="https://images.unsplash.com/photo-1542831371-d531d36971e6?q=80&w=1200&auto=format&fit=crop" alt="banner3">
   <h1>Bolão da Sorte 🎉</h1>
-  <p>Envie seus dados e o comprovante do pagamento para confirmar sua aposta!</p>
+  <p>Preencha seus dados e envie o comprovante para confirmar sua aposta!</p>
 </header>
 
 <main>
@@ -60,7 +60,6 @@ button:hover{opacity:.9}
   </div>
 
   <form id="formBolao">
-
     <label>Nome completo</label>
     <input type="text" id="nome" required placeholder="Seu nome completo">
 
@@ -70,7 +69,10 @@ button:hover{opacity:.9}
     <label>Telefone / WhatsApp</label>
     <input type="tel" id="telefone" required placeholder="(00) 00000-0000" maxlength="16">
 
-    <label>Comprovante de pagamento (print ou imagem)</label>
+    <label>Quantidade de cotas</label>
+    <input type="number" id="qtd" min="1" required placeholder="Ex: 2">
+
+    <label>Comprovante de pagamento (imagem ou print)</label>
     <input type="file" id="comprovante" accept="image/*" required>
 
     <input type="hidden" id="fotoSelecionada" value="">
@@ -81,10 +83,11 @@ button:hover{opacity:.9}
 </main>
 
 <script>
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzNA-r-I6z6E1d67LtVbRW_dbtsQ2r_zFio6U6cjg9JSqOiTpvn30K6XSW7jfkC_Gk/exec";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz_QZ6aY1_EI5U1lf777m9f4Pci2cEyX3GhC9tGPFYX67rZFfsNuAHvBhqkV48GBNhs/exec";
 const msg = document.getElementById('msg');
 const premioValor = document.getElementById('premioValor');
 const comprovante = document.getElementById('comprovante');
+const valorCota = 5;
 
 // Banner rotativo
 let banners = document.querySelectorAll('.banner');
@@ -129,28 +132,30 @@ document.getElementById('formBolao').addEventListener('submit', async e=>{
   const nome=document.getElementById('nome').value.trim();
   const email=document.getElementById('email').value.trim();
   const telefone=document.getElementById('telefone').value.trim();
-  const data=document.getElementById('data').value;
+  const qtd=document.getElementById('qtd').value;
   const foto=document.getElementById('fotoSelecionada').value;
   const file=comprovante.files[0];
 
-  if(!file){msg.textContent="⚠️ Envie o comprovante antes de confirmar.";return;}
   if(!foto){msg.textContent="Selecione uma das imagens acima.";return;}
+  if(!file){msg.textContent="⚠️ Envie o comprovante antes de confirmar.";return;}
+  if(!qtd || qtd<=0){msg.textContent="Informe a quantidade de cotas.";return;}
 
   msg.textContent="📤 Enviando comprovante...";
   const formData=new FormData();
   formData.append("action","upload");
-  formData.append("data",data);
   formData.append("nome",nome);
   formData.append("email",email);
   formData.append("telefone",telefone);
   formData.append("foto",foto);
+  formData.append("qtd",qtd);
   formData.append("file",file);
 
   try{
     const res=await fetch(SCRIPT_URL,{method:"POST",body:formData});
     const txt=await res.text();
     if(txt.includes("OK")){
-      msg.textContent="✅ Enviado com sucesso! A aposta será confirmada em breve.";
+      const total = qtd * valorCota;
+      msg.innerHTML=`✅ Enviado com sucesso! Valor total: <b>R$ ${total.toFixed(2).replace('.',',')}</b>. A aposta será confirmada em breve.`;
       e.target.reset();
       document.querySelectorAll('.photo').forEach(x=>x.classList.remove('selected'));
     }else{
