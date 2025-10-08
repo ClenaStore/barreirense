@@ -20,7 +20,7 @@ main{max-width:600px;margin:18px auto;background:var(--card);padding:20px;border
 .photo img{width:100%;height:100%;object-fit:cover}
 .photo.selected{border-color:var(--accent);transform:scale(1.1)}
 label{font-size:.9em;color:var(--muted)}
-input{width:100%;padding:10px;border:none;border-radius:8px;background:#0f172a;color:var(--ink);font-size:1em}
+input,select{width:100%;padding:10px;border:none;border-radius:8px;background:#0f172a;color:var(--ink);font-size:1em}
 input[type="file"]{background:none;border:1px dashed var(--accent);color:var(--muted);padding:14px;text-align:center;cursor:pointer}
 button{background:var(--accent);color:#000;font-weight:700;border:none;border-radius:8px;padding:12px;cursor:pointer}
 button[disabled]{opacity:.6;cursor:not-allowed}
@@ -28,15 +28,8 @@ button:hover{opacity:.9}
 .msg{text-align:center;margin-top:14px;color:var(--muted);font-size:.9em}
 #premioCard{text-align:center;background:#0b1120;padding:14px;border-radius:10px;margin-bottom:18px}
 #premioValor{font-size:1.6em;font-weight:700;color:var(--accent)}
-#qrcodeTela{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.8);color:#fff;align-items:center;justify-content:center;z-index:99}
-#qrcodeConteudo{background:#111;padding:20px;border-radius:12px;text-align:center;width:90%;max-width:380px}
-#qrcodeConteudo img{max-width:200px;border-radius:8px;margin:10px auto}
-.copyBtn{background:var(--accent);color:#000;padding:8px 12px;border:none;border-radius:8px;cursor:pointer}
-.closeBtn{background:#ef4444;color:#fff;padding:8px 14px;border:none;border-radius:8px;cursor:pointer;margin-top:8px}
-.totalPix{margin-top:8px;font-size:14px;opacity:.9}
 @media(max-width:600px){
   h1{margin-top:220px;font-size:1.6em}
-  #qrcodeConteudo{max-width:320px}
 }
 </style>
 </head>
@@ -48,7 +41,7 @@ button:hover{opacity:.9}
   <img class="banner" src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?q=80&w=1200&auto=format&fit=crop" alt="banner2">
   <img class="banner" src="https://images.unsplash.com/photo-1542831371-d531d36971e6?q=80&w=1200&auto=format&fit=crop" alt="banner3">
   <h1>Bolão da Sorte 🎉</h1>
-  <p>Participe e concorra ao prêmio acumulado!</p>
+  <p>Envie seus dados e o comprovante do pagamento para confirmar sua aposta!</p>
 </header>
 
 <main>
@@ -67,17 +60,25 @@ button:hover{opacity:.9}
   </div>
 
   <form id="formBolao">
+    <label>Data</label>
+    <input type="date" id="data" required>
+
+    <label>Horário</label>
+    <input type="time" id="hora" required>
+
     <label>Nome completo</label>
     <input type="text" id="nome" required placeholder="Seu nome completo">
 
     <label>E-mail</label>
     <input type="email" id="email" required placeholder="seu@email.com">
 
-    <label>Comprovante de pagamento</label>
-    <input type="file" id="comprovante" accept="image/*,.pdf" required>
+    <label>Telefone / WhatsApp</label>
+    <input type="tel" id="telefone" required placeholder="(00) 00000-0000" maxlength="16">
+
+    <label>Comprovante de pagamento (print ou imagem)</label>
+    <input type="file" id="comprovante" accept="image/*" required>
 
     <input type="hidden" id="fotoSelecionada" value="">
-    <input type="hidden" id="qtd" value="">
     <button id="btnEnviar" type="submit">Enviar Comprovante e Confirmar Aposta</button>
   </form>
 
@@ -85,7 +86,7 @@ button:hover{opacity:.9}
 </main>
 
 <script>
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxg_kZYx6SfeJ5ogJ3upXRQjI03ERnZvYmzm-X2g_jO_BqYe1p8lo8GEjBHyZcwbKoYlA/exec";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwFt013duL4ya4ngvr5jmGLbKlF4syg7mLGGwDxkfdmlImyXmoo7lwQToJ35N6EUKgB/exec";
 const msg = document.getElementById('msg');
 const premioValor = document.getElementById('premioValor');
 const comprovante = document.getElementById('comprovante');
@@ -99,7 +100,7 @@ setInterval(()=>{
   banners[atual].classList.add('active');
 },4000);
 
-// Atualiza prêmio
+// Atualiza prêmio líquido (-25%)
 async function atualizarPremio(){
   try{
     const r = await fetch(SCRIPT_URL + "?action=premio",{cache:'no-store'});
@@ -110,7 +111,7 @@ async function atualizarPremio(){
 setInterval(atualizarPremio,5000);
 atualizarPremio();
 
-// Seleção de fotos
+// Seleção de foto
 document.querySelectorAll('.photo').forEach(f=>{
   f.addEventListener('click',()=>{
     document.querySelectorAll('.photo').forEach(x=>x.classList.remove('selected'));
@@ -119,38 +120,51 @@ document.querySelectorAll('.photo').forEach(f=>{
   });
 });
 
-// Envio do comprovante
+// Máscara de telefone
+document.getElementById('telefone').addEventListener('input', e=>{
+  let v = e.target.value.replace(/\D/g,'').slice(0,11);
+  if(v.length>10){v=v.replace(/^(\d{2})(\d{5})(\d{4}).*/,'($1) $2-$3');}
+  else{v=v.replace(/^(\d{2})(\d{4})(\d{0,4}).*/,'($1) $2-$3');}
+  e.target.value=v;
+});
+
+// Envio de dados + comprovante
 document.getElementById('formBolao').addEventListener('submit', async e=>{
   e.preventDefault();
-  const nome = document.getElementById('nome').value.trim();
-  const email = document.getElementById('email').value.trim();
-  const foto = document.getElementById('fotoSelecionada').value;
-  const file = comprovante.files[0];
-  if(!file){msg.textContent="Envie o comprovante.";return;}
+  const nome=document.getElementById('nome').value.trim();
+  const email=document.getElementById('email').value.trim();
+  const telefone=document.getElementById('telefone').value.trim();
+  const data=document.getElementById('data').value;
+  const hora=document.getElementById('hora').value;
+  const foto=document.getElementById('fotoSelecionada').value;
+  const file=comprovante.files[0];
+
+  if(!file){msg.textContent="⚠️ Envie o comprovante antes de confirmar.";return;}
   if(!foto){msg.textContent="Selecione uma das imagens acima.";return;}
 
   msg.textContent="📤 Enviando comprovante...";
-  const formData = new FormData();
+  const formData=new FormData();
   formData.append("action","upload");
+  formData.append("data",data);
+  formData.append("hora",hora);
   formData.append("nome",nome);
   formData.append("email",email);
+  formData.append("telefone",telefone);
   formData.append("foto",foto);
   formData.append("file",file);
 
   try{
-    const res = await fetch(SCRIPT_URL,{method:"POST",body:formData});
-    const txt = await res.text();
+    const res=await fetch(SCRIPT_URL,{method:"POST",body:formData});
+    const txt=await res.text();
     if(txt.includes("OK")){
-      msg.textContent="✅ Comprovante enviado! Sua aposta será confirmada em breve.";
-      document.getElementById('nome').value="";
-      document.getElementById('email').value="";
-      comprovante.value="";
+      msg.textContent="✅ Enviado com sucesso! A aposta será confirmada em breve.";
+      e.target.reset();
       document.querySelectorAll('.photo').forEach(x=>x.classList.remove('selected'));
     }else{
-      msg.textContent="❌ Erro ao enviar comprovante.";
+      msg.textContent="❌ Erro ao enviar. Tente novamente.";
     }
   }catch(err){
-    msg.textContent="Falha de conexão. Confira o link do Apps Script.";
+    msg.textContent="Erro de conexão com o servidor.";
   }
 });
 </script>
