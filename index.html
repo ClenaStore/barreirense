@@ -23,20 +23,15 @@ label{font-size:.9em;color:var(--muted)}
 input{width:100%;padding:10px;border:none;border-radius:8px;background:#0f172a;color:var(--ink);font-size:1em}
 input[type="file"]{background:none;border:1px dashed var(--accent);color:var(--muted);padding:14px;text-align:center;cursor:pointer}
 button{background:var(--accent);color:#000;font-weight:700;border:none;border-radius:8px;padding:12px;cursor:pointer}
-button[disabled]{opacity:.6;cursor:not-allowed}
 button:hover{opacity:.9}
 .msg{text-align:center;margin-top:14px;color:var(--muted);font-size:.9em}
 #premioCard{text-align:center;background:#0b1120;padding:14px;border-radius:10px;margin-bottom:18px}
 #premioValor{font-size:1.6em;font-weight:700;color:var(--accent)}
-@media(max-width:600px){
-  h1{margin-top:220px;font-size:1.6em}
-}
 </style>
 </head>
 <body>
 
 <header>
-  <!-- Banner rotativo -->
   <img class="banner active" src="https://images.unsplash.com/photo-1606813902859-4cb0c0bfae24?q=80&w=1200&auto=format&fit=crop" alt="banner1">
   <img class="banner" src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?q=80&w=1200&auto=format&fit=crop" alt="banner2">
   <img class="banner" src="https://images.unsplash.com/photo-1542831371-d531d36971e6?q=80&w=1200&auto=format&fit=crop" alt="banner3">
@@ -83,7 +78,7 @@ button:hover{opacity:.9}
 </main>
 
 <script>
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwsFJdvWE4yWEC_2aQzH-ZrqYf4iVwgNmAwt21u7u088fPQYphKq5Z8hRsBFsaWfOvM/exec";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyBhV_z2NdU-nQ3SfZSzRrz1bPmWmm8Od_s_SHd9K4favNInzPhryit_XGJKLTNkTv1/exec";
 const msg = document.getElementById('msg');
 const premioValor = document.getElementById('premioValor');
 const comprovante = document.getElementById('comprovante');
@@ -126,7 +121,7 @@ document.getElementById('telefone').addEventListener('input', e=>{
   e.target.value=v;
 });
 
-// Envio de dados + comprovante
+// Envio
 document.getElementById('formBolao').addEventListener('submit', async e=>{
   e.preventDefault();
   const nome=document.getElementById('nome').value.trim();
@@ -135,12 +130,10 @@ document.getElementById('formBolao').addEventListener('submit', async e=>{
   const qtd=document.getElementById('qtd').value;
   const foto=document.getElementById('fotoSelecionada').value;
   const file=comprovante.files[0];
-
   if(!foto){msg.textContent="Selecione uma das imagens acima.";return;}
   if(!file){msg.textContent="⚠️ Envie o comprovante antes de confirmar.";return;}
-  if(!qtd || qtd<=0){msg.textContent="Informe a quantidade de cotas.";return;}
+  msg.textContent="📤 Enviando...";
 
-  msg.textContent="📤 Enviando comprovante...";
   const formData=new FormData();
   formData.append("action","upload");
   formData.append("nome",nome);
@@ -154,10 +147,11 @@ document.getElementById('formBolao').addEventListener('submit', async e=>{
     const res=await fetch(SCRIPT_URL,{method:"POST",body:formData});
     const txt=await res.text();
     if(txt.includes("OK")){
-      const total = qtd * valorCota;
-      msg.innerHTML=`✅ Enviado com sucesso! Valor total: <b>R$ ${total.toFixed(2).replace('.',',')}</b>. A aposta será confirmada em breve.`;
+      msg.innerHTML=`✅ Aposta registrada com sucesso! Valor total <b>R$ ${(qtd*valorCota).toFixed(2).replace('.',',')}</b>. Aguarde a confirmação.`;
       e.target.reset();
       document.querySelectorAll('.photo').forEach(x=>x.classList.remove('selected'));
+    }else if(txt.includes("duplicado")){
+      msg.textContent="⚠️ Esse número de telefone já possui uma aposta!";
     }else{
       msg.textContent="❌ Erro ao enviar. Tente novamente.";
     }
