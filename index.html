@@ -20,23 +20,28 @@ main{max-width:600px;margin:18px auto;background:var(--card);padding:20px;border
 .photo img{width:100%;height:100%;object-fit:cover}
 .photo.selected{border-color:var(--accent);transform:scale(1.1)}
 label{font-size:.9em;color:var(--muted)}
-input{width:100%;padding:10px;border:none;border-radius:8px;background:#0f172a;color:var(--ink);font-size:1em}
+input,select{width:100%;padding:10px;border:none;border-radius:8px;background:#0f172a;color:var(--ink);font-size:1em}
 input[type="file"]{background:none;border:1px dashed var(--accent);color:var(--muted);padding:14px;text-align:center;cursor:pointer}
 button{background:var(--accent);color:#000;font-weight:700;border:none;border-radius:8px;padding:12px;cursor:pointer}
+button[disabled]{opacity:.6;cursor:not-allowed}
 button:hover{opacity:.9}
 .msg{text-align:center;margin-top:14px;color:var(--muted);font-size:.9em}
 #premioCard{text-align:center;background:#0b1120;padding:14px;border-radius:10px;margin-bottom:18px}
 #premioValor{font-size:1.6em;font-weight:700;color:var(--accent)}
+@media(max-width:600px){
+  h1{margin-top:220px;font-size:1.6em}
+}
 </style>
 </head>
 <body>
 
 <header>
+  <!-- Banner rotativo -->
   <img class="banner active" src="https://images.unsplash.com/photo-1606813902859-4cb0c0bfae24?q=80&w=1200&auto=format&fit=crop" alt="banner1">
   <img class="banner" src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?q=80&w=1200&auto=format&fit=crop" alt="banner2">
   <img class="banner" src="https://images.unsplash.com/photo-1542831371-d531d36971e6?q=80&w=1200&auto=format&fit=crop" alt="banner3">
   <h1>Bolão da Sorte 🎉</h1>
-  <p>Preencha seus dados e envie o comprovante para confirmar sua aposta!</p>
+  <p>Envie seus dados e o comprovante do pagamento para confirmar sua aposta!</p>
 </header>
 
 <main>
@@ -55,6 +60,12 @@ button:hover{opacity:.9}
   </div>
 
   <form id="formBolao">
+    <label>Data</label>
+    <input type="date" id="data" required>
+
+    <label>Horário</label>
+    <input type="time" id="hora" required>
+
     <label>Nome completo</label>
     <input type="text" id="nome" required placeholder="Seu nome completo">
 
@@ -64,10 +75,7 @@ button:hover{opacity:.9}
     <label>Telefone / WhatsApp</label>
     <input type="tel" id="telefone" required placeholder="(00) 00000-0000" maxlength="16">
 
-    <label>Quantidade de cotas</label>
-    <input type="number" id="qtd" min="1" required placeholder="Ex: 2">
-
-    <label>Comprovante de pagamento (imagem ou print)</label>
+    <label>Comprovante de pagamento (print ou imagem)</label>
     <input type="file" id="comprovante" accept="image/*" required>
 
     <input type="hidden" id="fotoSelecionada" value="">
@@ -78,11 +86,10 @@ button:hover{opacity:.9}
 </main>
 
 <script>
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyBhV_z2NdU-nQ3SfZSzRrz1bPmWmm8Od_s_SHd9K4favNInzPhryit_XGJKLTNkTv1/exec";
+const SCRIPT_URL = "https://script.google.com/macros/s/SEU_ID_AQUI/exec";
 const msg = document.getElementById('msg');
 const premioValor = document.getElementById('premioValor');
 const comprovante = document.getElementById('comprovante');
-const valorCota = 5;
 
 // Banner rotativo
 let banners = document.querySelectorAll('.banner');
@@ -121,37 +128,38 @@ document.getElementById('telefone').addEventListener('input', e=>{
   e.target.value=v;
 });
 
-// Envio
+// Envio de dados + comprovante
 document.getElementById('formBolao').addEventListener('submit', async e=>{
   e.preventDefault();
   const nome=document.getElementById('nome').value.trim();
   const email=document.getElementById('email').value.trim();
   const telefone=document.getElementById('telefone').value.trim();
-  const qtd=document.getElementById('qtd').value;
+  const data=document.getElementById('data').value;
+  const hora=document.getElementById('hora').value;
   const foto=document.getElementById('fotoSelecionada').value;
   const file=comprovante.files[0];
-  if(!foto){msg.textContent="Selecione uma das imagens acima.";return;}
-  if(!file){msg.textContent="⚠️ Envie o comprovante antes de confirmar.";return;}
-  msg.textContent="📤 Enviando...";
 
+  if(!file){msg.textContent="⚠️ Envie o comprovante antes de confirmar.";return;}
+  if(!foto){msg.textContent="Selecione uma das imagens acima.";return;}
+
+  msg.textContent="📤 Enviando comprovante...";
   const formData=new FormData();
   formData.append("action","upload");
+  formData.append("data",data);
+  formData.append("hora",hora);
   formData.append("nome",nome);
   formData.append("email",email);
   formData.append("telefone",telefone);
   formData.append("foto",foto);
-  formData.append("qtd",qtd);
   formData.append("file",file);
 
   try{
     const res=await fetch(SCRIPT_URL,{method:"POST",body:formData});
     const txt=await res.text();
     if(txt.includes("OK")){
-      msg.innerHTML=`✅ Aposta registrada com sucesso! Valor total <b>R$ ${(qtd*valorCota).toFixed(2).replace('.',',')}</b>. Aguarde a confirmação.`;
+      msg.textContent="✅ Enviado com sucesso! A aposta será confirmada em breve.";
       e.target.reset();
       document.querySelectorAll('.photo').forEach(x=>x.classList.remove('selected'));
-    }else if(txt.includes("duplicado")){
-      msg.textContent="⚠️ Esse número de telefone já possui uma aposta!";
     }else{
       msg.textContent="❌ Erro ao enviar. Tente novamente.";
     }
