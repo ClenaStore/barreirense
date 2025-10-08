@@ -187,37 +187,15 @@ pixKey.addEventListener("click",async()=>{
 });
 
 // Atualizar prêmio
-// Atualizar prêmio com base nos aprovados
-async function refreshPremio() {
-  try {
-    // Busca todos os registros
-    const r = await fetch(`${SCRIPT_URL}?action=lista`);
-    const data = await r.json();
-
-    if (!Array.isArray(data)) {
-      document.getElementById("premio").textContent = "R$ 0,00";
-      return;
-    }
-
-    // Filtra apenas os aprovados e soma o valor total
-    const total = data
-      .filter(item => item.status && item.status.toUpperCase() === "APROVADO")
-      .reduce((acc, item) => {
-        const qtd = Number(item.qtd || 0);
-        return acc + (qtd * PRECO);
-      }, 0);
-
-    // Exibe o total formatado
-    document.getElementById("premio").textContent =
-      `R$ ${total.toFixed(2).replace('.', ',')}`;
-  } catch (err) {
-    console.error("Erro ao atualizar prêmio:", err);
-    document.getElementById("premio").textContent = "R$ 0,00";
-  }
+async function refreshPremio(){
+  try{
+    const r=await fetch(`${SCRIPT_URL}?action=premio`);
+    const j=await r.json();
+    document.getElementById("premio").textContent=j.valor||"R$ 0,00";
+  }catch{}
 }
-
 refreshPremio();
-setInterval(refreshPremio, 8000);
+setInterval(refreshPremio,8000);
 
 // Enviar aposta
 document.getElementById("f").addEventListener("submit",async e=>{
