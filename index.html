@@ -70,32 +70,36 @@ header{
 }
 .card img{
   width:100%;
-  height:150px;
+  height:120px;
   object-fit:cover;
-  object-position:center;
+  object-position:top;
   flex-shrink:0;
 }
-
-/* NOME DO JOGO NO CANTO SUPERIOR DIREITO */
 .card h3{
-  position:absolute;
-  top:8px;
-  right:10px;
-  font-size:13px;
-  font-weight:600;
-  background:rgba(0,0,0,0.6);
-  padding:5px 8px;
-  border-radius:8px;
+  font-size:15px;
+  padding:10px;
   color:var(--text);
-  animation:blink 1.5s infinite ease-in-out;
-  text-shadow:0 0 8px var(--accent);
-  white-space:nowrap;
+  margin-top:auto;
 }
 
-/* EFEITO DE PISCAR */
-@keyframes blink {
-  0%, 100% {opacity:1; text-shadow:0 0 8px var(--accent);}
-  50% {opacity:.4; text-shadow:none;}
+/* FLAG “JOGUE AGORA” */
+.flag{
+  position:absolute;
+  top:8px;
+  right:8px;
+  background:linear-gradient(135deg, var(--accent), #00e5ff);
+  color:#fff;
+  font-size:11px;
+  font-weight:600;
+  padding:5px 8px;
+  border-radius:8px;
+  box-shadow:0 0 10px rgba(0,188,212,.7);
+  animation:blink 1.6s infinite ease-in-out;
+  text-transform:uppercase;
+}
+@keyframes blink{
+  0%,100%{opacity:1; box-shadow:0 0 10px rgba(0,188,212,.8);}
+  50%{opacity:.5; box-shadow:none;}
 }
 
 .card:hover{
@@ -140,18 +144,9 @@ footer{
 <!-- LISTA DE JOGOS -->
 <section class="games">
   <div class="card" onclick="openGame('index.odete.html', this)">
+    <span class="flag">🎯 Jogue agora</span>
     <img src="https://github.com/ClenaStore/barreirense/blob/main/paste/Odete.jpg?raw=true" alt="Jogo 1">
-    <h3>Odete Roitman 🤔</h3>
-  </div>
-
-  <div class="card" onclick="openGame('index.futebol.html', this)">
-    <img src="https://github.com/ClenaStore/barreirense/blob/main/paste/futebol.jpg?raw=true" alt="Jogo 2">
-    <h3>Desafio Futebol ⚽</h3>
-  </div>
-
-  <div class="card" onclick="openGame('index.quiz.html', this)">
-    <img src="https://github.com/ClenaStore/barreirense/blob/main/paste/quiz.jpg?raw=true" alt="Jogo 3">
-    <h3>Quiz dos Famosos 🧠</h3>
+    <h3>Quem matou Odete Roitman? 🤔</h3>
   </div>
 </section>
 
