@@ -20,7 +20,7 @@ main{max-width:600px;margin:18px auto;background:var(--card);padding:20px;border
 .photo img{width:100%;height:100%;object-fit:cover}
 .photo.selected{border-color:var(--accent);transform:scale(1.1)}
 label{font-size:.9em;color:var(--muted)}
-input{width:100%;padding:10px;border:none;border-radius:8px;background:#0f172a;color:var(--ink);font-size:1em;margin-bottom:10px}
+input{width:100%;padding:10px;margin-bottom:10px;border:none;border-radius:8px;background:#0f172a;color:var(--ink);font-size:1em}
 button{background:var(--accent);color:#000;font-weight:700;border:none;border-radius:8px;padding:12px;cursor:pointer;width:100%}
 button[disabled]{opacity:.6;cursor:not-allowed}
 button:hover{opacity:.9}
@@ -43,9 +43,8 @@ button:hover{opacity:.9}
 
 <main>
   <div id="premioCard">
-    <div>Total do prêmio líquido (-25%):</div>
+    <div>Total do prêmio aprovado:</div>
     <div id="premioValor">R$ 0,00</div>
-    <small>Se houver mais de um ganhador, o prêmio será dividido igualmente.</small>
   </div>
 
   <div class="photo-grid" id="photoGrid">
@@ -62,6 +61,9 @@ button:hover{opacity:.9}
     <label>E-mail</label>
     <input type="email" id="email" required placeholder="seu@email.com">
 
+    <label>Telefone / WhatsApp</label>
+    <input type="tel" id="telefone" required placeholder="(00) 00000-0000" maxlength="16">
+
     <label>Quantidade de cotas</label>
     <input type="number" id="qtd" min="1" required placeholder="Ex: 2">
 
@@ -74,8 +76,8 @@ button:hover{opacity:.9}
 </main>
 
 <script>
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw62wzI88mRsxqvv3Rz8LzuGJTAP9-zdaAxjQmyXvNVeqPxg--3qRgD_3zYowTH38CB/exec";
-const NUMERO_WHATSAPP = "5577998253249"; // substitua pelo seu número
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwlG7iqwyA-0o0ZN1WEOv60nfhCRhnhEo4Xs2DiFobfVfd47o_1kp97ZR1CWbR9wsM/exec";
+const NUMERO_WHATSAPP = "5577998253249"; // Altere para o número real
 const valorCota = 5;
 const msg = document.getElementById('msg');
 const premioValor = document.getElementById('premioValor');
@@ -85,6 +87,14 @@ const btnWhatsapp = document.getElementById('btnWhatsapp');
 // Banner rotativo
 let banners=document.querySelectorAll('.banner');let atual=0;
 setInterval(()=>{banners[atual].classList.remove('active');atual=(atual+1)%banners.length;banners[atual].classList.add('active');},4000);
+
+// Máscara telefone
+document.getElementById('telefone').addEventListener('input',e=>{
+  let v=e.target.value.replace(/\D/g,'').slice(0,11);
+  if(v.length>10){v=v.replace(/^(\d{2})(\d{5})(\d{4}).*/,'($1) $2-$3');}
+  else{v=v.replace(/^(\d{2})(\d{4})(\d{0,4}).*/,'($1) $2-$3');}
+  e.target.value=v;
+});
 
 // Seleção de fotos
 document.querySelectorAll('.photo').forEach(f=>{
@@ -113,12 +123,13 @@ document.getElementById('formBolao').addEventListener('submit',async e=>{
 
   const nome=document.getElementById('nome').value.trim();
   const email=document.getElementById('email').value.trim();
+  const telefone=document.getElementById('telefone').value.trim();
   const qtd=document.getElementById('qtd').value;
   const foto=document.getElementById('fotoSelecionada').value;
 
   if(!foto){msg.textContent="Selecione uma das opções acima.";btnEnviar.disabled=false;return;}
 
-  const data={action:"registrar",nome,email,qtd,foto,valor:valorCota,status:"PENDENTE"};
+  const data={action:"registrar",nome,email,telefone,qtd,foto,valor:valorCota,status:"PENDENTE"};
   try{
     const res=await fetch(SCRIPT_URL,{
       method:"POST",
@@ -131,12 +142,12 @@ document.getElementById('formBolao').addEventListener('submit',async e=>{
       msg.textContent="Aposta registrada! Envie seu comprovante via WhatsApp.";
       btnWhatsapp.style.display='block';
       btnWhatsapp.onclick=()=>{
-        const mensagem=encodeURIComponent(`Olá! Enviei meu comprovante do Bolão da Sorte. Nome: ${nome} | E-mail: ${email} | ${qtd} cotas | Total: R$ ${(total).toFixed(2).replace('.',',')}`);
+        const mensagem=encodeURIComponent(`Olá! Enviando meu comprovante do Bolão da Sorte.\n\n👤 Nome: ${nome}\n📞 Telefone: ${telefone}\n📧 E-mail: ${email}\n💰 ${qtd} cotas | Total: R$ ${(total).toFixed(2).replace('.',',')}`);
         window.open(`https://wa.me/${NUMERO_WHATSAPP}?text=${mensagem}`,'_blank');
         msg.textContent="✅ Comprovante enviado. Boa sorte!";
       };
     }else if(txt.includes("duplicado")){
-      msg.textContent="⚠️ Este e-mail já possui aposta registrada.";
+      msg.textContent="⚠️ Este telefone já possui aposta registrada.";
     }else{
       msg.textContent="❌ Erro ao enviar. Tente novamente.";
     }
