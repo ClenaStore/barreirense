@@ -1,290 +1,188 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Bolão da Sorte 💰</title>
 <style>
-:root {
-  --bg:#0b1220;
-  --card:#141c2f;
-  --accent:#f59e0b;
-  --accent-hover:#d97706;
-  --text:#f8fafc;
-  --muted:#9ca3af;
-  --green:#22c55e;
-  --error:#ef4444;
+:root{
+  --bg:#0a0f1b; --card:#141c2f; --ink:#f8fafc; --muted:#9ca3af;
+  --accent:#f59e0b; --accent2:#d97706; --ok:#22c55e; --err:#ef4444;
 }
-*{box-sizing:border-box;margin:0;padding:0;font-family:Inter,system-ui,Segoe UI;}
-body {
-  background: var(--bg);
-  color: var(--text);
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:flex-start;
-  min-height:100vh;
-}
-header {
-  text-align:center;
-  padding:30px 20px 10px;
-}
-header h1 {
-  color: var(--accent);
-  font-size:2rem;
-  font-weight:800;
-  margin-bottom:8px;
-}
-header p {
-  color: var(--muted);
-  font-size:0.95rem;
-}
-main {
-  background: var(--card);
-  width:95%;
-  max-width:420px;
-  padding:24px;
-  border-radius:16px;
-  box-shadow:0 4px 25px rgba(0,0,0,0.4);
-  margin-bottom:30px;
-}
-#premioCard {
-  text-align:center;
-  background:#0f172a;
-  padding:14px 10px;
-  border-radius:10px;
-  margin-bottom:22px;
-  border:1px solid #1e293b;
-}
-#premioCard small {
-  color: var(--muted);
-  font-size:0.85rem;
-}
-#premioValor {
-  font-size:1.8rem;
-  font-weight:700;
-  color: var(--accent);
-  margin:6px 0;
-}
-.photo-grid {
-  display:flex;
-  justify-content:space-around;
-  flex-wrap:wrap;
-  margin-bottom:20px;
-}
-.photo {
-  width:75px;
-  height:75px;
-  border-radius:50%;
-  overflow:hidden;
-  cursor:pointer;
-  border:3px solid transparent;
-  transition:0.3s;
-}
-.photo img {width:100%;height:100%;object-fit:cover;}
-.photo.selected {
-  border-color: var(--accent);
-  transform:scale(1.08);
-}
-label {
-  display:block;
-  color: var(--muted);
-  font-size:0.9rem;
-  margin-bottom:4px;
-  margin-top:10px;
-}
-input {
-  width:100%;
-  padding:10px;
-  border:none;
-  border-radius:8px;
-  background:#0f172a;
-  color:var(--text);
-  font-size:1rem;
-}
-button {
-  width:100%;
-  border:none;
-  border-radius:8px;
-  padding:12px;
-  font-weight:700;
-  font-size:1rem;
-  cursor:pointer;
-  transition:0.2s;
-}
-#btnEnviar {
-  background: var(--accent);
-  color:#000;
-  margin-top:15px;
-}
-#btnEnviar:hover {background:var(--accent-hover);}
-#btnWhatsapp {
-  display:none;
-  background: var(--green);
-  color:#fff;
-  margin-top:12px;
-}
-#btnWhatsapp:hover {opacity:0.9;}
-.msg {
-  text-align:center;
-  font-size:0.9rem;
-  margin-top:14px;
-  color: var(--muted);
-}
-.msg.error {color:var(--error);}
-.msg.success {color:var(--green);}
-footer {
-  color:var(--muted);
-  font-size:0.8rem;
-  margin-bottom:15px;
-  text-align:center;
-}
+*{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,Segoe UI}
+.wrap{max-width:480px;margin:28px auto;padding:0 16px}
+h1{color:var(--accent);text-align:center;margin:0 0 8px;font-size:28px}
+.sub{color:var(--muted);text-align:center;margin:0 0 18px}
+.card{background:var(--card);border-radius:16px;padding:20px;box-shadow:0 8px 30px rgba(0,0,0,.35)}
+.premio{background:#0f172a;border:1px solid #1e293b;border-radius:12px;text-align:center;padding:14px;margin-bottom:18px}
+.premio small{color:var(--muted)} .valor{color:var(--accent);font-size:28px;font-weight:800;margin-top:6px}
+.grid{display:flex;gap:10px;justify-content:space-between;margin-bottom:16px}
+.photo{width:72px;height:72px;border-radius:50%;overflow:hidden;border:3px solid transparent;cursor:pointer;transition:.25s}
+.photo img{width:100%;height:100%;object-fit:cover}
+.photo.sel{border-color:var(--accent);transform:scale(1.06)}
+label{display:block;color:var(--muted);font-size:13px;margin:10px 0 6px}
+input{width:100%;background:#0b1220;color:var(--ink);border:none;border-radius:10px;padding:12px;font-size:15px}
+button{width:100%;border:none;border-radius:10px;padding:14px;font-weight:800;font-size:15px;cursor:pointer;transition:.2s}
+.btn{background:var(--accent);color:#111;margin-top:14px}
+.btn:hover{background:var(--accent2)}
+.msg{margin-top:12px;text-align:center;font-size:14px;color:var(--muted)}
+.msg.ok{color:var(--ok)} .msg.err{color:var(--err)}
+.whats{display:none;background:var(--ok);color:#fff;margin-top:10px}
 </style>
 </head>
 <body>
-
-<header>
+<div class="wrap">
   <h1>Bolão da Sorte 🎉</h1>
-  <p>Participe e concorra ao prêmio acumulado!</p>
-</header>
+  <p class="sub">Participe e concorra ao prêmio acumulado!</p>
 
-<main>
-  <div id="premioCard">
-    <div><small>Total do prêmio aprovado:</small></div>
-    <div id="premioValor">R$ 0,00</div>
+  <div class="card">
+    <div class="premio">
+      <small>Total do prêmio aprovado:</small>
+      <div id="premio" class="valor">R$ 0,00</div>
+    </div>
+
+    <div class="grid" id="grid">
+      <div class="photo"><img src="https://images.unsplash.com/photo-1556740749-887f6717d7e4?w=400" alt=""></div>
+      <div class="photo"><img src="https://images.unsplash.com/photo-1581091215367-59ab6d3213b1?w=400" alt=""></div>
+      <div class="photo"><img src="https://images.unsplash.com/photo-1564869733280-233b6fbc55d0?w=400" alt=""></div>
+      <div class="photo"><img src="https://images.unsplash.com/photo-1550510537-0b38c0d62f5a?w=400" alt=""></div>
+    </div>
+
+    <form id="f">
+      <input type="hidden" id="foto">
+      <label>Nome completo</label>
+      <input id="nome" type="text" required placeholder="Seu nome completo">
+
+      <label>E-mail</label>
+      <input id="email" type="email" required placeholder="seu@email.com">
+
+      <label>Telefone / WhatsApp</label>
+      <input id="tel" type="tel" required maxlength="16" placeholder="(00) 00000-0000">
+
+      <label>Quantidade de cotas</label>
+      <input id="qtd" type="number" min="1" required placeholder="Ex: 3">
+
+      <button id="enviar" class="btn" type="submit">Confirmar Participação</button>
+    </form>
+
+    <button id="whats" class="whats">📩 Enviar Comprovante pelo WhatsApp</button>
+    <div id="msg" class="msg"></div>
   </div>
-
-  <div class="photo-grid">
-    <div class="photo"><img src="https://images.unsplash.com/photo-1556740749-887f6717d7e4?w=400" alt="1"></div>
-    <div class="photo"><img src="https://images.unsplash.com/photo-1581091215367-59ab6d3213b1?w=400" alt="2"></div>
-    <div class="photo"><img src="https://images.unsplash.com/photo-1564869733280-233b6fbc55d0?w=400" alt="3"></div>
-    <div class="photo"><img src="https://images.unsplash.com/photo-1550510537-0b38c0d62f5a?w=400" alt="4"></div>
-  </div>
-
-  <form id="formBolao">
-    <label>Nome completo</label>
-    <input type="text" id="nome" required placeholder="Seu nome completo">
-
-    <label>E-mail</label>
-    <input type="email" id="email" required placeholder="seu@email.com">
-
-    <label>Telefone / WhatsApp</label>
-    <input type="tel" id="telefone" required placeholder="(00) 00000-0000" maxlength="16">
-
-    <label>Quantidade de cotas</label>
-    <input type="number" id="qtd" min="1" required placeholder="Ex: 3">
-
-    <input type="hidden" id="fotoSelecionada" value="">
-    <button id="btnEnviar" type="submit">Confirmar Participação</button>
-  </form>
-
-  <button id="btnWhatsapp">📩 Enviar Comprovante pelo WhatsApp</button>
-
-  <div id="msg" class="msg"></div>
-</main>
-
-<footer>© 2025 • Bolão da Sorte • Boa sorte a todos! 🍀</footer>
+</div>
 
 <script>
-/* ======== CONFIG ======== */
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxMLKDGAkuTHsVjJKgKqHINZGnhksg-n5Rb2LigPKItaIyYllTREY5PnOZYtGMhGOYf/exec";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxaTo1yxg3EoyDoQS0Vx8JnjCgGvnwJb7PCRdQ2f1nFgGQgznT1voOriPSJOaXWHWwI/exec";   // << troque pelo /exec do seu Web App
 const NUMERO_WHATSAPP = "5577998253249";
-const valorCota = 5;
+const PRECO = 5;
 
-/* ======== ELEMENTOS ======== */
-const msg = document.getElementById('msg');
-const premioValor = document.getElementById('premioValor');
-const btnEnviar = document.getElementById('btnEnviar');
-const btnWhatsapp = document.getElementById('btnWhatsapp');
+const premio = document.getElementById("premio");
+const fotos  = document.querySelectorAll(".photo");
+const fotoH  = document.getElementById("foto");
+const nome   = document.getElementById("nome");
+const email  = document.getElementById("email");
+const tel    = document.getElementById("tel");
+const qtd    = document.getElementById("qtd");
+const enviar = document.getElementById("enviar");
+const msg    = document.getElementById("msg");
+const whats  = document.getElementById("whats");
 
-/* ======== MÁSCARA TELEFONE ======== */
-document.getElementById('telefone').addEventListener('input', e=>{
-  let v=e.target.value.replace(/\D/g,'').slice(0,11);
-  if(v.length>10) v=v.replace(/^(\d{2})(\d{5})(\d{4}).*/,'($1) $2-$3');
-  else v=v.replace(/^(\d{2})(\d{4})(\d{0,4}).*/,'($1) $2-$3');
-  e.target.value=v;
+// máscara telefone
+tel.addEventListener("input", (e)=>{
+  let v = e.target.value.replace(/\D/g,'').slice(0,11);
+  v = v.length>10 ? v.replace(/^(\d{2})(\d{5})(\d{4}).*/,'($1) $2-$3')
+                  : v.replace(/^(\d{2})(\d{4})(\d{0,4}).*/,'($1) $2-$3');
+  e.target.value = v;
 });
 
-/* ======== FOTO ======== */
-document.querySelectorAll('.photo').forEach(f=>{
-  f.addEventListener('click',()=>{
-    document.querySelectorAll('.photo').forEach(x=>x.classList.remove('selected'));
-    f.classList.add('selected');
-    document.getElementById('fotoSelecionada').value=f.querySelector('img').src;
+// seleção de foto
+fotos.forEach(p=>{
+  p.addEventListener("click", ()=>{
+    fotos.forEach(x=>x.classList.remove("sel"));
+    p.classList.add("sel");
+    fotoH.value = p.querySelector("img").src;
   });
 });
 
-/* ======== ATUALIZA PREMIO ======== */
-async function atualizarPremio(){
+// atualiza prêmio aprovado (-25%)
+async function refreshPremio(){
   try{
-    const r=await fetch(SCRIPT_URL+"?action=premio",{cache:'no-store'});
-    const j=await r.json();
-    premioValor.textContent=j.valor||"R$ 0,00";
-  }catch{
-    premioValor.textContent="R$ 0,00";
+    const r = await fetch(`${SCRIPT_URL}?action=premio`, {cache:"no-store"});
+    const j = await r.json();
+    premio.textContent = j.valor || "R$ 0,00";
+  }catch(e){
+    premio.textContent = "R$ 0,00";
   }
 }
-setInterval(atualizarPremio,5000);
-atualizarPremio();
+refreshPremio();
+setInterval(refreshPremio, 6000);
 
-/* ======== FORM ======== */
-document.getElementById('formBolao').addEventListener('submit', async e=>{
+// submit
+document.getElementById("f").addEventListener("submit", async (e)=>{
   e.preventDefault();
-  msg.textContent="";
-  msg.className="msg";
-  btnEnviar.disabled=true;
+  msg.className = "msg";
+  msg.textContent = "";
+  whats.style.display = "none";
 
-  const nome=document.getElementById('nome').value.trim();
-  const email=document.getElementById('email').value.trim();
-  const telefone=document.getElementById('telefone').value.trim();
-  const qtd=document.getElementById('qtd').value;
-  const foto=document.getElementById('fotoSelecionada').value;
-
-  if(!foto){
-    msg.textContent="Selecione uma das opções acima.";
-    msg.classList.add('error');
-    btnEnviar.disabled=false;
+  if(!fotoH.value){
+    msg.textContent = "Selecione uma das imagens acima.";
+    msg.classList.add("err");
     return;
   }
 
-  const data={action:"registrar",nome,email,telefone,qtd,foto,valor:valorCota,status:"PENDENTE"};
+  enviar.disabled = true;
+
+  const payload = {
+    action:"registrar",
+    nome: nome.value.trim(),
+    email: email.value.trim(),
+    telefone: tel.value.trim(),
+    qtd: Number(qtd.value),
+    foto: fotoH.value,
+    valor: PRECO,
+    status: "PENDENTE"
+  };
 
   try{
-    const res=await fetch(SCRIPT_URL,{
-      method:"POST",
-      headers:{"Content-Type":"text/plain;charset=utf-8"},
-      body:JSON.stringify(data)
+    const res = await fetch(SCRIPT_URL, {
+      method: "POST",
+      headers: {"Content-Type":"text/plain;charset=utf-8"}, // evita preflight no GAS
+      body: JSON.stringify(payload)
     });
-    const txt=await res.text();
 
-    if(txt.includes("OK")){
-      const total=Number(qtd)*valorCota;
-      msg.textContent="✅ Aposta registrada! Agora envie seu comprovante pelo WhatsApp.";
-      msg.classList.add('success');
-      btnWhatsapp.style.display='block';
+    const txt = await res.text();
 
-      btnWhatsapp.onclick=()=>{
-        const mensagem=encodeURIComponent(
-          `Olá! Enviando meu comprovante do Bolão da Sorte.\n\n👤 Nome: ${nome}\n📞 Telefone: ${telefone}\n📧 E-mail: ${email}\n💰 ${qtd} cotas | Total: R$ ${(total).toFixed(2).replace('.',',')}`
+    if (txt.includes("OK")) {
+      const total = payload.qtd * PRECO;
+      msg.textContent = "✅ Aposta registrada! Envie seu comprovante pelo WhatsApp.";
+      msg.classList.add("ok");
+      whats.style.display = "block";
+      whats.onclick = ()=>{
+        const m = encodeURIComponent(
+          `Olá! Enviando meu comprovante do Bolão da Sorte.\n\n👤 Nome: ${payload.nome}\n📞 Telefone: ${payload.telefone}\n📧 E-mail: ${payload.email}\n💰 ${payload.qtd} cotas | Total: R$ ${total.toFixed(2).replace('.',',')}`
         );
-        window.open(`https://wa.me/${NUMERO_WHATSAPP}?text=${mensagem}`,'_blank');
-        msg.textContent="✅ Comprovante enviado. Boa sorte!";
+        window.open(`https://wa.me/${NUMERO_WHATSAPP}?text=${m}`, "_blank");
       };
-    }else if(txt.includes("duplicado")){
-      msg.textContent="⚠️ Este telefone já possui aposta registrada.";
-      msg.classList.add('error');
-    }else{
-      msg.textContent="❌ Erro ao enviar. Tente novamente.";
-      msg.classList.add('error');
+      // limpa só qtd e foto (usuário pode apostar outra vez com outro tel)
+      qtd.value = "";
+      fotoH.value = "";
+      fotos.forEach(x=>x.classList.remove("sel"));
+      refreshPremio();
+    } else if (txt.includes("duplicado")) {
+      msg.textContent = "⚠️ Este telefone já possui uma aposta.";
+      msg.classList.add("err");
+    } else {
+      msg.textContent = "❌ Erro ao enviar. Verifique se o Web App está em 'Qualquer pessoa'.";
+      msg.classList.add("err");
+      console.log("Resposta do GAS:", txt);
     }
-  }catch{
-    msg.textContent="Erro de conexão com o servidor.";
-    msg.classList.add('error');
+  }catch(err){
+    msg.textContent = "Falha de conexão com o Apps Script.";
+    msg.classList.add("err");
+    console.error(err);
   }finally{
-    btnEnviar.disabled=false;
+    enviar.disabled = false;
   }
 });
 </script>
-
 </body>
 </html>
