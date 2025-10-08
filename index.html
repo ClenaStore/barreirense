@@ -10,9 +10,18 @@
 }
 *{box-sizing:border-box}
 body{margin:0;font-family:system-ui,Segoe UI,Roboto;background:var(--bg);color:var(--ink)}
-header{text-align:center;padding:16px 12px}
-header img.banner{width:100%;max-height:260px;object-fit:cover;border-bottom:3px solid var(--accent)}
-h1{margin-top:10px;color:var(--accent)}
+header{text-align:center;position:relative;overflow:hidden}
+.banner{
+  width:100%;
+  height:260px;
+  object-fit:cover;
+  position:absolute;
+  inset:0;
+  opacity:0;
+  transition:opacity 1.2s ease-in-out;
+}
+.banner.active{opacity:1}
+h1{margin-top:280px;color:var(--accent)}
 main{max-width:600px;margin:18px auto;background:var(--card);padding:20px;border-radius:12px;box-shadow:0 4px 30px rgba(0,0,0,.4)}
 .photo-grid{display:flex;justify-content:space-around;flex-wrap:wrap;margin-bottom:20px}
 .photo{width:80px;height:80px;border-radius:50%;overflow:hidden;border:3px solid transparent;cursor:pointer;transition:.3s}
@@ -30,12 +39,18 @@ button:hover{opacity:.9}
 #qrcodeConteudo img{max-width:200px;border-radius:8px;margin:10px auto}
 .copyBtn{background:var(--accent);color:#000;padding:8px 12px;border:none;border-radius:8px;cursor:pointer}
 .closeBtn{background:#ef4444;color:#fff;padding:8px 14px;border:none;border-radius:8px;cursor:pointer;margin-top:8px}
+@media(max-width:600px){
+  h1{margin-top:220px;font-size:1.6em}
+  #qrcodeConteudo{max-width:320px}
+}
 </style>
 </head>
 <body>
 
 <header>
-  <img class="banner" src="https://images.unsplash.com/photo-1606813902859-4cb0c0bfae24?q=80&w=1200&auto=format&fit=crop" alt="banner">
+  <img class="banner active" src="https://images.unsplash.com/photo-1606813902859-4cb0c0bfae24?q=80&w=1200&auto=format&fit=crop" alt="banner1">
+  <img class="banner" src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?q=80&w=1200&auto=format&fit=crop" alt="banner2">
+  <img class="banner" src="https://images.unsplash.com/photo-1542831371-d531d36971e6?q=80&w=1200&auto=format&fit=crop" alt="banner3">
   <h1>Bolão da Sorte 🎉</h1>
   <p>Participe e concorra ao prêmio acumulado!</p>
 </header>
@@ -87,7 +102,7 @@ button:hover{opacity:.9}
 </div>
 
 <script>
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyW26xe2neO6L5I-yhyhDEaHNVIShwSEKkvMPjEdtn83412GWK8-UcW9CW3CZFcyLdx/exec";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyd78pG5mMyfGvM0wPGxNfEzq_EyyB5sCDsuogzzOqeG-x7pXTtjtmZxMOnY0bNeSzB/exec";
 const valorCota = 5;
 const msg = document.getElementById('msg');
 const premioValor = document.getElementById('premioValor');
@@ -96,6 +111,16 @@ const qrcodeTela = document.getElementById('qrcodeTela');
 const pixKey = document.getElementById('pixKey');
 const btnCopiar = document.getElementById('btnCopiar');
 
+// BANNER ROTATIVO
+let banners = document.querySelectorAll('.banner');
+let atual = 0;
+setInterval(()=>{
+  banners[atual].classList.remove('active');
+  atual = (atual + 1) % banners.length;
+  banners[atual].classList.add('active');
+},4000);
+
+// FORMATAÇÃO DE TELEFONE
 telefone.addEventListener('input', e=>{
   let v = e.target.value.replace(/\D/g,'');
   v = v.replace(/^(\d{2})(\d)/g,'($1) $2');
@@ -103,6 +128,7 @@ telefone.addEventListener('input', e=>{
   e.target.value = v;
 });
 
+// PIX E CÓPIA
 function fecharQr(){qrcodeTela.style.display='none';}
 btnCopiar.onclick = ()=>{
   navigator.clipboard.writeText(pixKey.textContent);
@@ -110,7 +136,7 @@ btnCopiar.onclick = ()=>{
   setTimeout(()=>btnCopiar.textContent="Copiar chave",1500);
 };
 
-// Seleção de fotos + quantidade
+// SELEÇÃO DE FOTOS
 document.querySelectorAll('.photo').forEach(f=>{
   f.addEventListener('click',()=>{
     document.querySelectorAll('.photo').forEach(x=>x.classList.remove('selected'));
@@ -124,7 +150,7 @@ document.querySelectorAll('.photo').forEach(f=>{
   });
 });
 
-// Atualiza total de prêmios aprovados (líquido)
+// ATUALIZAÇÃO DO PRÊMIO
 async function atualizarPremio(){
   try{
     const r = await fetch(SCRIPT_URL + "?action=premio");
@@ -135,7 +161,7 @@ async function atualizarPremio(){
 setInterval(atualizarPremio,5000);
 atualizarPremio();
 
-// Envio do formulário
+// ENVIO DO FORMULÁRIO
 document.getElementById('formBolao').addEventListener('submit', async e=>{
   e.preventDefault();
   msg.textContent = "Enviando...";
