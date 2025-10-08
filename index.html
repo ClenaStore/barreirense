@@ -65,7 +65,7 @@ button{width:100%;border:none;border-radius:10px;padding:14px;font-weight:800;fo
   <p>Enviando aposta...</p>
 </div>
 
-<!-- Popup para digitar nome -->
+<!-- Popup -->
 <div class="popup" id="popup">
   <div class="popup-content">
     <h3>Digite o nome do suspeito ou sua opinião</h3>
@@ -111,20 +111,22 @@ button{width:100%;border:none;border-radius:10px;padding:14px;font-weight:800;fo
     <div id="msg" class="msg"></div>
   </div>
 
-  <!-- RESUMO APÓS ENVIO -->
+  <!-- RESUMO -->
   <div id="resumo" style="display:none;text-align:center;">
     <h2 style="color:var(--amber);margin-top:0;">🎉 Aposta registrada!</h2>
     <p id="rNome"></p>
     <p id="rSuspeito"></p>
     <p id="rCotas"></p>
     <p id="rValor"></p>
-    <div class="pix-box">
+
+    <div id="pixBox" class="pix-box">
       <div class="pix-label">COPIE A CHAVE PARA PAGAMENTO:</div>
       <div id="pixKey" class="pix-key">storeclena@gmail.com</div>
       <div id="copiedMsg" class="copied" style="display:none;">✅ Chave copiada!</div>
     </div>
+
     <div id="totalValor" class="total-valor"></div>
-    <button id="whats" class="whats">Enviar Comprovante pelo WhatsApp (77) 9 9825-3249</button>
+    <button id="whats" class="whats">📩 Enviar Comprovante pelo WhatsApp</button>
     <p style="color:var(--muted);font-size:13px;margin-top:10px">Recarregue a página para nova aposta.</p>
   </div>
 </div>
@@ -135,12 +137,12 @@ const NUMERO_WHATSAPP="5577998253249";
 const PIX_KEY="storeclena@gmail.com";
 const PRECO=5;
 
-// refs
 const fotos=document.querySelectorAll(".photo-item");
 const fotoH=document.getElementById("foto");
 const overlay=document.getElementById("overlay");
 const cardForm=document.getElementById("cardForm");
 const resumo=document.getElementById("resumo");
+const pixBox=document.getElementById("pixBox");
 const pixKey=document.getElementById("pixKey");
 const copiedMsg=document.getElementById("copiedMsg");
 const whats=document.getElementById("whats");
@@ -150,7 +152,7 @@ const confirmSuspeito=document.getElementById("confirmSuspeito");
 const cancelSuspeito=document.getElementById("cancelSuspeito");
 let fotoSelecionada=null;
 
-// selecionar fotos
+// Selecionar suspeito
 fotos.forEach(item=>{
   const p=item.querySelector(".photo");
   p.addEventListener("click",()=>{
@@ -169,7 +171,7 @@ fotos.forEach(item=>{
 confirmSuspeito.onclick=()=>{const nome=nomeSuspeito.value.trim();if(nome){fotoSelecionada.dataset.nome=nome;fotoSelecionada.querySelector(".photo-name").textContent=nome;fotoH.value=nome;popup.style.display="none";}};
 cancelSuspeito.onclick=()=>{popup.style.display="none";};
 
-// máscara telefone
+// Máscara telefone
 tel.addEventListener("input",e=>{
   let v=e.target.value.replace(/\D/g,'').slice(0,11);
   v=v.length>10? v.replace(/^(\d{2})(\d{5})(\d{4}).*/,'($1) $2-$3')
@@ -177,14 +179,14 @@ tel.addEventListener("input",e=>{
   e.target.value=v;
 });
 
-// copiar pix
+// Copiar PIX
 pixKey.addEventListener("click",async()=>{
   await navigator.clipboard.writeText(PIX_KEY);
   copiedMsg.style.display="block";
   setTimeout(()=>copiedMsg.style.display="none",2000);
 });
 
-// atualizar prêmio
+// Atualizar prêmio
 async function refreshPremio(){
   try{
     const r=await fetch(`${SCRIPT_URL}?action=premio`);
@@ -195,7 +197,7 @@ async function refreshPremio(){
 refreshPremio();
 setInterval(refreshPremio,8000);
 
-// enviar aposta
+// Enviar aposta
 document.getElementById("f").addEventListener("submit",async e=>{
   e.preventDefault();
   const nome=document.getElementById("nome").value.trim();
@@ -213,12 +215,14 @@ document.getElementById("f").addEventListener("submit",async e=>{
     if(t.includes("OK")){
       cardForm.style.display="none";
       resumo.style.display="block";
+      pixBox.style.display="block"; // ✅ exibe chave PIX
       const total=qtd*PRECO;
       document.getElementById("rNome").textContent=`👤 ${nome}`;
       document.getElementById("rSuspeito").textContent=`🎯 Suspeito: ${foto}`;
       document.getElementById("rCotas").textContent=`📦 ${qtd} cota(s)`;
       document.getElementById("rValor").textContent=`💰 Total: R$ ${total.toFixed(2).replace('.',',')}`;
       document.getElementById("totalValor").textContent=`Valor a pagar: R$ ${total.toFixed(2).replace('.',',')}`;
+      whats.style.display="block";
       whats.onclick=()=>{
         const msg=`Olá! Enviando comprovante.\n\n👤 ${nome}\n📧 ${email}\n📞 ${tel}\n🎯 ${foto}\n💰 ${qtd} cota(s) = R$ ${total.toFixed(2).replace('.',',')}`;
         window.open(`https://wa.me/${NUMERO_WHATSAPP}?text=${encodeURIComponent(msg)}`,"_blank");
