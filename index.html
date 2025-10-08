@@ -28,6 +28,10 @@ button{width:100%;border:none;border-radius:10px;padding:14px;font-weight:800;fo
 .msg{margin-top:12px;text-align:center;font-size:14px;color:var(--muted)}
 .msg.ok{color:var(--ok)} .msg.err{color:var(--err)}
 .whats{display:none;background:var(--ok);color:#fff;margin-top:10px}
+.pix-box{display:none;background:#0f172a;border:1px solid #1e293b;border-radius:10px;padding:10px;margin-top:15px;text-align:center}
+.pix-label{color:var(--muted);font-size:14px;margin-bottom:6px}
+.pix-key{background:#1e293b;color:var(--ink);padding:8px 10px;border-radius:6px;font-size:14px;word-break:break-all;cursor:pointer;user-select:all}
+.copied{color:var(--ok);font-size:13px;margin-top:6px}
 </style>
 </head>
 <body>
@@ -65,14 +69,21 @@ button{width:100%;border:none;border-radius:10px;padding:14px;font-weight:800;fo
       <button id="enviar" class="btn" type="submit">Confirmar Participação</button>
     </form>
 
+    <div id="pixBox" class="pix-box">
+      <div class="pix-label">Chave PIX para pagamento:</div>
+      <div id="pixKey" class="pix-key">storeclena@gmail.com</div>
+      <div id="copiedMsg" class="copied" style="display:none;">✅ Chave copiada!</div>
+    </div>
+
     <button id="whats" class="whats">📩 Enviar Comprovante pelo WhatsApp</button>
     <div id="msg" class="msg"></div>
   </div>
 </div>
 
 <script>
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxaTo1yxg3EoyDoQS0Vx8JnjCgGvnwJb7PCRdQ2f1nFgGQgznT1voOriPSJOaXWHWwI/exec";   // << troque pelo /exec do seu Web App
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxaTo1yxg3EoyDoQS0Vx8JnjCgGvnwJb7PCRdQ2f1nFgGQgznT1voOriPSJOaXWHWwI/exec";
 const NUMERO_WHATSAPP = "5577998253249";
+const PIX_KEY = "storeclena@gmail.com"; // 🟡 altere aqui se quiser outra chave PIX
 const PRECO = 5;
 
 const premio = document.getElementById("premio");
@@ -85,6 +96,16 @@ const qtd    = document.getElementById("qtd");
 const enviar = document.getElementById("enviar");
 const msg    = document.getElementById("msg");
 const whats  = document.getElementById("whats");
+const pixBox = document.getElementById("pixBox");
+const pixKey = document.getElementById("pixKey");
+const copiedMsg = document.getElementById("copiedMsg");
+
+// copiar chave PIX
+pixKey.addEventListener("click", async ()=>{
+  await navigator.clipboard.writeText(PIX_KEY);
+  copiedMsg.style.display = "block";
+  setTimeout(()=>copiedMsg.style.display="none",2000);
+});
 
 // máscara telefone
 tel.addEventListener("input", (e)=>{
@@ -122,6 +143,7 @@ document.getElementById("f").addEventListener("submit", async (e)=>{
   msg.className = "msg";
   msg.textContent = "";
   whats.style.display = "none";
+  pixBox.style.display = "none";
 
   if(!fotoH.value){
     msg.textContent = "Selecione uma das imagens acima.";
@@ -145,24 +167,23 @@ document.getElementById("f").addEventListener("submit", async (e)=>{
   try{
     const res = await fetch(SCRIPT_URL, {
       method: "POST",
-      headers: {"Content-Type":"text/plain;charset=utf-8"}, // evita preflight no GAS
+      headers: {"Content-Type":"text/plain;charset=utf-8"},
       body: JSON.stringify(payload)
     });
-
     const txt = await res.text();
 
     if (txt.includes("OK")) {
       const total = payload.qtd * PRECO;
-      msg.textContent = "✅ Aposta registrada! Envie seu comprovante pelo WhatsApp.";
+      msg.textContent = "✅ Aposta registrada! Copie a chave PIX abaixo e envie o comprovante pelo WhatsApp.";
       msg.classList.add("ok");
       whats.style.display = "block";
+      pixBox.style.display = "block";
       whats.onclick = ()=>{
         const m = encodeURIComponent(
           `Olá! Enviando meu comprovante do Bolão da Sorte.\n\n👤 Nome: ${payload.nome}\n📞 Telefone: ${payload.telefone}\n📧 E-mail: ${payload.email}\n💰 ${payload.qtd} cotas | Total: R$ ${total.toFixed(2).replace('.',',')}`
         );
         window.open(`https://wa.me/${NUMERO_WHATSAPP}?text=${m}`, "_blank");
       };
-      // limpa só qtd e foto (usuário pode apostar outra vez com outro tel)
       qtd.value = "";
       fotoH.value = "";
       fotos.forEach(x=>x.classList.remove("sel"));
@@ -171,7 +192,7 @@ document.getElementById("f").addEventListener("submit", async (e)=>{
       msg.textContent = "⚠️ Este telefone já possui uma aposta.";
       msg.classList.add("err");
     } else {
-      msg.textContent = "❌ Erro ao enviar. Verifique se o Web App está em 'Qualquer pessoa'.";
+      msg.textContent = "❌ Erro ao enviar. Verifique se o Web App está público.";
       msg.classList.add("err");
       console.log("Resposta do GAS:", txt);
     }
