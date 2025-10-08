@@ -27,72 +27,69 @@ h1{color:var(--accent);text-align:center;margin:0 0 8px;font-size:28px}
   margin-bottom:16px;
   flex-wrap:wrap;
 }
-.photo-item{
-  text-align:center;
-  width:calc(25% - 8px);
-}
+.photo-item{text-align:center;width:calc(25% - 8px)}
 .photo{
-  width:72px;
-  height:72px;
-  border-radius:50%;
-  overflow:hidden;
-  border:3px solid transparent;
-  cursor:pointer;
-  transition:.25s;
-  margin:0 auto 6px;
+  width:72px;height:72px;border-radius:50%;
+  overflow:hidden;border:3px solid transparent;
+  cursor:pointer;transition:.25s;margin:0 auto 6px;
 }
 .photo img{width:100%;height:100%;object-fit:cover}
 .photo.sel{border-color:var(--accent);transform:scale(1.06)}
-.photo-name{
-  font-size:13px;
-  color:var(--muted);
-  text-align:center;
-  word-wrap:break-word;
-}
+.photo-name{font-size:13px;color:var(--muted);text-align:center;word-wrap:break-word}
 
-/* ===== FORM ===== */
-label{display:block;color:var(--muted);font-size:13px;margin:10px 0 6px}
-input{width:100%;background:#0b1220;color:var(--ink);border:none;border-radius:10px;padding:12px;font-size:15px}
-button{width:100%;border:none;border-radius:10px;padding:14px;font-weight:800;font-size:15px;cursor:pointer;transition:.2s}
-.btn{background:var(--accent);color:#111;margin-top:14px}
-.btn:hover{background:var(--accent2)}
-.msg{margin-top:12px;text-align:center;font-size:14px;color:var(--muted)}
-.msg.ok{color:var(--ok)}
-.msg.err{color:var(--err)}
-.whats{display:none;background:var(--ok);color:#fff;margin-top:10px}
-.pix-box{display:none;background:#0f172a;border:1px solid #1e293b;border-radius:10px;padding:10px;margin-top:15px;text-align:center}
-.pix-label{color:var(--muted);font-size:14px;margin-bottom:6px}
-.pix-key{background:#1e293b;color:var(--ink);padding:8px 10px;border-radius:6px;font-size:14px;word-break:break-all;cursor:pointer;user-select:all}
-.copied{color:var(--ok);font-size:13px;margin-top:6px}
-.total-valor{margin-top:10px;font-size:16px;color:var(--accent);font-weight:700}
+/* ===== POPUP ===== */
+.popup{
+  display:none;position:fixed;inset:0;
+  background:rgba(0,0,0,0.85);
+  justify-content:center;align-items:center;
+  z-index:9999;flex-direction:column;
+}
+.popup-content{
+  background:var(--card);padding:20px;border-radius:10px;
+  width:90%;max-width:320px;text-align:center;
+}
+.popup-content h3{margin:0 0 10px;color:var(--accent)}
+.popup-content input{
+  width:100%;padding:10px;border:none;border-radius:8px;
+  background:#0b1220;color:var(--ink);font-size:15px;margin-bottom:12px;
+}
+.popup-content button{
+  border:none;padding:10px 14px;border-radius:8px;
+  font-weight:700;cursor:pointer;margin:4px;
+}
+.popup-content .ok{background:var(--accent);color:#111}
+.popup-content .cancel{background:#1e293b;color:var(--muted)}
 
 /* ===== Overlay ===== */
 .overlay{
-  display:none;
-  position:fixed;
-  inset:0;
+  display:none;position:fixed;inset:0;
   background:rgba(0,0,0,0.85);
-  z-index:9999;
-  justify-content:center;
-  align-items:center;
-  flex-direction:column;
-  color:var(--ink);
-  text-align:center;
+  z-index:999;justify-content:center;align-items:center;
+  flex-direction:column;color:var(--ink);text-align:center;
 }
 .loader{
-  border:4px solid #1e293b;
-  border-top:4px solid var(--accent);
-  border-radius:50%;
-  width:60px;
-  height:60px;
-  animation:spin 1s linear infinite;
-  margin-bottom:16px;
+  border:4px solid #1e293b;border-top:4px solid var(--accent);
+  border-radius:50%;width:60px;height:60px;
+  animation:spin 1s linear infinite;margin-bottom:16px;
 }
 @keyframes spin{100%{transform:rotate(360deg)}}
 .overlay p{font-size:1.1em;color:var(--muted)}
 </style>
 </head>
 <body>
+
+<!-- Popup nome do suspeito -->
+<div class="popup" id="popup">
+  <div class="popup-content">
+    <h3>Digite o nome do suspeito</h3>
+    <input id="nomeSuspeito" type="text" placeholder="Ex: Lineu">
+    <div>
+      <button class="ok" id="confirmSuspeito">Confirmar</button>
+      <button class="cancel" id="cancelSuspeito">Cancelar</button>
+    </div>
+  </div>
+</div>
+
 <div class="overlay" id="overlay">
   <div class="loader"></div>
   <p>Enviando aposta...</p>
@@ -109,25 +106,30 @@ button{width:100%;border:none;border-radius:10px;padding:14px;font-weight:800;fo
     </div>
 
     <div class="grid" id="grid">
-      <div class="photo-item">
-        <div class="photo"><img src="https://github.com/ClenaStore/barreirense/blob/main/paste/Celine.jpg?raw=true" alt=""></div>
+      <div class="photo-item" data-nome="Celina">
+        <div class="photo"><img src="https://github.com/ClenaStore/barreirense/blob/main/paste/Celine.jpg?raw=true"></div>
         <div class="photo-name">Celina</div>
       </div>
-      <div class="photo-item">
-        <div class="photo"><img src="https://github.com/ClenaStore/barreirense/blob/main/paste/Cezar.jpg?raw=true" alt=""></div>
+      <div class="photo-item" data-nome="Sezar">
+        <div class="photo"><img src="https://github.com/ClenaStore/barreirense/blob/main/paste/Cezar.jpg?raw=true"></div>
         <div class="photo-name">Sezar</div>
       </div>
-      <div class="photo-item">
-        <div class="photo"><img src="https://github.com/ClenaStore/barreirense/blob/main/paste/Heleninha.jpg?raw=true" alt=""></div>
+      <div class="photo-item" data-nome="Heleninha">
+        <div class="photo"><img src="https://github.com/ClenaStore/barreirense/blob/main/paste/Heleninha.jpg?raw=true"></div>
         <div class="photo-name">Heleninha</div>
       </div>
-      <div class="photo-item">
-        <div class="photo"><img src="https://github.com/ClenaStore/barreirense/blob/main/paste/Marcus%20Aur%C3%A9lio.jpg?raw=true" alt=""></div>
+      <div class="photo-item" data-nome="Marcos Aurélio">
+        <div class="photo"><img src="https://github.com/ClenaStore/barreirense/blob/main/paste/Marcus%20Aur%C3%A9lio.jpg?raw=true"></div>
         <div class="photo-name">Marcos Aurélio</div>
       </div>
-      <div class="photo-item">
-        <div class="photo"><img src="https://github.com/ClenaStore/barreirense/blob/main/paste/Maria%20de%20F%C3%A1tima.jpg?raw=true" alt=""></div>
+      <div class="photo-item" data-nome="Maria de Fátima">
+        <div class="photo"><img src="https://github.com/ClenaStore/barreirense/blob/main/paste/Maria%20de%20F%C3%A1tima.jpg?raw=true"></div>
         <div class="photo-name">Maria de Fátima</div>
+      </div>
+      <!-- NOVA FOTO -->
+      <div class="photo-item outro" data-nome="">
+        <div class="photo"><img src="https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png"></div>
+        <div class="photo-name">Outro Suspeito</div>
       </div>
     </div>
 
@@ -135,27 +137,23 @@ button{width:100%;border:none;border-radius:10px;padding:14px;font-weight:800;fo
       <input type="hidden" id="foto">
       <label>Nome completo</label>
       <input id="nome" type="text" required placeholder="Seu nome completo">
-
       <label>E-mail</label>
       <input id="email" type="email" required placeholder="seu@email.com">
-
       <label>Telefone / WhatsApp</label>
       <input id="tel" type="tel" required maxlength="16" placeholder="(00) 00000-0000">
-
       <label>Quantidade de cotas</label>
       <input id="qtd" type="number" min="1" required placeholder="Ex: 3">
-
       <button id="enviar" class="btn" type="submit">Confirmar Participação</button>
     </form>
 
-    <div id="pixBox" class="pix-box">
+    <div id="pixBox" class="pix-box" style="display:none;">
       <div class="pix-label">COPIE A CHAVE PARA PAGAMENTO:</div>
       <div id="pixKey" class="pix-key">711e433b-bb4e-477e-adb7-518eacf2f67e</div>
       <div id="totalValor" class="total-valor"></div>
       <div id="copiedMsg" class="copied" style="display:none;">✅ Chave copiada!</div>
     </div>
 
-    <button id="whats" class="whats">📩 Enviar Comprovante pelo WhatsApp</button>
+    <button id="whats" class="whats" style="display:none;">📩 Enviar Comprovante pelo WhatsApp</button>
     <div id="msg" class="msg"></div>
   </div>
 </div>
@@ -167,128 +165,137 @@ const PIX_KEY = "storeclena@gmail.com";
 const PRECO = 5;
 
 const premio = document.getElementById("premio");
-const fotos  = document.querySelectorAll(".photo");
-const fotoH  = document.getElementById("foto");
-const nome   = document.getElementById("nome");
-const email  = document.getElementById("email");
-const tel    = document.getElementById("tel");
-const qtd    = document.getElementById("qtd");
+const fotos = document.querySelectorAll(".photo-item");
+const fotoH = document.getElementById("foto");
+const nome = document.getElementById("nome");
+const email = document.getElementById("email");
+const tel = document.getElementById("tel");
+const qtd = document.getElementById("qtd");
 const enviar = document.getElementById("enviar");
-const msg    = document.getElementById("msg");
-const whats  = document.getElementById("whats");
+const msg = document.getElementById("msg");
+const whats = document.getElementById("whats");
 const pixBox = document.getElementById("pixBox");
 const pixKey = document.getElementById("pixKey");
 const copiedMsg = document.getElementById("copiedMsg");
 const totalValor = document.getElementById("totalValor");
 const overlay = document.getElementById("overlay");
+const popup = document.getElementById("popup");
+const nomeSuspeito = document.getElementById("nomeSuspeito");
+const confirmSuspeito = document.getElementById("confirmSuspeito");
+const cancelSuspeito = document.getElementById("cancelSuspeito");
+
+let fotoSelecionada = null;
+
+// selecionar foto
+fotos.forEach(item=>{
+  const foto = item.querySelector(".photo");
+  foto.addEventListener("click",()=>{
+    fotos.forEach(x=>x.querySelector(".photo").classList.remove("sel"));
+    foto.classList.add("sel");
+    if(item.classList.contains("outro")){
+      popup.style.display="flex";
+      nomeSuspeito.value="";
+      nomeSuspeito.focus();
+      fotoSelecionada=item;
+    }else{
+      fotoH.value=item.dataset.nome;
+    }
+  });
+});
+
+// popup confirma
+confirmSuspeito.onclick=()=>{
+  const nome=nomeSuspeito.value.trim();
+  if(nome){
+    fotoSelecionada.dataset.nome=nome;
+    fotoSelecionada.querySelector(".photo-name").textContent=nome;
+    fotoH.value=nome;
+    popup.style.display="none";
+  }
+};
+cancelSuspeito.onclick=()=>{popup.style.display="none";};
 
 // copiar chave PIX
 pixKey.addEventListener("click", async ()=>{
   await navigator.clipboard.writeText(PIX_KEY);
-  copiedMsg.style.display = "block";
+  copiedMsg.style.display="block";
   setTimeout(()=>copiedMsg.style.display="none",2000);
 });
 
 // máscara telefone
-tel.addEventListener("input", (e)=>{
-  let v = e.target.value.replace(/\D/g,'').slice(0,11);
-  v = v.length>10 ? v.replace(/^(\d{2})(\d{5})(\d{4}).*/,'($1) $2-$3')
-                  : v.replace(/^(\d{2})(\d{4})(\d{0,4}).*/,'($1) $2-$3');
-  e.target.value = v;
+tel.addEventListener("input", e=>{
+  let v=e.target.value.replace(/\D/g,'').slice(0,11);
+  v=v.length>10? v.replace(/^(\d{2})(\d{5})(\d{4}).*/,'($1) $2-$3')
+               :v.replace(/^(\d{2})(\d{4})(\d{0,4}).*/,'($1) $2-$3');
+  e.target.value=v;
 });
 
-// seleção de foto
-fotos.forEach(p=>{
-  p.addEventListener("click", ()=>{
-    fotos.forEach(x=>x.classList.remove("sel"));
-    p.classList.add("sel");
-    fotoH.value = p.querySelector("img").src;
-  });
-});
-
-// atualiza prêmio aprovado (-25%)
+// atualiza prêmio
 async function refreshPremio(){
   try{
-    const r = await fetch(`${SCRIPT_URL}?action=premio`, {cache:"no-store"});
-    const j = await r.json();
-    premio.textContent = j.valor || "R$ 0,00";
-  }catch(e){
-    premio.textContent = "R$ 0,00";
-  }
+    const r=await fetch(`${SCRIPT_URL}?action=premio`,{cache:"no-store"});
+    const j=await r.json();
+    premio.textContent=j.valor||"R$ 0,00";
+  }catch{premio.textContent="R$ 0,00";}
 }
 refreshPremio();
-setInterval(refreshPremio, 6000);
+setInterval(refreshPremio,6000);
 
 // submit
-document.getElementById("f").addEventListener("submit", async (e)=>{
+document.getElementById("f").addEventListener("submit",async e=>{
   e.preventDefault();
-  msg.className = "msg";
-  msg.textContent = "";
-  whats.style.display = "none";
-  pixBox.style.display = "none";
+  msg.className="msg";msg.textContent="";
+  whats.style.display="none";pixBox.style.display="none";
 
   if(!fotoH.value){
-    msg.textContent = "Selecione uma das imagens acima.";
+    msg.textContent="Selecione uma das imagens acima.";
     msg.classList.add("err");
     return;
   }
 
-  enviar.disabled = true;
-  overlay.style.display = "flex"; // mostra overlay
+  enviar.disabled=true;overlay.style.display="flex";
 
-  const payload = {
+  const payload={
     action:"registrar",
-    nome: nome.value.trim(),
-    email: email.value.trim(),
-    telefone: tel.value.trim(),
-    qtd: Number(qtd.value),
-    foto: fotoH.value,
-    valor: PRECO,
-    status: "PENDENTE"
+    nome:nome.value.trim(),
+    email:email.value.trim(),
+    telefone:tel.value.trim(),
+    qtd:Number(qtd.value),
+    foto:fotoH.value,
+    valor:PRECO,
+    status:"PENDENTE"
   };
 
   try{
-    const res = await fetch(SCRIPT_URL, {
-      method: "POST",
-      headers: {"Content-Type":"text/plain;charset=utf-8"},
-      body: JSON.stringify(payload)
+    const res=await fetch(SCRIPT_URL,{
+      method:"POST",
+      headers:{"Content-Type":"text/plain;charset=utf-8"},
+      body:JSON.stringify(payload)
     });
-    const txt = await res.text();
-
-    if (txt.includes("OK")) {
-      const total = payload.qtd * PRECO;
-      msg.textContent = "✅ Aposta registrada! Copie a chave PIX abaixo e envie o comprovante pelo WhatsApp.";
+    const txt=await res.text();
+    if(txt.includes("OK")){
+      const total=payload.qtd*PRECO;
+      msg.textContent="✅ Aposta registrada! Copie a chave PIX e envie o comprovante.";
       msg.classList.add("ok");
-      whats.style.display = "block";
-      pixBox.style.display = "block";
-      totalValor.textContent = `Valor a pagar: R$ ${total.toFixed(2).replace('.', ',')}`;
-
-      whats.onclick = ()=>{
-        const m = encodeURIComponent(
-          `Olá! Enviando meu comprovante do Bolão da Sorte.\n\n👤 Nome: ${payload.nome}\n📞 Telefone: ${payload.telefone}\n📧 E-mail: ${payload.email}\n💰 ${payload.qtd} cotas | Total: R$ ${total.toFixed(2).replace('.',',')}`
+      whats.style.display="block";pixBox.style.display="block";
+      totalValor.textContent=`Valor a pagar: R$ ${total.toFixed(2).replace('.',',')}`;
+      whats.onclick=()=>{
+        const m=encodeURIComponent(
+          `Olá! Enviando comprovante.\n\n👤 Nome: ${payload.nome}\n📞 ${payload.telefone}\n📧 ${payload.email}\n🎯 Suspeito: ${payload.foto}\n💰 ${payload.qtd} cotas | Total R$ ${total.toFixed(2).replace('.',',')}`
         );
-        window.open(`https://wa.me/${NUMERO_WHATSAPP}?text=${m}`, "_blank");
+        window.open(`https://wa.me/${NUMERO_WHATSAPP}?text=${m}`,"_blank");
       };
-
-      qtd.value = "";
-      fotoH.value = "";
-      fotos.forEach(x=>x.classList.remove("sel"));
+      qtd.value="";fotoH.value="";fotos.forEach(x=>x.querySelector(".photo").classList.remove("sel"));
       refreshPremio();
-    } else if (txt.includes("duplicado")) {
-      msg.textContent = "⚠️ Este telefone já possui uma aposta.";
-      msg.classList.add("err");
-    } else {
-      msg.textContent = "❌ Erro ao enviar. Verifique se o Web App está público.";
-      msg.classList.add("err");
-      console.log("Resposta do GAS:", txt);
+    }else if(txt.includes("duplicado")){
+      msg.textContent="⚠️ Este telefone já possui uma aposta.";msg.classList.add("err");
+    }else{
+      msg.textContent="❌ Erro ao enviar.";msg.classList.add("err");
     }
-  }catch(err){
-    msg.textContent = "Falha de conexão com o Apps Script.";
-    msg.classList.add("err");
-    console.error(err);
+  }catch{
+    msg.textContent="Falha de conexão com o Apps Script.";msg.classList.add("err");
   }finally{
-    overlay.style.display = "none"; // esconde overlay
-    enviar.disabled = false;
+    overlay.style.display="none";enviar.disabled=false;
   }
 });
 </script>
