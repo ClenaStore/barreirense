@@ -1,544 +1,176 @@
-<!doctype html>
-<html lang="pt-BR" data-theme="dark">
+<!DOCTYPE html>
+<html lang="pt-BR">
 <head>
-  <meta charset="utf-8" />
-  <title>Bazar • Produtos Usados</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no" />
-  <meta name="color-scheme" content="light dark" />
-  <meta name="theme-color" content="#000000" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="mobile-web-app-capable" content="yes" />
-  <meta name="description" content="Bazar de usados — stories, produtos, favoritos e WhatsApp." />
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
-
-  <style>
-    :root{
-      --bg:#0b0f18; --surface:#0f172a; --card:#111827; --ink:#e6edf6; --muted:#93a3b8; --line:#1f2937;
-      --brand:#16a34a; --brand-2:#22c55e; --danger:#ef4444; --radius:16px; --shadow:0 10px 30px rgba(2,6,23,.35);
-      --overlay:rgba(0,0,0,.9); --heart:#ef4444;
-    }
-    @media (prefers-color-scheme: light){
-      :root{ --bg:#f5f7fb; --surface:#ffffff; --card:#ffffff; --ink:#0f172a; --muted:#64748b; --line:#e5e7eb;
-             --brand:#16a34a; --brand-2:#22c55e; --shadow:0 10px 24px rgba(15,23,42,.08); --overlay:rgba(0,0,0,.92); }
-    }
-    *{box-sizing:border-box}
-    html,body{margin:0;height:100%}
-    body{font-family:Inter,system-ui,Arial;background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased;overscroll-behavior:none}
-    ::-webkit-scrollbar{width:0;height:0} *{scrollbar-width:none}
-
-    /* Header + busca e coração */
-    header{
-      position:sticky; top:0; z-index:20;
-      background:linear-gradient(180deg,var(--bg),rgba(0,0,0,0)),var(--surface);
-      border-bottom:1px solid var(--line); padding:10px 14px;
-      display:grid; grid-template-columns:auto 1fr auto; align-items:center; gap:10px;
-      backdrop-filter:saturate(120%) blur(6px);
-    }
-    .brand{display:flex;align-items:center;gap:10px}
-    .brand-logo{width:36px;height:36px;border-radius:10px;background:radial-gradient(120% 120% at 20% 20%, var(--brand-2), var(--brand))}
-    .brand h1{font-size:16px;margin:0}
-    .tag{font-size:12px;color:var(--muted)}
-    .container{max-width:1200px;margin:0 auto;padding:14px}
-
-    .top-tools{display:flex; align-items:center; gap:8px; justify-content:flex-end}
-    .search-wrap{
-      display:flex; align-items:center; gap:6px; padding:8px 10px; border:1px solid var(--line);
-      background:var(--surface); border-radius:12px; min-width:180px; max-width:420px; flex:1;
-    }
-    .search{flex:1; background:transparent; border:0; outline:0; color:var(--ink); font-size:14px}
-    .heart-btn{
-      position:relative; width:40px; height:40px; border-radius:12px; border:1px solid var(--line);
-      display:grid; place-items:center; background:var(--surface); cursor:pointer;
-    }
-    .heart-btn.active{ outline:2px solid rgba(239,68,68,.35) }
-    .badge{
-      position:absolute; top:-6px; right:-6px; background:var(--heart); color:#fff; font-weight:800;
-      width:18px; height:18px; border-radius:999px; font-size:11px; display:grid; place-items:center;
-      box-shadow:0 4px 10px rgba(239,68,68,.4);
-    }
-
-    /* Stories strip */
-    .stories-strip{display:flex; gap:10px; overflow-x:auto; padding:8px 2px 2px; -webkit-overflow-scrolling:touch; scroll-snap-type:x mandatory;}
-    .story-pill{ flex:0 0 auto; width:76px; scroll-snap-align:start; text-align:center; cursor:pointer; }
-    .story-ring{
-      width:76px;height:76px;border-radius:50%;
-      padding:3px; background:
-        radial-gradient(closest-side, #0000 70%, #0000 0) padding-box,
-        conic-gradient(from 0deg, var(--brand-2), var(--brand)) border-box;
-      display:grid; place-items:center;
-    }
-    .story-thumb{ width:68px;height:68px;border-radius:50%; object-fit:cover; border:2px solid var(--bg) }
-    .story-title{font-size:12px;margin-top:6px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-
-    /* Grid */
-    .grid{display:grid; gap:14px; margin-top:12px; grid-template-columns:repeat(2, 1fr)}
-    @media (min-width:768px){ .grid{ grid-template-columns:repeat(4, 1fr) } }
-    @media (min-width:1200px){ .grid{ grid-template-columns:repeat(6, 1fr) } }
-
-    .card{
-      position:relative; display:flex; flex-direction:column; overflow:hidden; border-radius:16px;
-      background:var(--card); border:1px solid var(--line); box-shadow:var(--shadow);
-      transition:transform .2s, border-color .2s ease;
-    }
-    .card:hover{ transform:translateY(-2px); border-color:rgba(34,197,94,.45) }
-    .thumb{ aspect-ratio:4/3; width:100%; object-fit:cover; display:block; background:#0b1020 }
-    .content{ padding:12px }
-    .title{font-size:14px; font-weight:800; margin:0 0 6px; line-height:1.25}
-    .price{font-size:15px; font-weight:800; color:var(--brand); margin-bottom:6px}
-    .desc{font-size:12px; color:var(--muted); line-height:1.45; margin:0 0 10px; min-height:2.8em; overflow:hidden}
-    .pill{position:absolute; bottom:10px; right:10px; font-size:11px; color:var(--muted); padding:6px 8px; border:1px dashed var(--line); border-radius:999px; background:rgba(0,0,0,.2)}
-
-    /* Favoritar */
-    .fav{
-      position:absolute; top:10px; right:10px; width:36px; height:36px; border-radius:999px;
-      display:grid; place-items:center; background:rgba(0,0,0,.35); color:#fff; cursor:pointer; border:1px solid rgba(255,255,255,.2);
-    }
-    .fav .fill{ fill:transparent; stroke:#fff; stroke-width:1.5 }
-    .fav.active .fill{ fill:var(--heart); stroke:var(--heart) }
-
-    footer{color:var(--muted); font-size:12px; text-align:center; padding:24px 12px}
-    .list-meta{margin:6px 2px 0; font-size:12px; color:var(--muted)}
-
-    /* Overlays (stories) */
-    .overlay{position:fixed; inset:0; z-index:9999; background:var(--overlay); display:none; align-items:center; justify-content:center; width:100vw; height:100svh; -webkit-backdrop-filter:blur(2px); backdrop-filter:blur(2px)}
-    .overlay.open{ display:flex }
-
-    /* Story viewer */
-    .story-viewer{position:relative; width:min(100vw, 420px); height:100svh; background:#000; overflow:hidden; display:flex; align-items:center; justify-content:center}
-    .story-img{position:absolute; inset:0; object-fit:cover; width:100%; height:100%; opacity:0; transition:opacity .8s ease}
-    .story-img.active{ opacity:1 }
-    .progress{position:absolute; top:calc(env(safe-area-inset-top) + 8px); left:8px; right:8px; display:flex; gap:5px; z-index:3}
-    .bar{ flex:1; height:3px; border-radius:999px; background:rgba(255,255,255,.25); overflow:hidden }
-    .bar .fill{ width:0%; height:100%; background:#fff; transition:width linear }
-    .controls{ position:absolute; inset:0; display:flex; z-index:2 }
-    .tap-left,.tap-right{ flex:1 1 50% }
-    .close-btn{ position:absolute; top:calc(env(safe-area-inset-top) + 10px); right:10px; z-index:4; width:36px;height:36px;border-radius:999px;border:1px solid rgba(255,255,255,.2); display:grid;place-items:center;background:rgba(0,0,0,.35); color:#fff; cursor:pointer }
-    .close-btn.disabled{ opacity:.4; pointer-events:none }
-
-    /* Tag do item + composer */
-    .story-tag{position:absolute; left:12px; bottom:82px; z-index:4; background:rgba(0,0,0,.55); color:#fff; padding:6px 10px; border-radius:10px; font-size:12px; border:1px solid rgba(255,255,255,.15); max-width:90%; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
-    .composer{position:absolute; left:0; right:0; bottom:0; z-index:5; padding:12px 10px calc(10px + env(safe-area-inset-bottom)); background:linear-gradient(180deg, rgba(0,0,0,0), rgba(0,0,0,.55) 40%, rgba(0,0,0,.85)); display:flex; gap:8px; align-items:center}
-    .composer input{flex:1; border:1px solid rgba(255,255,255,.25); background:rgba(0,0,0,.35); color:#fff; border-radius:12px; padding:10px 12px; font-size:14px; outline:none}
-    .composer button{min-width:120px; appearance:none; border:0; border-radius:12px; padding:10px 12px; cursor:pointer; font-weight:800; font-size:12px; display:inline-flex; align-items:center; justify-content:center; background:linear-gradient(180deg,var(--brand-2),var(--brand)); color:#fff; box-shadow:0 10px 20px rgba(34,197,94,.22), inset 0 -2px 0 rgba(0,0,0,.2)}
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bolão • Compra de Cotas</title>
+<style>
+  :root{
+    --bg:#0e172a;--card:#131c33;--ink:#f8fafc;--accent:#f59e0b;--muted:#94a3b8;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    font-family:system-ui,Segoe UI,Roboto;
+    background:var(--bg);
+    color:var(--ink);
+  }
+  header{
+    text-align:center;
+    padding:20px;
+  }
+  header img.banner{
+    width:100%;
+    max-height:280px;
+    object-fit:cover;
+    border-bottom:4px solid var(--accent);
+  }
+  h1{margin-top:12px;font-size:1.8em;color:var(--accent)}
+  main{
+    max-width:600px;
+    margin:20px auto;
+    background:var(--card);
+    padding:20px;
+    border-radius:12px;
+    box-shadow:0 4px 24px rgba(0,0,0,0.4);
+  }
+  .photo-grid{
+    display:flex;
+    justify-content:space-around;
+    flex-wrap:wrap;
+    margin-bottom:20px;
+  }
+  .photo{
+    width:80px;
+    height:80px;
+    border-radius:50%;
+    overflow:hidden;
+    border:3px solid transparent;
+    cursor:pointer;
+    transition:0.3s;
+  }
+  .photo img{
+    width:100%;height:100%;object-fit:cover;
+  }
+  .photo.selected{border-color:var(--accent);transform:scale(1.1)}
+  form{display:flex;flex-direction:column;gap:12px}
+  label{font-size:0.9em;color:var(--muted)}
+  input{
+    padding:10px;
+    border-radius:8px;
+    border:none;
+    background:#1e293b;
+    color:var(--ink);
+    font-size:1em;
+  }
+  button{
+    background:var(--accent);
+    color:#000;
+    font-weight:700;
+    border:none;
+    border-radius:8px;
+    padding:12px;
+    cursor:pointer;
+  }
+  button:hover{opacity:0.9}
+  .message{text-align:center;margin-top:14px;color:var(--muted);font-size:0.9em}
+</style>
 </head>
 <body>
-  <header>
-    <div class="brand">
-      <div class="brand-logo" aria-hidden="true"></div>
-      <div>
-        <h1>Bazar</h1>
-        <div class="tag" id="today"></div>
-      </div>
-    </div>
 
-    <!-- Busca + coração no topo -->
-    <div class="top-tools">
-      <div class="search-wrap">
-        <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 19a8 8 0 1 1 5.293-14.293A8 8 0 0 1 11 19zm10 3-6-6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
-        <input class="search" id="searchTop" type="search" placeholder="Buscar..." />
-      </div>
-      <button id="heartTop" class="heart-btn" title="Mostrar apenas favoritos">
-        <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true">
-          <path class="stroke" d="M12.1 20.3s-7.6-4.4-9.2-9.3C1.9 6.8 5 4.1 8 5.1c1.5.5 2.7 1.8 4 4 1.3-2.2 2.5-3.5 4-4 3-.9 6.1 1.7 5.1 5.9-1.5 4.9-9.1 9.3-9.1 9.3z" fill="none" stroke="currentColor" stroke-width="1.5"/>
-        </svg>
-        <span id="favCount" class="badge" style="display:none">0</span>
-      </button>
-    </div>
+<header>
+  <img class="banner" src="https://images.unsplash.com/photo-1606813902859-4cb0c0bfae24?q=80&w=1200&auto=format&fit=crop" alt="Banner Bolão">
+  <h1>Bolão da Sorte 🎉</h1>
+  <p>Escolha uma opção abaixo e participe! Boa sorte 🍀</p>
+</header>
 
-    <div></div><!-- spacer -->
-  </header>
-
-  <main class="container">
-    <!-- STORIES (vêm da planilha) -->
-    <section aria-label="Stories">
-      <div id="storiesStrip" class="stories-strip"></div>
-    </section>
-
-    <!-- Meta da lista -->
-    <div class="list-meta"><span id="count"></span></div>
-
-    <!-- GRID -->
-    <section id="grid" class="grid" aria-live="polite"></section>
-  </main>
-
-  <footer>
-    © <span id="year"></span> Bazar • Feito com ❤️ | Estoque sujeito a confirmação.
-  </footer>
-
-  <!-- OVERLAY: STORIES -->
-  <div id="storiesOverlay" class="overlay" role="dialog" aria-modal="true" aria-label="Stories">
-    <div class="story-viewer" id="storyViewer">
-      <div class="progress" id="storyProgress"></div>
-      <div class="controls">
-        <div class="tap-left" id="tapLeft"></div>
-        <div class="tap-right" id="tapRight"></div>
-      </div>
-      <div class="story-tag" id="storyTag"></div>
-      <div class="composer">
-        <input id="storyMsg" type="text" maxlength="160" placeholder="Escreva sua mensagem..." />
-        <button id="storySend">Enviar</button>
-      </div>
-      <button class="close-btn" id="closeStories" aria-label="Fechar stories">✕</button>
-    </div>
+<main>
+  <div class="photo-grid" id="photoGrid">
+    <div class="photo"><img src="https://images.unsplash.com/photo-1556740749-887f6717d7e4?w=400" alt="1"></div>
+    <div class="photo"><img src="https://images.unsplash.com/photo-1581091215367-59ab6d3213b1?w=400" alt="2"></div>
+    <div class="photo"><img src="https://images.unsplash.com/photo-1564869733280-233b6fbc55d0?w=400" alt="3"></div>
+    <div class="photo"><img src="https://images.unsplash.com/photo-1550510537-0b38c0d62f5a?w=400" alt="4"></div>
+    <div class="photo"><img src="https://images.unsplash.com/photo-1593642532973-d31b6557fa68?w=400" alt="5"></div>
   </div>
 
-  <script>
-    /* =============== CONFIG: PLANILHA =============== */
-    // Coloque aqui o ID da sua planilha (Arquivo > Publicar na Web em cada aba).
-    const SHEET_ID = "https://script.google.com/macros/s/AKfycbyVUcV4Z9x3tQZy4z0SDg37lTCy0aHcjoyOeVQsQU4ClJxrMQhxYEwwLqATWGK27Wv4aQ/exec";
-    const SHEETS = { config: "Config", produtos: "Produtos", stories: "Stories" };
+  <form id="formBolao">
+    <label>Nome completo</label>
+    <input type="text" id="nome" required placeholder="Seu nome">
 
-    /* =============== ESTADO =============== */
-    let CONFIG   = { whatsapp:"", storyDurationSec:7 };
-    let PRODUCTS = []; // [{id,nome,preco,descricao,foto,whatsapp,story}]
-    let STORIES  = []; // [{id,title,thumb,slides:[{productId,src}]}]
-    let FILTER_FAVS_ONLY = false;
-    let FAVORITES = new Set(JSON.parse(localStorage.getItem("bazar_favs") || "[]"));
+    <label>E-mail</label>
+    <input type="email" id="email" required placeholder="seu@email.com">
 
-    /* =============== UTILS =============== */
-    const onlyDigits = s => String(s||"").replace(/\D+/g,"");
-    const fmtBRL = (v)=>{
-      const n = typeof v === "number" ? v : parseFloat(String(v).replace(/\./g,"").replace(",","."));
-      return (isNaN(n) ? 0 : n).toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
+    <label>Telefone / WhatsApp</label>
+    <input type="tel" id="telefone" required placeholder="(00) 00000-0000">
+
+    <label>Quantidade de cotas</label>
+    <input type="number" id="qtd" required min="1" max="50" placeholder="Ex: 2">
+
+    <input type="hidden" id="fotoSelecionada" value="">
+
+    <button type="submit">Enviar participação</button>
+  </form>
+
+  <div class="message" id="msg"></div>
+</main>
+
+<script>
+  // URL do seu Apps Script
+  const SCRIPT_URL = "https://script.google.com/macros/s/SEU_SCRIPT_ID/exec";
+
+  const grid = document.getElementById('photoGrid');
+  const fotos = grid.querySelectorAll('.photo');
+  const fotoSelecionada = document.getElementById('fotoSelecionada');
+  const form = document.getElementById('formBolao');
+  const msg = document.getElementById('msg');
+
+  fotos.forEach(f => {
+    f.addEventListener('click', () => {
+      fotos.forEach(ff => ff.classList.remove('selected'));
+      f.classList.add('selected');
+      const src = f.querySelector('img').src;
+      fotoSelecionada.value = src;
+      const qtd = prompt('Quantas cotas deseja comprar?');
+      if(qtd && !isNaN(qtd)){
+        document.getElementById('qtd').value = qtd;
+      }
+    });
+  });
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    msg.textContent = "Enviando...";
+    const data = {
+      action: "registrar",
+      nome: form.nome.value,
+      email: form.email.value,
+      telefone: form.telefone.value,
+      qtd: form.qtd.value,
+      foto: fotoSelecionada.value,
+      status: "PENDENTE",
+      data: new Date().toISOString()
     };
-    const pageLink = (id) => location.origin + location.pathname + "#" + id;
-    const saveFavs = ()=> localStorage.setItem("bazar_favs", JSON.stringify([...FAVORITES]));
-    const isFav = (id)=> FAVORITES.has(id);
-    const csvURL = (sheet)=> `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(sheet)}`;
 
-    function lockBody(){
-      document.documentElement.style.overflow = 'hidden';
-      document.body.style.position = 'fixed';
-      document.body.style.top = `-${window.scrollY}px`;
-      document.body.style.width = '100%';
-    }
-    function unlockBody(){
-      const y = -parseInt(document.body.style.top || '0', 10) || 0;
-      document.documentElement.style.overflow = '';
-      document.body.style.position = '';
-      document.body.style.top = '';
-      document.body.style.width = '';
-      window.scrollTo(0, y);
-    }
-
-    // CSV parser (suporta aspas e vírgulas)
-    function parseCSV(text){
-      const rows = [];
-      let row = [], cell = "", inQuotes = false;
-      for(let i=0;i<text.length;i++){
-        const ch = text[i], next=text[i+1];
-        if(ch === '"'){
-          if(inQuotes && next === '"'){ cell += '"'; i++; }
-          else inQuotes = !inQuotes;
-        }else if(ch === ',' && !inQuotes){ row.push(cell); cell=""; }
-        else if((ch === '\n' || ch === '\r') && !inQuotes){
-          if(cell !== "" || row.length) { row.push(cell); rows.push(row); row=[]; cell=""; }
-          if(ch === '\r' && next === '\n') i++; // CRLF
-        }else cell += ch;
-      }
-      if(cell !== "" || row.length) { row.push(cell); rows.push(row); }
-      if(!rows.length) return [];
-      const header = rows[0].map(h=>h.trim());
-      return rows.slice(1).filter(r => r.some(x => String(x).trim() !== "")).map(r=>{
-        const o={}; header.forEach((h,idx)=> o[h]= r[idx] ?? ""); return o;
+    try {
+      const res = await fetch(SCRIPT_URL, {
+        method: "POST",
+        body: JSON.stringify(data),
+        headers: { "Content-Type": "application/json" }
       });
-    }
-
-    async function fetchCSV(sheet){
-      const res = await fetch(csvURL(sheet), {cache:"no-store"});
-      if(!res.ok) throw new Error(`Falha ao carregar aba ${sheet}`);
-      const text = await res.text();
-      return parseCSV(text);
-    }
-
-    /* =============== CARREGAR PLANILHA =============== */
-    async function loadData(){
-      // CONFIG
-      try{
-        const cfgRows = await fetchCSV(SHEETS.config);
-        if(cfgRows.length){
-          const c = cfgRows[0];
-          CONFIG.whatsapp = onlyDigits(c.whatsapp || c.WhatsApp || "");
-          CONFIG.storyDurationSec = Number(c.storyDurationSec || c.DuracaoStories || 7) || 7;
-        }
-      }catch(e){ console.warn("Sem Config:", e.message); }
-
-      // PRODUTOS
-      const pRows = await fetchCSV(SHEETS.produtos);
-      PRODUCTS = pRows.map(p=>{
-        const idBase = p.id || p.ID || p.nome || p.Nome || ('id-' + Math.random().toString(36).slice(2,9));
-        return {
-          id: String(idBase).toLowerCase().trim().replace(/\s+/g,"-").replace(/[^a-z0-9\-]/g,""),
-          nome: p.nome || p.Nome || "Produto",
-          preco: p.preco || p.Preco || p.Valor || 0,
-          descricao: p.descricao || p.Descricao || "",
-          foto: p.foto || p.Foto || "",
-          whatsapp: p.whatsapp || p.WhatsApp || "",
-          story: p.story || p.StoryGrupo || ""
-        };
-      });
-
-      // STORIES (opcional)
-      try{
-        const sRows = await fetchCSV(SHEETS.stories);
-        if(sRows.length){
-          STORIES = sRows.map((r,i)=>{
-            const title = r.grupo || r.Grupo || r.title || `Stories ${i+1}`;
-            const thumb = r.thumb || r.Thumb || "";
-            const slidesRaw = r.slides || r.Slides || "";
-            const ids = String(slidesRaw).split(/[,|]/).map(s=>s.trim()).filter(Boolean);
-            const slides = ids.map(pid=>{
-              const prod = PRODUCTS.find(p=>p.id===pid || p.nome.toLowerCase()===pid.toLowerCase());
-              return prod ? {productId: prod.id, src: prod.foto} : null;
-            }).filter(Boolean);
-            return { id: title.toLowerCase().replace(/\s+/g,"-"), title, thumb: thumb || (slides[0]?.src || ""), slides };
-          }).filter(g=>g.slides.length);
-        }
-      }catch(e){
-        console.warn("Sem aba Stories, vou agrupar pelos produtos:", e.message);
-      }
-
-      if(!STORIES.length){
-        const groups = {};
-        for(const p of PRODUCTS){
-          const g = p.story || "Destaques";
-          (groups[g] ||= []).push({productId:p.id, src:p.foto});
-        }
-        STORIES = Object.entries(groups).map(([g,slides])=>({
-          id:g.toLowerCase().replace(/\s+/g,"-"), title:g, thumb: slides[0]?.src || "", slides
-        }));
-      }
-    }
-
-    /* =============== STORIES UI =============== */
-    const storiesStrip = document.getElementById("storiesStrip");
-    function renderStories(){
-      storiesStrip.innerHTML = "";
-      for(const st of STORIES){
-        const el = document.createElement("div");
-        el.className = "story-pill";
-        el.innerHTML = `
-          <div class="story-ring"><img class="story-thumb" src="${st.thumb}" alt="${st.title}" loading="lazy" /></div>
-          <div class="story-title">${st.title}</div>`;
-        el.addEventListener("click", ()=> openStories(st));
-        storiesStrip.appendChild(el);
-      }
-    }
-
-    const storiesOverlay = document.getElementById("storiesOverlay");
-    const storyViewer   = document.getElementById("storyViewer");
-    const storyProgress = document.getElementById("storyProgress");
-    const storyTag      = document.getElementById("storyTag");
-    const storyMsg      = document.getElementById("storyMsg");
-    const storySend     = document.getElementById("storySend");
-    const closeStories  = document.getElementById("closeStories");
-    const tapLeft  = document.getElementById("tapLeft");
-    const tapRight = document.getElementById("tapRight");
-
-    let currentStory=null, currentIndex=0, timer=null;
-    let COMPOSING = false; // trava o story enquanto estiver escrevendo
-
-    function getPhoneFor(prod){ return onlyDigits(prod?.whatsapp || CONFIG.whatsapp || ""); }
-    function buildWaLink(phone, text){
-      return phone ? `https://wa.me/${phone}?text=${encodeURIComponent(text)}` :
-                     `https://wa.me/?text=${encodeURIComponent(text)}`;
-    }
-
-    function clearViewer(){
-      [...storyViewer.querySelectorAll("img.story-img")].forEach(n=>n.remove());
-      storyProgress.innerHTML = ""; storyMsg.value = "";
-      if(timer){ clearTimeout(timer); timer=null; }
-      COMPOSING = false;
-      closeStories.classList.remove('disabled');
-    }
-    const productById = (id)=> PRODUCTS.find(p=>p.id===id);
-    function labelCurrent(){
-      const slide = currentStory.slides[currentIndex];
-      const prod  = productById(slide.productId);
-      storyTag.textContent = prod ? prod.nome : "";
-    }
-
-    function openStories(story){
-      clearViewer(); currentStory = story; currentIndex=0;
-
-      currentStory.slides.forEach((sl,i)=>{
-        const img = document.createElement("img");
-        img.className = "story-img" + (i===0 ? " active" : "");
-        img.src = sl.src; img.alt = `${story.title} • ${i+1}/${currentStory.slides.length}`;
-        storyViewer.appendChild(img);
-
-        const bar = document.createElement("div"); bar.className="bar";
-        const fill = document.createElement("div"); fill.className="fill";
-        bar.appendChild(fill); storyProgress.appendChild(bar);
-      });
-
-      // Enviar no story
-      storySend.onclick = ()=>{
-        const slide = currentStory.slides[currentIndex];
-        const prod  = productById(slide.productId);
-        if(!prod) return;
-        const custom = storyMsg.value.trim();
-        const msg = [ custom ? `Mensagem: ${custom}` : null, `Item: ${prod.nome}`, `Link: ${pageLink(prod.id)}` ].filter(Boolean).join("\n");
-        window.open(buildWaLink(getPhoneFor(prod), msg), "_blank", "noopener");
-      };
-
-      // Travar enquanto digita: pausa autoplay, desabilita fechar e voltar
-      storyMsg.addEventListener("focus", ()=>{
-        COMPOSING = true;
-        if(timer){ clearTimeout(timer); timer=null; }
-        closeStories.classList.add('disabled');
-      });
-      // Mantemos COMPOSING mesmo no blur; só destrava ao avançar (tapRight)
-      storyMsg.addEventListener("keydown", (e)=>{ if(e.key==="Enter"){ e.preventDefault(); storySend.click(); } });
-
-      storiesOverlay.classList.add("open");
-      lockBody();
-      runStep();
-      labelCurrent();
-    }
-
-    function runStep(){
-      const imgs  = [...storyViewer.querySelectorAll(".story-img")];
-      const fills = [...storyProgress.querySelectorAll(".fill")];
-
-      imgs.forEach((n,i)=> n.classList.toggle("active", i===currentIndex));
-      fills.forEach((f,i)=>{ f.style.transition="none"; f.style.width = i < currentIndex ? "100%" : "0%" });
-
-      const dur = Math.max(1, Number(CONFIG.storyDurationSec || 7)) * 1000;
-      requestAnimationFrame(()=>{ const f = fills[currentIndex]; if(f){ f.style.transition=`width ${dur}ms linear`; f.style.width="100%"; }});
-      if(timer) clearTimeout(timer);
-      timer = setTimeout(nextStory, dur);
-    }
-
-    function nextStory(){
-      // Se estava compondo, destrava apenas quando for para "próximo"
-      if(COMPOSING){
-        COMPOSING = false;
-        closeStories.classList.remove('disabled');
-      }
-      if(currentIndex < currentStory.slides.length-1){
-        currentIndex++; runStep(); labelCurrent();
+      if(res.ok){
+        msg.textContent = "Cadastro enviado! Aguardando aprovação.";
+        localStorage.setItem("participante", JSON.stringify(data));
+        form.reset();
+        fotos.forEach(f=>f.classList.remove('selected'));
       } else {
-        closeStoriesOverlay();
+        msg.textContent = "Erro ao enviar. Tente novamente.";
       }
+    } catch(err){
+      msg.textContent = "Falha de conexão.";
+      console.error(err);
     }
-    function prevStory(){
-      // Se está compondo, não deixa voltar
-      if(COMPOSING) return;
-      if(currentIndex>0){ currentIndex--; runStep(); labelCurrent(); }
-      else { runStep(); }
-    }
-    function closeStoriesOverlay(){
-      // Se está compondo, não fecha
-      if(COMPOSING) return;
-      storiesOverlay.classList.remove("open");
-      clearViewer();
-      unlockBody();
-    }
+  });
+</script>
 
-    tapRight.addEventListener("click", ()=> nextStory());
-    tapLeft.addEventListener("click", ()=> prevStory());
-    closeStories.addEventListener("click", closeStoriesOverlay);
-    storiesOverlay.addEventListener("click", (e)=>{ 
-      // bloquear fechar clicando fora quando compondo
-      if(e.target === storiesOverlay && !COMPOSING) closeStoriesOverlay();
-    });
-
-    /* =============== GRID (cards) =============== */
-    const grid  = document.getElementById("grid");
-    const countEl = document.getElementById("count");
-    const searchTop = document.getElementById("searchTop");
-    const heartTop  = document.getElementById("heartTop");
-    const favCount  = document.getElementById("favCount");
-
-    function updateFavBadge(){
-      const n = FAVORITES.size;
-      favCount.textContent = n;
-      favCount.style.display = n ? "grid" : "none";
-      heartTop.classList.toggle("active", FILTER_FAVS_ONLY);
-    }
-
-    function filteredList(){
-      const q = (searchTop.value || "").trim().toLowerCase();
-      let list = PRODUCTS;
-      if(FILTER_FAVS_ONLY) list = list.filter(p=> isFav(p.id));
-      if(q) list = list.filter(p =>
-        (p.nome||"").toLowerCase().includes(q) || (p.descricao||"").toLowerCase().includes(q)
-      );
-      return list;
-    }
-
-    function render(){
-      const list = filteredList();
-      countEl.textContent = `${list.length} item(ns)`;
-      grid.innerHTML = "";
-      for(const p of list){
-        const el = document.createElement("article");
-        el.className = "card";
-        el.id = p.id;
-        const favActive = isFav(p.id) ? "active" : "";
-
-        el.innerHTML = `
-          <button class="fav ${favActive}" data-fav="${p.id}" title="Favoritar">
-            <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path class="fill" d="M12.1 20.3s-7.6-4.4-9.2-9.3C1.9 6.8 5 4.1 8 5.1c1.5.5 2.7 1.8 4 4 1.3-2.2 2.5-3.5 4-4 3-.9 6.1 1.7 5.1 5.9-1.5 4.9-9.1 9.3-9.1 9.3z"/></svg>
-          </button>
-
-          <img class="thumb" src="${p.foto}" alt="${p.nome}" loading="lazy" />
-          <div class="content">
-            <h2 class="title">${p.nome}</h2>
-            <div class="price">${fmtBRL(p.preco)}</div>
-            <p class="desc">${p.descricao||""}</p>
-          </div>
-          <span class="pill">Usado</span>
-        `;
-        grid.appendChild(el);
-      }
-      updateFavBadge();
-    }
-
-    grid.addEventListener("click", (e)=>{
-      const favBtn = e.target.closest("[data-fav]");
-      if(favBtn){
-        const id = favBtn.dataset.fav;
-        if(FAVORITES.has(id)) FAVORITES.delete(id); else FAVORITES.add(id);
-        saveFavs();
-        render();
-      }
-    });
-    heartTop.addEventListener("click", ()=>{
-      FILTER_FAVS_ONLY = !FILTER_FAVS_ONLY;
-      render();
-    });
-    searchTop.addEventListener("input", render);
-
-    /* =============== INIT =============== */
-    document.getElementById("year").textContent = new Date().getFullYear();
-    document.getElementById("today").textContent = new Date().toLocaleDateString("pt-BR", {weekday:"long", day:"2-digit", month:"2-digit"});
-
-    (async function init(){
-      try{
-        if(!SHEET_ID || SHEET_ID.includes("COLOQUE_AQUI")) throw new Error("Defina o SHEET_ID no topo do arquivo.");
-        await loadData();
-        if(!PRODUCTS.length) throw new Error("Produtos vazios.");
-        renderStories();
-        render();
-      }catch(err){
-        console.error("[Erro ao carregar planilha]", err);
-        const main = document.querySelector("main");
-        const warn = document.createElement("div");
-        warn.style.cssText="margin:12px 0;padding:12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--muted);font-size:12px";
-        warn.innerHTML = "Não foi possível carregar da planilha. Confira o <b>SHEET_ID</b> e se as abas foram <b>publicadas na Web</b>.";
-        main.prepend(warn);
-      }
-    })();
-
-    // Deep-link para card (usa #id na URL)
-    if(location.hash){
-      const el = document.querySelector(location.hash);
-      if(el){ el.scrollIntoView({behavior:"smooth", block:"center"}); }
-    }
-  </script>
 </body>
 </html>
