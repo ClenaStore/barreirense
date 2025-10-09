@@ -74,9 +74,9 @@ header{
 /* CATEGORIAS HORIZONTAIS */
 .categorias-scroll{
   display:flex;
-  gap:12px;
+  gap:10px;
   overflow-x:auto;
-  padding:15px 20px;
+  padding:10px 20px 15px;
   scroll-behavior:smooth;
 }
 .categorias-scroll::-webkit-scrollbar{height:6px;}
@@ -86,14 +86,14 @@ header{
 }
 .cat-mini{
   flex:0 0 auto;
-  width:110px;
-  height:95px;
+  width:100px;
+  height:70px; /* 🔹 mais estreito na altura */
   background:linear-gradient(180deg,#1a1a2a,#0b0b14);
-  border-radius:14px;
+  border-radius:12px;
   text-align:center;
   cursor:pointer;
   transition:transform .3s, box-shadow .3s, background .3s;
-  box-shadow:0 0 8px rgba(0,229,255,.25);
+  box-shadow:0 0 6px rgba(0,229,255,.25);
   border:1px solid rgba(255,255,255,0.1);
   display:flex;
   flex-direction:column;
@@ -101,8 +101,8 @@ header{
   justify-content:center;
 }
 .cat-mini:hover{
-  transform:scale(1.07);
-  box-shadow:0 0 18px var(--accent);
+  transform:scale(1.08);
+  box-shadow:0 0 15px var(--accent);
 }
 .cat-mini.active{
   background:linear-gradient(180deg,var(--accent2),var(--accent));
@@ -110,14 +110,14 @@ header{
   box-shadow:0 0 20px var(--accent);
 }
 .cat-mini img{
-  width:38px;
-  height:38px;
+  width:30px;
+  height:30px;
   object-fit:contain;
-  margin-bottom:6px;
+  margin-bottom:4px;
   filter:drop-shadow(0 0 5px rgba(0,229,255,.6));
 }
 .cat-mini h4{
-  font-size:13px;
+  font-size:12px;
   font-weight:600;
   color:#fff;
   text-shadow:0 0 5px rgba(0,229,255,.4);
@@ -184,7 +184,19 @@ header{
   50%{filter:brightness(1.5);}
 }
 
-/* FOOTER */
+/* RESPONSIVO */
+@media(max-width:768px){
+  .banner-container{height:150px;}
+  .games{grid-template-columns:repeat(2,1fr);gap:14px;} /* 🔹 2 cards por linha */
+  .card{height:280px;}
+  .card img{height:180px;}
+}
+@media(max-width:480px){
+  .cat-mini{width:85px;height:65px;}
+  .cat-mini img{width:26px;height:26px;}
+  .cat-mini h4{font-size:11px;}
+  .games{grid-template-columns:repeat(2,1fr);gap:12px;} /* 🔹 mantém 2 por linha */
+}
 footer{
   text-align:center;
   padding:15px;
@@ -208,7 +220,7 @@ footer{
   <img src="https://github.com/ClenaStore/barreirense/blob/main/paste/9.png?raw=true" alt="Banner 4">
 </div>
 
-<!-- CATEGORIAS ROLÁVEIS -->
+<!-- CATEGORIAS COM ROLAGEM HORIZONTAL -->
 <div class="categorias-scroll" id="categorias">
   <div class="cat-mini active" data-cat="todos"><img src="https://cdn-icons-png.flaticon.com/512/992/992700.png"><h4>Todos</h4></div>
   <div class="cat-mini" data-cat="mistério"><img src="https://cdn-icons-png.flaticon.com/512/808/808484.png"><h4>Mistério</h4></div>
@@ -255,7 +267,7 @@ setInterval(()=>{
   banners[index].classList.add('active');
 },4000);
 
-// Animação de clique
+// Clique com animação
 function openGame(url,card){
   card.style.transform='scale(0.97)';
   setTimeout(()=>{window.location.href=url;},250);
