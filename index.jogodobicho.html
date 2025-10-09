@@ -1,1 +1,129 @@
-s
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>🎯 Jogo do Bicho</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg1:#060818; --bg2:#0a0f2c; --panel:#0f172a; --line:#1e2a3f;
+  --text:#eaf2ff; --muted:#a7b3c8; --accent:#00e5ff; --accent2:#7c3aed; --warn:#f59e0b;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:Inter,system-ui;
+  background:radial-gradient(900px 700px at 50% -150px,var(--bg2),#020412 75%);
+  color:var(--text);
+}
+header{text-align:center;padding:22px 10px 12px}
+h1{font-family:Orbitron;color:var(--warn);text-shadow:0 0 10px rgba(245,158,11,.6);font-size:28px;margin-bottom:4px}
+.sub{color:var(--muted);font-size:15px}
+
+/* ===== Grid ===== */
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(160px,1fr));
+  gap:12px;
+  max-width:950px;
+  margin:20px auto 60px;
+  padding:0 14px;
+}
+.card{
+  background:linear-gradient(180deg,#0c152b,#0a1020);
+  border:1px solid #13213a;
+  border-radius:14px;
+  box-shadow:inset 0 0 0 2px rgba(0,229,255,.05);
+  overflow:hidden;
+  transition:.25s;
+  cursor:pointer;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:space-between;
+  text-align:center;
+}
+.card:hover{
+  transform:translateY(-4px);
+  box-shadow:0 8px 18px rgba(0,229,255,.18), inset 0 0 0 2px rgba(0,229,255,.18);
+}
+.card img{
+  width:100%;
+  height:100px;
+  object-fit:contain;
+  margin-top:10px;
+  filter:drop-shadow(0 0 8px rgba(0,229,255,.35));
+}
+.name{
+  font-weight:700;
+  font-size:16px;
+  margin:6px 0 2px;
+  color:var(--accent);
+  text-shadow:0 0 6px rgba(0,229,255,.3);
+}
+.nums{
+  font-size:13px;
+  color:var(--muted);
+  margin-bottom:10px;
+}
+footer{
+  text-align:center;
+  padding:20px;
+  color:var(--muted);
+  font-size:13px;
+  border-top:1px solid rgba(255,255,255,.06);
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🎯 Jogo do Bicho</h1>
+  <p class="sub">Tabela completa — 25 animais e suas numerações</p>
+</header>
+
+<div class="grid" id="grid"></div>
+
+<footer>© 2025 Painel do Jogo do Bicho • Desenvolvido por DV</footer>
+
+<script>
+const bichos = [
+  {nome:"Avestruz", numeros:"01 • 02 • 03 • 04", img:"https://i.imgur.com/4UfbKQP.png"},
+  {nome:"Águia", numeros:"05 • 06 • 07 • 08", img:"https://i.imgur.com/Q12H25S.png"},
+  {nome:"Burro", numeros:"09 • 10 • 11 • 12", img:"https://i.imgur.com/lNsDxWr.png"},
+  {nome:"Borboleta", numeros:"13 • 14 • 15 • 16", img:"https://i.imgur.com/6g3bE1S.png"},
+  {nome:"Cachorro", numeros:"17 • 18 • 19 • 20", img:"https://i.imgur.com/pttBf7Z.png"},
+  {nome:"Cabra", numeros:"21 • 22 • 23 • 24", img:"https://i.imgur.com/7QlRcf7.png"},
+  {nome:"Carneiro", numeros:"25 • 26 • 27 • 28", img:"https://i.imgur.com/dm1ckEi.png"},
+  {nome:"Camelo", numeros:"29 • 30 • 31 • 32", img:"https://i.imgur.com/MzjNP7W.png"},
+  {nome:"Cobra", numeros:"33 • 34 • 35 • 36", img:"https://i.imgur.com/Nx1OiAM.png"},
+  {nome:"Coelho", numeros:"37 • 38 • 39 • 40", img:"https://i.imgur.com/jyPLawK.png"},
+  {nome:"Cavalo", numeros:"41 • 42 • 43 • 44", img:"https://i.imgur.com/fm6oA5C.png"},
+  {nome:"Elefante", numeros:"45 • 46 • 47 • 48", img:"https://i.imgur.com/GwS1nLD.png"},
+  {nome:"Galo", numeros:"49 • 50 • 51 • 52", img:"https://i.imgur.com/rX1Kyeb.png"},
+  {nome:"Gato", numeros:"53 • 54 • 55 • 56", img:"https://i.imgur.com/l4uQ8Ld.png"},
+  {nome:"Jacaré", numeros:"57 • 58 • 59 • 60", img:"https://i.imgur.com/BuE2ZFl.png"},
+  {nome:"Leão", numeros:"61 • 62 • 63 • 64", img:"https://i.imgur.com/dL22sKm.png"},
+  {nome:"Macaco", numeros:"65 • 66 • 67 • 68", img:"https://i.imgur.com/LH4CAXD.png"},
+  {nome:"Porco", numeros:"69 • 70 • 71 • 72", img:"https://i.imgur.com/l8aXkzl.png"},
+  {nome:"Pavão", numeros:"73 • 74 • 75 • 76", img:"https://i.imgur.com/aYYIcsR.png"},
+  {nome:"Peru", numeros:"77 • 78 • 79 • 80", img:"https://i.imgur.com/f9v7vTV.png"},
+  {nome:"Touro", numeros:"81 • 82 • 83 • 84", img:"https://i.imgur.com/d0AM7Lr.png"},
+  {nome:"Tigre", numeros:"85 • 86 • 87 • 88", img:"https://i.imgur.com/JleKmuR.png"},
+  {nome:"Urso", numeros:"89 • 90 • 91 • 92", img:"https://i.imgur.com/Jts7lL7.png"},
+  {nome:"Veado", numeros:"93 • 94 • 95 • 96", img:"https://i.imgur.com/1LqJixU.png"},
+  {nome:"Vaca", numeros:"97 • 98 • 99 • 00", img:"https://i.imgur.com/bIMqKu5.png"},
+];
+
+const grid = document.getElementById("grid");
+bichos.forEach(b=>{
+  const c=document.createElement("div");
+  c.className="card";
+  c.innerHTML=`<img src="${b.img}" alt="${b.nome}">
+               <div class="name">${b.nome}</div>
+               <div class="nums">${b.numeros}</div>`;
+  grid.appendChild(c);
+});
+</script>
+</body>
+</html>
