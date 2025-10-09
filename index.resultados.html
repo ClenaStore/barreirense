@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>📊 Resultados • Jogo do Bicho</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg1:#060818;--bg2:#0a0f2c;--panel:#0f172a;--line:#1e2a3f;
+  --text:#eaf2ff;--muted:#a7b3c8;--accent:#00e5ff;--accent2:#7c3aed;
+  --warn:#f59e0b;--ok:#16a34a;--bad:#ef4444;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:Inter,system-ui;
+  background:radial-gradient(900px 700px at 50% -150px,var(--bg2),#020412 75%);
+  color:var(--text);
+  min-height:100vh;
+  overflow-x:hidden;
+  padding-bottom:80px;
+}
+
+/* ===== Cabeçalho ===== */
+header{text-align:center;padding:24px 10px 12px}
+h1{font-family:Orbitron;color:var(--accent);text-shadow:0 0 10px rgba(0,229,255,.5);font-size:28px;margin-bottom:6px}
+.sub{color:var(--muted);font-size:15px}
+
+/* ===== Container dos resultados ===== */
+.container{max-width:1000px;margin:24px auto;padding:0 14px;display:flex;flex-direction:column;gap:16px}
+
+/* ===== Card do jogo ===== */
+.card{
+  background:linear-gradient(180deg,var(--panel),#0a0f1f);
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:16px;
+  box-shadow:0 0 20px rgba(0,229,255,.08);
+  transition:.3s;
+}
+.card:hover{box-shadow:0 0 25px rgba(0,229,255,.2);transform:translateY(-2px)}
+.card-header{
+  display:flex;justify-content:space-between;align-items:center;
+  cursor:pointer;
+}
+.card-header h2{font-family:Orbitron;font-size:18px;color:var(--warn)}
+.card-header span{font-size:13px;color:var(--muted)}
+.card-body{margin-top:12px;display:none;animation:fade .4s ease}
+@keyframes fade{from{opacity:0;transform:translateY(-5px)}to{opacity:1;transform:translateY(0)}}
+
+/* ===== Dados principais ===== */
+.info-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin-top:8px}
+.info-box{
+  background:#0b1220;border:1px solid #1f2f49;
+  border-radius:10px;padding:10px;
+  text-align:center;
+}
+.info-box b{display:block;font-size:15px;color:var(--accent);margin-bottom:4px}
+.info-box span{font-size:13px;color:var(--muted)}
+
+/* ===== Ganhadores ===== */
+.winners{margin-top:16px}
+.winners h3{color:var(--ok);font-family:Orbitron;font-size:16px;margin-bottom:8px}
+.winner-card{
+  background:#0c1428;border:1px solid #1f2f49;border-radius:10px;padding:10px;margin-bottom:8px;
+}
+.winner-card b{color:var(--warn);display:block;margin-bottom:4px}
+.winner-card small{color:var(--muted)}
+.winner-photo img{width:100%;max-height:240px;object-fit:contain;border-radius:10px;border:1px solid #1f2f49;margin-top:10px}
+
+/* ===== Loading ===== */
+.loading{text-align:center;margin-top:80px}
+.loader{width:60px;height:60px;border:4px solid #23304a;border-top-color:var(--accent);border-radius:50%;animation:spin 1s linear infinite;margin:auto}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading p{margin-top:10px;color:var(--muted)}
+
+/* ===== Responsivo ===== */
+@media(max-width:700px){
+  h1{font-size:24px}
+  .info-grid{grid-template-columns:repeat(2,1fr)}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>📊 Resultados</h1>
+  <p class="sub">Confira os ganhadores e repasses de cada jogo</p>
+</header>
+
+<div id="content" class="container">
+  <div class="loading">
+    <div class="loader"></div>
+    <p>Carregando resultados...</p>
+  </div>
+</div>
+
+<script>
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz94zCUzLHcv8UdmYVO2RUA26Zlp-rP2lUEybUoiBUaT14-paIlrseiDj_hdoNcz0CU/exec";
+
+// === Função principal ===
+async function carregarResultados(){
+  try{
+    const res = await fetch(`${SCRIPT_URL}?action=resultados`, {cache:"no-store"});
+    const data = await res.json();
+    renderResultados(data);
+  }catch(e){
+    document.getElementById("content").innerHTML = "<p style='text-align:center;color:#f87171'>Erro ao carregar resultados.</p>";
+  }
+}
+
+function renderResultados(lista){
+  if(!Array.isArray(lista) || lista.length===0){
+    document.getElementById("content").innerHTML = "<p style='text-align:center;color:#a7b3c8'>Nenhum resultado disponível.</p>";
+    return;
+  }
+
+  document.getElementById("content").innerHTML = lista.map(jogo=>{
+    const ganhadores = (jogo.ganhadores||[]).map(g=>`
+      <div class='winner-card'>
+        <b>${g.nome}</b>
+        <small>Cotas: ${g.cotas} • Valor investido: R$ ${g.investimento}</small>
+        <div class='winner-photo'>
+          ${g.comprovante ? `<img src='${g.comprovante}' alt='Comprovante de repasse'>` : ""}
+        </div>
+      </div>
+    `).join('');
+
+    return `
+    <div class="card">
+      <div class="card-header" onclick="toggleCard(this)">
+        <h2>${jogo.titulo||'Jogo sem título'}</h2>
+        <span>${jogo.data||''}</span>
+      </div>
+      <div class="card-body">
+        <div class="info-grid">
+          <div class="info-box"><b>${jogo.totalCotas||0}</b><span>Total de cotas</span></div>
+          <div class="info-box"><b>R$ ${jogo.valorTotal||'0,00'}</b><span>Investimento total</span></div>
+          <div class="info-box"><b>R$ ${jogo.repasses||'0,00'}</b><span>Valor de repasses</span></div>
+        </div>
+        <div class="winners">
+          <h3>🏆 Ganhadores</h3>
+          ${ganhadores || "<p style='color:#a7b3c8'>Nenhum ganhador registrado.</p>"}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// === Expande/Recolhe cards ===
+function toggleCard(header){
+  const body = header.nextElementSibling;
+  const open = body.style.display==="block";
+  document.querySelectorAll(".card-body").forEach(b=>b.style.display="none");
+  if(!open) body.style.display="block";
+}
+
+// === Início ===
+carregarResultados();
+</script>
+</body>
+</html>
