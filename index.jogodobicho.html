@@ -3,24 +3,40 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
-<title>🐘 Jogo do Bicho</title>
+<title>🎯 Jogo do Bicho</title>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&family=Inter:wght@400;600&display=swap" rel="stylesheet">
 <style>
 :root{
   --bg1:#060818; --bg2:#0a0f2c; --panel:#0f172a; --line:#1e2a3f;
-  --text:#eaf2ff; --muted:#a7b3c8; --accent:#00e5ff; --accent2:#7c3aed; --warn:#f59e0b;
+  --text:#eaf2ff; --muted:#a7b3c8; --accent:#00e5ff; --accent2:#7c3aed;
+  --warn:#f59e0b; --ok:#16a34a; --bad:#ef4444;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 body{
   font-family:Inter,system-ui;
   background:radial-gradient(900px 700px at 50% -150px,var(--bg2),#020412 75%);
   color:var(--text);
+  min-height:100vh;
 }
 header{text-align:center;padding:22px 10px 12px}
 h1{font-family:Orbitron;color:var(--warn);text-shadow:0 0 10px rgba(245,158,11,.6);font-size:28px;margin-bottom:4px}
 .sub{color:var(--muted);font-size:15px}
 
-/* ===== Grid ===== */
+/* Painel superior */
+.panel{
+  max-width:950px;margin:14px auto;background:linear-gradient(180deg,var(--panel),#0a0f1f);
+  border:1px solid var(--line);border-radius:16px;padding:12px 14px;
+  display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;
+  box-shadow:0 0 22px rgba(0,229,255,.07)
+}
+.badge{font-size:12px;background:#0b1223;border:1px solid var(--line);padding:6px 10px;border-radius:10px;color:#a7b3c8}
+.price{color:var(--warn);font-weight:800}
+.actions{display:flex;gap:10px}
+.btn{border:none;border-radius:10px;padding:12px 14px;font-weight:800;cursor:pointer;transition:.25s;font-size:14px}
+.btn-primary{background:linear-gradient(90deg,var(--accent2),var(--accent));color:#06121a;box-shadow:0 0 12px rgba(0,229,255,.35)}
+.btn-clear{background:#102038;color:#dbe7ff;border:1px solid var(--line)}
+
+/* Grid de bichos */
 .grid{
   display:grid;
   grid-template-columns:repeat(auto-fill,minmax(160px,1fr));
@@ -33,24 +49,21 @@ h1{font-family:Orbitron;color:var(--warn);text-shadow:0 0 10px rgba(245,158,11,.
   background:linear-gradient(180deg,#0c152b,#0a1020);
   border:1px solid #13213a;
   border-radius:14px;
-  box-shadow:inset 0 0 0 2px rgba(0,229,255,.05);
   overflow:hidden;
+  text-align:center;
+  padding-bottom:6px;
+  box-shadow:inset 0 0 0 2px rgba(0,229,255,.05);
   transition:.25s;
   cursor:pointer;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  text-align:center;
 }
-.card:hover{
-  transform:translateY(-4px);
-  box-shadow:0 8px 18px rgba(0,229,255,.18), inset 0 0 0 2px rgba(0,229,255,.18);
-}
-.card img{width:100%;height:100px;object-fit:contain;margin-top:10px;filter:drop-shadow(0 0 8px rgba(0,229,255,.35))}
-.name{font-weight:700;font-size:16px;margin:6px 0 2px;color:var(--accent);text-shadow:0 0 6px rgba(0,229,255,.3)}
-.nums{font-size:13px;color:var(--muted);margin-bottom:10px}
+.card:hover{transform:translateY(-3px);box-shadow:0 8px 18px rgba(0,229,255,.18),inset 0 0 0 2px rgba(0,229,255,.18)}
+.card img{width:100%;height:100px;object-fit:contain;margin-top:6px;filter:drop-shadow(0 0 8px rgba(0,229,255,.35))}
+.name{font-weight:700;font-size:15px;margin:6px 0 2px;color:var(--accent);text-shadow:0 0 6px rgba(0,229,255,.3)}
+.nums{font-size:13px;color:var(--muted);margin-bottom:6px}
+.card.selected{outline:2px solid var(--accent);box-shadow:0 0 0 4px rgba(0,229,255,.22) inset,0 0 16px rgba(0,229,255,.24)}
+.card.sold{opacity:.6;cursor:not-allowed}
 
-/* ===== Overlay e Popup ===== */
+/* Overlay e Popup */
 .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9999;align-items:center;justify-content:center;flex-direction:column}
 .loader{width:64px;height:64px;border-radius:50%;border:4px solid #23304a;border-top-color:var(--warn);animation:spin 1s linear infinite;margin-bottom:12px}
 @keyframes spin{to{transform:rotate(360deg)}} .overlay p{color:#bed0ee}
@@ -61,11 +74,10 @@ h1{font-family:Orbitron;color:var(--warn);text-shadow:0 0 10px rgba(245,158,11,.
 .box label{display:block;color:var(--muted);font-size:13px;margin:10px 0 6px}
 .box input{width:100%;background:#0b1220;color:var(--text);border:none;border-radius:10px;padding:12px;font-size:15px}
 .row{display:flex;gap:10px;margin-top:12px}
-.btn{border:none;border-radius:10px;padding:12px 14px;font-weight:800;cursor:pointer;transition:.25s;font-size:14px}
 .ok{background:linear-gradient(90deg,var(--warn),#ffb757);color:#111}
 .cancel{background:#112036;color:#c9d6ec;border:1px solid #1f2f49}
 
-/* PIX Drawer */
+/* Drawer PIX */
 .pix-drawer{display:none;position:fixed;left:0;right:0;bottom:0;z-index:9000;background:#0b1325;border-top:1px solid #1e2a3f;padding:12px 14px}
 .pix-drawer .row{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}
 .pix-key{background:#16243a;color:#eaf2ff;padding:10px 12px;border-radius:8px;font-weight:700;word-break:break-all;border:1px solid #20344f}
@@ -75,10 +87,24 @@ h1{font-family:Orbitron;color:var(--warn);text-shadow:0 0 10px rgba(245,158,11,.
 </style>
 </head>
 <body>
+
 <header>
-  <h1>🐘 Jogo do Bicho</h1>
-  <p class="sub">Selecione seus bichos favoritos — R$ 6,00 cada</p>
+  <h1>🎯 Jogo do Bicho</h1>
+  <p class="sub">Selecione seus bichos — R$ 6,00 cada</p>
 </header>
+
+<div class="panel">
+  <div>
+    <span class="badge">Disponíveis: <b id="disp">—</b></span>
+    <span class="badge">Selecionados: <b id="selCount">0</b></span>
+    <span class="badge">Preço: <b class="price">R$ 6,00</b></span>
+    <span class="badge">💰 Prêmio atual: <b id="premio">—</b></span>
+  </div>
+  <div class="actions">
+    <button id="btnClear" class="btn btn-clear">Limpar Seleção</button>
+    <button id="btnConfirm" class="btn btn-primary" disabled>Confirmar Participação</button>
+  </div>
+</div>
 
 <div class="grid" id="grid"></div>
 
@@ -91,8 +117,8 @@ h1{font-family:Orbitron;color:var(--warn);text-shadow:0 0 10px rgba(245,158,11,.
 <!-- Popup -->
 <div id="popup" class="popup">
   <div class="box">
-    <h3>Confirmar Seleção</h3>
-    <p>Revise e preencha seus dados.</p>
+    <h3>Confirmar Participação</h3>
+    <p>Revise seus bichos e preencha seus dados.</p>
     <div class="badge" style="display:block;text-align:center;margin-bottom:8px">
       Bichos: <b id="numsPreview"></b> • Total: <b id="totalPreview"></b>
     </div>
@@ -103,8 +129,8 @@ h1{font-family:Orbitron;color:var(--warn);text-shadow:0 0 10px rgba(245,158,11,.
     <label>Telefone / WhatsApp</label>
     <input id="tel" type="tel" placeholder="(00) 00000-0000" maxlength="16" required>
     <div class="row">
-      <button id="confirm" class="btn ok">Enviar</button>
-      <button id="cancel" class="btn cancel">Cancelar</button>
+      <button id="confirm" class="btn ok" type="button">Enviar</button>
+      <button id="cancel" class="btn cancel" type="button">Cancelar</button>
     </div>
   </div>
 </div>
@@ -122,74 +148,100 @@ h1{font-family:Orbitron;color:var(--warn);text-shadow:0 0 10px rgba(245,158,11,.
 </div>
 
 <script>
-const SCRIPT_URL = "COLE_AQUI_A_URL_DO_SEU_GAS"; 
+const SCRIPT_URL = "COLE_AQUI_SUA_URL_DO_GAS";
 const PRECO = 6;
 const PIX_KEY = "711e433b-bb4e-477e-adb7-518eacf2f67e";
 
 const bichos = [
-  "Avestruz","Águia","Burro","Borboleta","Cachorro",
-  "Cabra","Carneiro","Camelo","Cobra","Coelho",
-  "Cavalo","Elefante","Galo","Gato","Jacaré",
-  "Leão","Macaco","Porco","Pavão","Peru",
-  "Touro","Tigre","Urso","Veado","Vaca"
+  ["Avestruz","01–04"],["Águia","05–08"],["Burro","09–12"],["Borboleta","13–16"],["Cachorro","17–20"],
+  ["Cabra","21–24"],["Carneiro","25–28"],["Camelo","29–32"],["Cobra","33–36"],["Coelho","37–40"],
+  ["Cavalo","41–44"],["Elefante","45–48"],["Galo","49–52"],["Gato","53–56"],["Jacaré","57–60"],
+  ["Leão","61–64"],["Macaco","65–68"],["Porco","69–72"],["Pavão","73–76"],["Peru","77–80"],
+  ["Touro","81–84"],["Tigre","85–88"],["Urso","89–92"],["Veado","93–96"],["Vaca","97–00"]
 ];
 
-const grid=document.getElementById("grid"),overlay=document.getElementById("overlay"),popup=document.getElementById("popup");
+const grid=document.getElementById("grid");
+const dispEl=document.getElementById("disp"),selCountEl=document.getElementById("selCount"),premioEl=document.getElementById("premio");
+const overlay=document.getElementById("overlay"),popup=document.getElementById("popup");
 const nomeEl=document.getElementById("nome"),emailEl=document.getElementById("email"),telEl=document.getElementById("tel");
 const numsPreview=document.getElementById("numsPreview"),totalPreview=document.getElementById("totalPreview");
 const pixDrawer=document.getElementById("pixDrawer"),pixTotalEl=document.getElementById("pixTotal"),pixKeyBox=document.getElementById("pixKeyBox");
 const copyPix=document.getElementById("copyPix"),closeDrawer=document.getElementById("closeDrawer");
+const btnConfirm=document.getElementById("btnConfirm"),btnClear=document.getElementById("btnClear");
 
-let vendidos=new Set(),selecionados=new Set();
+let vendidos=new Set(),selecionados=new Set(),pagos=0;
 
 function showOverlay(s){overlay.style.display=s?'flex':'none'}
-function openPopup(){popup.style.display='flex'}
+function openPopup(){popup.style.display='flex';setTimeout(()=>nomeEl.focus(),50)}
 function closePopup(){popup.style.display='none'}
-function openDrawer(total){pixTotalEl.textContent=`R$ ${total.toFixed(2)}`;pixKeyBox.textContent=PIX_KEY;pixDrawer.style.display="block"}
+function openDrawer(total){pixTotalEl.textContent=`R$ ${(total).toFixed(2)}`;pixKeyBox.textContent=PIX_KEY;pixDrawer.style.display="block"}
 function closePixDrawer(){pixDrawer.style.display="none"}
 
 function renderGrid(){
-  grid.innerHTML='';
-  bichos.forEach(b=>{
+  grid.innerHTML='';let disponiveis=0;
+  bichos.forEach(([nome,nums])=>{
     const c=document.createElement('div');
     c.className='card';
-    c.innerHTML=`<img src="https://i.imgur.com/4UfbKQP.png" alt="${b}">
-                 <div class='name'>${b}</div>
-                 <div class='nums'>Clique para selecionar</div>`;
-    if(vendidos.has(b)){c.style.opacity=.5;c.style.pointerEvents='none';c.querySelector('.nums').textContent='Indisponível'}
-    c.addEventListener('click',()=>{if(selecionados.has(b))selecionados.delete(b);else selecionados.add(b);c.classList.toggle('selected');});
+    c.innerHTML=`<img src="https://i.imgur.com/4UfbKQP.png" alt="${nome}">
+                 <div class="name">${nome}</div><div class="nums">${nums}</div>`;
+    if(vendidos.has(nome)){c.classList.add('sold');c.querySelector('.nums').textContent='INDISPONÍVEL'}
+    else{
+      disponiveis++;
+      if(selecionados.has(nome))c.classList.add('selected');
+      c.addEventListener('click',()=>{
+        if(selecionados.has(nome))selecionados.delete(nome);
+        else selecionados.add(nome);
+        c.classList.toggle('selected');
+        updatePanel();
+      });
+    }
     grid.appendChild(c);
   });
+  dispEl.textContent=disponiveis;
+}
+
+function updatePanel(){
+  selCountEl.textContent=selecionados.size;
+  btnConfirm.disabled=selecionados.size===0;
+  const total=selecionados.size*PRECO;
+  const premio=(pagos*PRECO*0.6).toFixed(2);
+  premioEl.textContent=`R$ ${premio}`;
 }
 
 async function loadVendidos(){
   try{
     const r=await fetch(`${SCRIPT_URL}?action=vendidos`);
     const j=await r.json();
-    vendidos=new Set(j);
-  }catch(e){vendidos=new Set([]);}
+    vendidos=new Set(j.vendidos||[]);
+    pagos=j.pagos||0;
+  }catch{vendidos=new Set();pagos=0;}
 }
 
-async function init(){
-  await loadVendidos();
-  renderGrid();
-}
+async function init(){await loadVendidos();renderGrid();updatePanel();}
 init();
 
+btnClear.addEventListener('click',()=>{selecionados.clear();renderGrid();updatePanel();});
+btnConfirm.addEventListener('click',()=>{
+  const arr=Array.from(selecionados);
+  numsPreview.textContent=arr.join(', ');
+  totalPreview.textContent=`R$ ${(arr.length*PRECO).toFixed(2)}`;
+  openPopup();
+});
 document.getElementById('cancel').addEventListener('click',closePopup);
+
 document.getElementById('confirm').addEventListener('click',async()=>{
   const nome=nomeEl.value.trim(),email=emailEl.value.trim(),tel=telEl.value.trim();
   const arr=Array.from(selecionados);
   if(!nome||!email||!tel||arr.length===0){alert('Preencha os dados e selecione ao menos 1 bicho.');return;}
   showOverlay(true);
   try{
-    const payload={nome,email,telefone:tel,bichos:arr,total:arr.length*PRECO,pix:PIX_KEY};
+    const payload={action:"registrar_rifa",nome,email,telefone:tel,bichos:arr,total:arr.length*PRECO,pix:PIX_KEY};
     const res=await fetch(SCRIPT_URL,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(payload)});
     const text=await res.text();
     showOverlay(false);
-    if(/OK/i.test(text)){closePopup();openDrawer(arr.length*PRECO);selecionados.clear();await loadVendidos();renderGrid();}
-    else alert("Erro ao enviar.");
-  }catch(e){showOverlay(false);alert("Falha de conexão.");}
+    if(/OK/i.test(text)){closePopup();openDrawer(arr.length*PRECO);selecionados.clear();await loadVendidos();renderGrid();updatePanel();}
+    else alert('Erro ao enviar.');
+  }catch(e){showOverlay(false);alert('Falha de conexão.');}
 });
 copyPix.addEventListener('click',async()=>{await navigator.clipboard.writeText(PIX_KEY);copyPix.textContent="Copiado!";setTimeout(()=>copyPix.textContent="Copiar chave PIX",1500);});
 closeDrawer.addEventListener('click',closePixDrawer);
