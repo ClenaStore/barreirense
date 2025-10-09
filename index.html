@@ -184,12 +184,27 @@ header{
   50%{filter:brightness(1.5);}
 }
 
-/* CONTEÚDO RESULTADOS */
+/* SEÇÃO RESULTADOS */
 #resultados-section{
   max-width:1000px;
-  margin:0 auto 80px;
+  margin:20px auto 80px;
   padding:0 20px;
   display:none;
+  opacity:0;
+  transform:translateY(10px);
+  transition:opacity .6s ease, transform .6s ease;
+}
+#resultados-section.show{
+  display:block;
+  opacity:1;
+  transform:translateY(0);
+}
+#resultados-section .resultados-wrapper{
+  margin-top:10px;
+}
+#resultados-section header,
+#resultados-section h1{
+  margin-top:10px !important;
 }
 
 /* RESPONSIVO */
@@ -257,7 +272,7 @@ footer{
   </div>
 </section>
 
-<!-- SEÇÃO RESULTADOS (carregada dinamicamente) -->
+<!-- SEÇÃO RESULTADOS -->
 <section id="resultados-section"></section>
 
 <footer>© 2025 Games Hub</footer>
@@ -296,23 +311,24 @@ categorias.forEach(cat=>{
     }
 
     resultadosSection.style.display='none';
+    resultadosSection.innerHTML='';
     jogos.forEach(j=>{
       j.style.display=(filtro==='todos'||j.dataset.cat===filtro)?'flex':'none';
     });
   });
 });
 
-// ===== Carrega o index.resultados.html =====
+// ===== Carrega o index.resultados.html abaixo das categorias =====
 async function carregarResultados(){
   try{
     const res = await fetch('index.resultados.html');
     const html = await res.text();
-    resultadosSection.innerHTML = html;
-    resultadosSection.style.display='block';
+    resultadosSection.innerHTML = `<div class="resultados-wrapper">${html}</div>`;
+    resultadosSection.classList.add('show');
     resultadosSection.scrollIntoView({behavior:'smooth'});
   }catch(e){
     resultadosSection.innerHTML = "<p style='text-align:center;color:#f87171;margin:20px;'>Erro ao carregar resultados.</p>";
-    resultadosSection.style.display='block';
+    resultadosSection.classList.add('show');
   }
 }
 </script>
