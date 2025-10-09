@@ -46,8 +46,21 @@ header{
   width:100%;
   height:180px;
   overflow:hidden;
-  border-bottom:1px solid rgba(255,255,255,0.1);
+  border-radius:16px; /* cantos arredondados */
+  margin:10px auto;
+  box-shadow:0 0 15px rgba(0,229,255,.3);
+  animation:borderGlow 4s linear infinite;
 }
+
+/* efeito da fita de luz colorida percorrendo a borda */
+@keyframes borderGlow{
+  0%{box-shadow:0 0 10px #00e5ff, inset 0 0 10px #7c3aed;}
+  25%{box-shadow:0 0 20px #7c3aed, inset 0 0 20px #00e5ff;}
+  50%{box-shadow:0 0 15px #ff00ff, inset 0 0 15px #00ffff;}
+  75%{box-shadow:0 0 20px #00e5ff, inset 0 0 25px #7c3aed;}
+  100%{box-shadow:0 0 10px #00e5ff, inset 0 0 10px #7c3aed;}
+}
+
 .banner-container img{
   width:100%;
   height:100%;
@@ -56,7 +69,8 @@ header{
   top:0;left:0;
   opacity:0;
   transition:opacity 1.2s ease;
-  filter:brightness(.85);
+  filter:brightness(.88);
+  border-radius:16px;
 }
 .banner-container img.active{opacity:1}
 
@@ -85,15 +99,15 @@ header{
   box-shadow:0 0 25px var(--accent);
 }
 
-/* CAPA DO JOGO - sempre colada no topo */
+/* CAPA DO JOGO */
 .card img{
   width:100%;
   height:220px;
   object-fit:cover;
-  object-position:top; /* <<< Mantém o topo visível */
+  object-position:top;
   display:block;
   border-bottom:1px solid rgba(255,255,255,0.05);
-  margin:0; /* <<< Colada no topo */
+  margin:0;
 }
 
 /* TÍTULO */
@@ -162,7 +176,7 @@ footer{
   <img src="https://github.com/ClenaStore/barreirense/blob/main/paste/11.png?raw=true" class="active" alt="Banner 1">
   <img src="https://github.com/ClenaStore/barreirense/blob/main/paste/12.png?raw=true" alt="Banner 2">
   <img src="https://github.com/ClenaStore/barreirense/blob/main/paste/10.png?raw=true" alt="Banner 3">
-    <img src="https://github.com/ClenaStore/barreirense/blob/main/paste/9.png?raw=true" alt="Banner 4">
+  <img src="https://github.com/ClenaStore/barreirense/blob/main/paste/9.png?raw=true" alt="Banner 4">
 </div>
 
 <section class="games">
@@ -177,28 +191,28 @@ footer{
     <img src="https://github.com/ClenaStore/barreirense/blob/main/paste/Design%20sem%20nome%20(26).png?raw=true" alt="Jogo 2">
     <h3>Rifa</h3>
   </div>
-    <div class="card" onclick="openGame('index.jogodobicho.html', this)">
+
+  <div class="card" onclick="openGame('index.jogodobicho.html', this)">
     <span class="flag">🎮 JOGUE AGORA</span>
     <img src="https://github.com/ClenaStore/barreirense/blob/main/paste/JOGO%20DO%20BICHO.png?raw=true" alt="Jogo 3">
     <h3>Jogo do Bicho</h3>
   </div>
-
 </section>
 
 <footer>© 2025 Games Hub</footer>
 
 <script>
-// Banner rotativo  
-let banners = document.querySelectorAll('.banner-container img');
-let index = 0;
+// Banner rotativo
+let banners=document.querySelectorAll('.banner-container img');
+let index=0;
 setInterval(()=>{
   banners[index].classList.remove('active');
-  index = (index + 1) % banners.length;
+  index=(index+1)%banners.length;
   banners[index].classList.add('active');
 },4000);
 
 // Animação de clique
-function openGame(url, card){
+function openGame(url,card){
   card.style.transform='scale(0.97)';
   setTimeout(()=>{window.location.href=url;},250);
 }
