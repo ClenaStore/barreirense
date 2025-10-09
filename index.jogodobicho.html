@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
-<title>🎯 Jogo do Bicho</title>
+<title>🐘 Jogo do Bicho</title>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&family=Inter:wght@400;600&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -40,90 +40,159 @@ h1{font-family:Orbitron;color:var(--warn);text-shadow:0 0 10px rgba(245,158,11,.
   display:flex;
   flex-direction:column;
   align-items:center;
-  justify-content:space-between;
   text-align:center;
 }
 .card:hover{
   transform:translateY(-4px);
   box-shadow:0 8px 18px rgba(0,229,255,.18), inset 0 0 0 2px rgba(0,229,255,.18);
 }
-.card img{
-  width:100%;
-  height:100px;
-  object-fit:contain;
-  margin-top:10px;
-  filter:drop-shadow(0 0 8px rgba(0,229,255,.35));
-}
-.name{
-  font-weight:700;
-  font-size:16px;
-  margin:6px 0 2px;
-  color:var(--accent);
-  text-shadow:0 0 6px rgba(0,229,255,.3);
-}
-.nums{
-  font-size:13px;
-  color:var(--muted);
-  margin-bottom:10px;
-}
-footer{
-  text-align:center;
-  padding:20px;
-  color:var(--muted);
-  font-size:13px;
-  border-top:1px solid rgba(255,255,255,.06);
-}
+.card img{width:100%;height:100px;object-fit:contain;margin-top:10px;filter:drop-shadow(0 0 8px rgba(0,229,255,.35))}
+.name{font-weight:700;font-size:16px;margin:6px 0 2px;color:var(--accent);text-shadow:0 0 6px rgba(0,229,255,.3)}
+.nums{font-size:13px;color:var(--muted);margin-bottom:10px}
+
+/* ===== Overlay e Popup ===== */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9999;align-items:center;justify-content:center;flex-direction:column}
+.loader{width:64px;height:64px;border-radius:50%;border:4px solid #23304a;border-top-color:var(--warn);animation:spin 1s linear infinite;margin-bottom:12px}
+@keyframes spin{to{transform:rotate(360deg)}} .overlay p{color:#bed0ee}
+
+.popup{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:10000;align-items:center;justify-content:center}
+.box{width:min(92vw,420px);background:linear-gradient(180deg,var(--panel),#0a0f1c);border:1px solid var(--line);border-radius:14px;padding:16px;box-shadow:0 0 18px rgba(0,229,255,.25)}
+.box h3{margin:0 0 8px;color:var(--warn);font-family:Orbitron;text-align:center}
+.box label{display:block;color:var(--muted);font-size:13px;margin:10px 0 6px}
+.box input{width:100%;background:#0b1220;color:var(--text);border:none;border-radius:10px;padding:12px;font-size:15px}
+.row{display:flex;gap:10px;margin-top:12px}
+.btn{border:none;border-radius:10px;padding:12px 14px;font-weight:800;cursor:pointer;transition:.25s;font-size:14px}
+.ok{background:linear-gradient(90deg,var(--warn),#ffb757);color:#111}
+.cancel{background:#112036;color:#c9d6ec;border:1px solid #1f2f49}
+
+/* PIX Drawer */
+.pix-drawer{display:none;position:fixed;left:0;right:0;bottom:0;z-index:9000;background:#0b1325;border-top:1px solid #1e2a3f;padding:12px 14px}
+.pix-drawer .row{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.pix-key{background:#16243a;color:#eaf2ff;padding:10px 12px;border-radius:8px;font-weight:700;word-break:break-all;border:1px solid #20344f}
+.copy{border:none;border-radius:8px;padding:10px 12px;background:linear-gradient(90deg,var(--accent),#5cc7ff);color:#0b1220;font-weight:800;cursor:pointer}
+.close-drawer{border:none;background:#112036;color:#d7e4ff;border:1px solid #1f2f49;border-radius:8px;padding:10px 12px}
+.total-line{color:#ffd089;font-weight:800}
 </style>
 </head>
 <body>
-
 <header>
-  <h1>🎯 Jogo do Bicho</h1>
-  <p class="sub">Tabela completa — 25 animais e suas numerações</p>
+  <h1>🐘 Jogo do Bicho</h1>
+  <p class="sub">Selecione seus bichos favoritos — R$ 6,00 cada</p>
 </header>
 
 <div class="grid" id="grid"></div>
 
-<footer>© 2025 Painel do Jogo do Bicho • Desenvolvido por DV</footer>
+<!-- Overlay -->
+<div id="overlay" class="overlay">
+  <div class="loader"></div>
+  <p>Processando...</p>
+</div>
+
+<!-- Popup -->
+<div id="popup" class="popup">
+  <div class="box">
+    <h3>Confirmar Seleção</h3>
+    <p>Revise e preencha seus dados.</p>
+    <div class="badge" style="display:block;text-align:center;margin-bottom:8px">
+      Bichos: <b id="numsPreview"></b> • Total: <b id="totalPreview"></b>
+    </div>
+    <label>Nome completo</label>
+    <input id="nome" type="text" placeholder="Seu nome" required>
+    <label>E-mail</label>
+    <input id="email" type="email" placeholder="seu@email.com" required>
+    <label>Telefone / WhatsApp</label>
+    <input id="tel" type="tel" placeholder="(00) 00000-0000" maxlength="16" required>
+    <div class="row">
+      <button id="confirm" class="btn ok">Enviar</button>
+      <button id="cancel" class="btn cancel">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Drawer PIX -->
+<div id="pixDrawer" class="pix-drawer">
+  <div class="row">
+    <div class="total-line">Valor total: <span id="pixTotal"></span></div>
+    <div class="pix-key" id="pixKeyBox"></div>
+  </div>
+  <div class="row" style="margin-top:8px">
+    <button class="copy" id="copyPix">Copiar chave PIX</button>
+    <button class="close-drawer" id="closeDrawer">Fechar</button>
+  </div>
+</div>
 
 <script>
+const SCRIPT_URL = "COLE_AQUI_A_URL_DO_SEU_GAS"; 
+const PRECO = 6;
+const PIX_KEY = "711e433b-bb4e-477e-adb7-518eacf2f67e";
+
 const bichos = [
-  {nome:"Avestruz", numeros:"01 • 02 • 03 • 04", img:"https://i.imgur.com/4UfbKQP.png"},
-  {nome:"Águia", numeros:"05 • 06 • 07 • 08", img:"https://i.imgur.com/Q12H25S.png"},
-  {nome:"Burro", numeros:"09 • 10 • 11 • 12", img:"https://i.imgur.com/lNsDxWr.png"},
-  {nome:"Borboleta", numeros:"13 • 14 • 15 • 16", img:"https://i.imgur.com/6g3bE1S.png"},
-  {nome:"Cachorro", numeros:"17 • 18 • 19 • 20", img:"https://i.imgur.com/pttBf7Z.png"},
-  {nome:"Cabra", numeros:"21 • 22 • 23 • 24", img:"https://i.imgur.com/7QlRcf7.png"},
-  {nome:"Carneiro", numeros:"25 • 26 • 27 • 28", img:"https://i.imgur.com/dm1ckEi.png"},
-  {nome:"Camelo", numeros:"29 • 30 • 31 • 32", img:"https://i.imgur.com/MzjNP7W.png"},
-  {nome:"Cobra", numeros:"33 • 34 • 35 • 36", img:"https://i.imgur.com/Nx1OiAM.png"},
-  {nome:"Coelho", numeros:"37 • 38 • 39 • 40", img:"https://i.imgur.com/jyPLawK.png"},
-  {nome:"Cavalo", numeros:"41 • 42 • 43 • 44", img:"https://i.imgur.com/fm6oA5C.png"},
-  {nome:"Elefante", numeros:"45 • 46 • 47 • 48", img:"https://i.imgur.com/GwS1nLD.png"},
-  {nome:"Galo", numeros:"49 • 50 • 51 • 52", img:"https://i.imgur.com/rX1Kyeb.png"},
-  {nome:"Gato", numeros:"53 • 54 • 55 • 56", img:"https://i.imgur.com/l4uQ8Ld.png"},
-  {nome:"Jacaré", numeros:"57 • 58 • 59 • 60", img:"https://i.imgur.com/BuE2ZFl.png"},
-  {nome:"Leão", numeros:"61 • 62 • 63 • 64", img:"https://i.imgur.com/dL22sKm.png"},
-  {nome:"Macaco", numeros:"65 • 66 • 67 • 68", img:"https://i.imgur.com/LH4CAXD.png"},
-  {nome:"Porco", numeros:"69 • 70 • 71 • 72", img:"https://i.imgur.com/l8aXkzl.png"},
-  {nome:"Pavão", numeros:"73 • 74 • 75 • 76", img:"https://i.imgur.com/aYYIcsR.png"},
-  {nome:"Peru", numeros:"77 • 78 • 79 • 80", img:"https://i.imgur.com/f9v7vTV.png"},
-  {nome:"Touro", numeros:"81 • 82 • 83 • 84", img:"https://i.imgur.com/d0AM7Lr.png"},
-  {nome:"Tigre", numeros:"85 • 86 • 87 • 88", img:"https://i.imgur.com/JleKmuR.png"},
-  {nome:"Urso", numeros:"89 • 90 • 91 • 92", img:"https://i.imgur.com/Jts7lL7.png"},
-  {nome:"Veado", numeros:"93 • 94 • 95 • 96", img:"https://i.imgur.com/1LqJixU.png"},
-  {nome:"Vaca", numeros:"97 • 98 • 99 • 00", img:"https://i.imgur.com/bIMqKu5.png"},
+  "Avestruz","Águia","Burro","Borboleta","Cachorro",
+  "Cabra","Carneiro","Camelo","Cobra","Coelho",
+  "Cavalo","Elefante","Galo","Gato","Jacaré",
+  "Leão","Macaco","Porco","Pavão","Peru",
+  "Touro","Tigre","Urso","Veado","Vaca"
 ];
 
-const grid = document.getElementById("grid");
-bichos.forEach(b=>{
-  const c=document.createElement("div");
-  c.className="card";
-  c.innerHTML=`<img src="${b.img}" alt="${b.nome}">
-               <div class="name">${b.nome}</div>
-               <div class="nums">${b.numeros}</div>`;
-  grid.appendChild(c);
+const grid=document.getElementById("grid"),overlay=document.getElementById("overlay"),popup=document.getElementById("popup");
+const nomeEl=document.getElementById("nome"),emailEl=document.getElementById("email"),telEl=document.getElementById("tel");
+const numsPreview=document.getElementById("numsPreview"),totalPreview=document.getElementById("totalPreview");
+const pixDrawer=document.getElementById("pixDrawer"),pixTotalEl=document.getElementById("pixTotal"),pixKeyBox=document.getElementById("pixKeyBox");
+const copyPix=document.getElementById("copyPix"),closeDrawer=document.getElementById("closeDrawer");
+
+let vendidos=new Set(),selecionados=new Set();
+
+function showOverlay(s){overlay.style.display=s?'flex':'none'}
+function openPopup(){popup.style.display='flex'}
+function closePopup(){popup.style.display='none'}
+function openDrawer(total){pixTotalEl.textContent=`R$ ${total.toFixed(2)}`;pixKeyBox.textContent=PIX_KEY;pixDrawer.style.display="block"}
+function closePixDrawer(){pixDrawer.style.display="none"}
+
+function renderGrid(){
+  grid.innerHTML='';
+  bichos.forEach(b=>{
+    const c=document.createElement('div');
+    c.className='card';
+    c.innerHTML=`<img src="https://i.imgur.com/4UfbKQP.png" alt="${b}">
+                 <div class='name'>${b}</div>
+                 <div class='nums'>Clique para selecionar</div>`;
+    if(vendidos.has(b)){c.style.opacity=.5;c.style.pointerEvents='none';c.querySelector('.nums').textContent='Indisponível'}
+    c.addEventListener('click',()=>{if(selecionados.has(b))selecionados.delete(b);else selecionados.add(b);c.classList.toggle('selected');});
+    grid.appendChild(c);
+  });
+}
+
+async function loadVendidos(){
+  try{
+    const r=await fetch(`${SCRIPT_URL}?action=vendidos`);
+    const j=await r.json();
+    vendidos=new Set(j);
+  }catch(e){vendidos=new Set([]);}
+}
+
+async function init(){
+  await loadVendidos();
+  renderGrid();
+}
+init();
+
+document.getElementById('cancel').addEventListener('click',closePopup);
+document.getElementById('confirm').addEventListener('click',async()=>{
+  const nome=nomeEl.value.trim(),email=emailEl.value.trim(),tel=telEl.value.trim();
+  const arr=Array.from(selecionados);
+  if(!nome||!email||!tel||arr.length===0){alert('Preencha os dados e selecione ao menos 1 bicho.');return;}
+  showOverlay(true);
+  try{
+    const payload={nome,email,telefone:tel,bichos:arr,total:arr.length*PRECO,pix:PIX_KEY};
+    const res=await fetch(SCRIPT_URL,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(payload)});
+    const text=await res.text();
+    showOverlay(false);
+    if(/OK/i.test(text)){closePopup();openDrawer(arr.length*PRECO);selecionados.clear();await loadVendidos();renderGrid();}
+    else alert("Erro ao enviar.");
+  }catch(e){showOverlay(false);alert("Falha de conexão.");}
 });
+copyPix.addEventListener('click',async()=>{await navigator.clipboard.writeText(PIX_KEY);copyPix.textContent="Copiado!";setTimeout(()=>copyPix.textContent="Copiar chave PIX",1500);});
+closeDrawer.addEventListener('click',closePixDrawer);
 </script>
 </body>
 </html>
