@@ -19,25 +19,55 @@ body{
   min-height:100vh;
   overflow-x:hidden;
 }
+
+/* ===== Cabeçalho ===== */
 header{text-align:center;padding:22px 10px 12px}
 h1{font-family:Orbitron;color:var(--warn);text-shadow:0 0 10px rgba(245,158,11,.6);font-size:28px;margin-bottom:4px}
 .sub{color:var(--muted);font-size:15px}
 
-/* Painel superior */
+/* ===== Painel Superior ===== */
 .panel{
-  max-width:950px;margin:14px auto;background:linear-gradient(180deg,var(--panel),#0a0f1f);
-  border:1px solid var(--line);border-radius:16px;padding:12px 14px;
-  display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;
-  box-shadow:0 0 22px rgba(0,229,255,.07)
+  max-width:950px;
+  margin:14px auto;
+  background:linear-gradient(180deg,var(--panel),#0a0f1f);
+  border:1px solid var(--line);
+  border-radius:16px;
+  padding:14px;
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  align-items:center;
+  justify-content:space-between;
+  box-shadow:0 0 22px rgba(0,229,255,.07);
 }
-.badge{font-size:12px;background:#0b1223;border:1px solid var(--line);padding:6px 10px;border-radius:10px;color:#a7b3c8}
+.panel .badges{
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+  align-items:center;
+  justify-content:flex-start;
+  flex:1;
+  min-width:250px;
+}
+.badge{
+  font-size:12px;
+  background:#0b1223;
+  border:1px solid var(--line);
+  padding:6px 10px;
+  border-radius:10px;
+  color:#a7b3c8;
+  white-space:nowrap;
+}
 .price{color:var(--warn);font-weight:800}
-.actions{display:flex;gap:10px;flex-wrap:wrap}
-.btn{border:none;border-radius:10px;padding:12px 14px;font-weight:800;cursor:pointer;transition:.25s;font-size:14px}
+.actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end;flex:1}
+.btn{
+  border:none;border-radius:10px;padding:12px 14px;
+  font-weight:800;cursor:pointer;transition:.25s;font-size:14px;
+}
 .btn-primary{background:linear-gradient(90deg,var(--accent2),var(--accent));color:#06121a;box-shadow:0 0 12px rgba(0,229,255,.35)}
 .btn-clear{background:#102038;color:#dbe7ff;border:1px solid var(--line)}
 
-/* Grid */
+/* ===== Grid ===== */
 .grid{
   display:grid;
   grid-template-columns:repeat(auto-fill,minmax(150px,1fr));
@@ -47,44 +77,40 @@ h1{font-family:Orbitron;color:var(--warn);text-shadow:0 0 10px rgba(245,158,11,.
   padding:0 14px;
 }
 .card{
-  background:linear-gradient(180deg,#0c152b,#0a1020);
+  position:relative;
   border:1px solid #13213a;
   border-radius:14px;
-  text-align:center;
   overflow:hidden;
-  padding:8px;
   cursor:pointer;
-  position:relative;
   transition:.25s;
+  background:#000;
+  height:170px;
 }
 .card:hover{transform:translateY(-3px);box-shadow:0 8px 18px rgba(0,229,255,.18),inset 0 0 0 2px rgba(0,229,255,.18)}
 .card.selected{outline:2px solid var(--accent);box-shadow:0 0 0 4px rgba(0,229,255,.22) inset,0 0 16px rgba(0,229,255,.24)}
 .card.sold{opacity:.6;cursor:not-allowed}
-.name{font-weight:700;font-size:15px;color:var(--accent);text-shadow:0 0 6px rgba(0,229,255,.3);margin-top:4px}
-.nums{
-  position:absolute;
-  right:6px;top:6px;
-  text-align:right;
-  font-size:12px;
-  line-height:1.2em;
-  color:var(--warn);
-  font-weight:600;
-}
 .card img{
-  width:100%;
-  height:110px;
-  object-fit:contain;
-  object-position:top center;
-  margin-top:0;
-  filter:drop-shadow(0 0 6px rgba(0,229,255,.25));
+  position:absolute;inset:0;width:100%;height:100%;
+  object-fit:cover;object-position:center top;
+  filter:brightness(0.85);
+}
+.nums{
+  position:absolute;right:6px;top:6px;
+  text-align:right;font-size:12px;line-height:1.2em;
+  color:var(--warn);font-weight:600;text-shadow:0 0 6px rgba(0,0,0,.7);
+}
+.name{
+  position:absolute;bottom:6px;left:0;right:0;
+  font-weight:700;font-size:15px;color:var(--accent);
+  text-shadow:0 0 8px rgba(0,0,0,.9);
 }
 
-/* Overlay */
+/* ===== Overlay ===== */
 .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9999;align-items:center;justify-content:center;flex-direction:column}
 .loader{width:64px;height:64px;border-radius:50%;border:4px solid #23304a;border-top-color:var(--warn);animation:spin 1s linear infinite;margin-bottom:12px}
 @keyframes spin{to{transform:rotate(360deg)}}.overlay p{color:#bed0ee}
 
-/* Popup */
+/* ===== Popup ===== */
 .popup{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:10000;align-items:center;justify-content:center}
 .box{width:min(92vw,420px);background:linear-gradient(180deg,var(--panel),#0a0f1c);border:1px solid var(--line);border-radius:14px;padding:16px;box-shadow:0 0 18px rgba(0,229,255,.25)}
 .box h3{margin:0 0 8px;color:var(--warn);font-family:Orbitron;text-align:center}
@@ -94,7 +120,7 @@ h1{font-family:Orbitron;color:var(--warn);text-shadow:0 0 10px rgba(245,158,11,.
 .ok{background:linear-gradient(90deg,var(--warn),#ffb757);color:#111}
 .cancel{background:#112036;color:#c9d6ec;border:1px solid #1f2f49}
 
-/* Drawer PIX */
+/* ===== Drawer PIX ===== */
 .pix-drawer{display:none;position:fixed;left:0;right:0;bottom:0;z-index:9000;background:#0b1325;border-top:1px solid #1e2a3f;padding:12px 14px}
 .pix-drawer .row{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}
 .pix-key{background:#16243a;color:#eaf2ff;padding:10px 12px;border-radius:8px;font-weight:700;word-break:break-all;border:1px solid #20344f}
@@ -102,14 +128,14 @@ h1{font-family:Orbitron;color:var(--warn);text-shadow:0 0 10px rgba(245,158,11,.
 .close-drawer{border:none;background:#112036;color:#d7e4ff;border:1px solid #1f2f49;border-radius:8px;padding:10px 12px}
 .total-line{color:#ffd089;font-weight:800;text-align:center;width:100%}
 
-/* mobile tweaks */
-@media(max-width:600px){
-  .grid{grid-template-columns:repeat(2,1fr);gap:10px}
-  .card img{height:80px}
-  h1{font-size:22px}
-  .panel{flex-direction:column;align-items:flex-start}
+/* ===== Mobile ajustes ===== */
+@media(max-width:700px){
+  h1{font-size:24px}
+  .panel{flex-direction:column;align-items:flex-start;gap:10px}
+  .panel .actions{width:100%;justify-content:space-between}
   .btn{flex:1}
-  .nums{font-size:11px;right:4px}
+  .grid{grid-template-columns:repeat(2,1fr);gap:10px}
+  .card{height:150px}
 }
 </style>
 </head>
@@ -121,7 +147,7 @@ h1{font-family:Orbitron;color:var(--warn);text-shadow:0 0 10px rgba(245,158,11,.
 </header>
 
 <div class="panel">
-  <div>
+  <div class="badges">
     <span class="badge">Disponíveis: <b id="disp">—</b></span>
     <span class="badge">Selecionados: <b id="selCount">0</b></span>
     <span class="badge">Preço: <b class="price">R$ 6,00</b></span>
@@ -228,8 +254,8 @@ function renderGrid(){
   bichos.forEach(([nome,n1,n2,n3,n4,img])=>{
     const c=document.createElement('div');
     c.className='card';
-    c.innerHTML=`<div class="nums">${n1}<br>${n2}<br>${n3}<br>${n4}</div>
-                 <img src="${img}" alt="${nome}">
+    c.innerHTML=`<img src="${img}" alt="${nome}">
+                 <div class="nums">${n1}<br>${n2}<br>${n3}<br>${n4}</div>
                  <div class="name">${nome}</div>`;
     if(vendidos.has(nome)){c.classList.add('sold')}
     else{
