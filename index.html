@@ -71,44 +71,56 @@ header{
 }
 .banner-container img.active{opacity:1}
 
-/* CATEGORIAS */
-.categorias{
-  display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(130px,1fr));
-  gap:18px;
-  padding:20px;
-  margin:10px auto 25px;
-  max-width:950px;
+/* CATEGORIAS ROLÁVEIS */
+.categorias-scroll{
+  display:flex;
+  gap:12px;
+  overflow-x:auto;
+  padding:15px 20px;
+  scroll-behavior:smooth;
 }
-.cat-card{
-  background:linear-gradient(180deg,#141424,#0b0b14);
+.categorias-scroll::-webkit-scrollbar{
+  height:6px;
+}
+.categorias-scroll::-webkit-scrollbar-thumb{
+  background:linear-gradient(90deg,var(--accent),var(--accent2));
+  border-radius:4px;
+}
+.cat-mini{
+  flex:0 0 auto;
+  width:110px;
+  height:100px;
+  background:linear-gradient(180deg,#1a1a2a,#0b0b14);
   border-radius:14px;
   text-align:center;
-  padding:18px 10px;
   cursor:pointer;
   transition:transform .3s, box-shadow .3s;
-  box-shadow:0 0 10px rgba(0,229,255,.15);
-  border:1px solid rgba(255,255,255,0.08);
+  box-shadow:0 0 8px rgba(0,229,255,.25);
+  border:1px solid rgba(255,255,255,0.1);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
 }
-.cat-card:hover{
-  transform:translateY(-4px) scale(1.03);
-  box-shadow:0 0 25px rgba(0,229,255,.6);
+.cat-mini:hover{
+  transform:scale(1.08);
+  box-shadow:0 0 18px var(--accent);
 }
-.cat-card img{
-  width:60px;
-  height:60px;
+.cat-mini img{
+  width:40px;
+  height:40px;
   object-fit:contain;
-  margin-bottom:10px;
-  filter:drop-shadow(0 0 6px rgba(0,229,255,.5));
+  margin-bottom:6px;
+  filter:drop-shadow(0 0 5px rgba(0,229,255,.6));
 }
-.cat-card h4{
-  font-size:14px;
-  color:#f5f5f5;
+.cat-mini h4{
+  font-size:13px;
   font-weight:600;
+  color:#fff;
   text-shadow:0 0 5px rgba(0,229,255,.4);
 }
 
-/* CATEGORIA BLOCOS */
+/* BLOCO DE CATEGORIA DE JOGOS */
 .categoria-bloco{
   max-width:1000px;
   margin:40px auto;
@@ -197,20 +209,11 @@ footer{
 
 /* RESPONSIVO */
 @media(max-width:768px){
-  header{font-size:20px;padding:15px;}
   .banner-container{height:150px;}
-  .categorias{grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:14px;}
-  .cat-card img{width:50px;height:50px;}
-  .games{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:16px;}
+  .cat-mini{width:90px;height:85px;}
+  .games{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));}
   .card{height:290px;}
   .card img{height:200px;}
-}
-@media(max-width:480px){
-  .categorias{grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:12px;}
-  .cat-card h4{font-size:12px;}
-  .games{grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:14px;}
-  .card{height:260px;}
-  .card img{height:180px;}
 }
 </style>
 </head>
@@ -226,33 +229,27 @@ footer{
   <img src="https://github.com/ClenaStore/barreirense/blob/main/paste/9.png?raw=true" alt="Banner 4">
 </div>
 
-<!-- CATEGORIAS -->
-<section class="categorias">
-  <div class="cat-card" onclick="location.href='index.html'">
-    <img src="https://cdn-icons-png.flaticon.com/512/992/992700.png" alt="Todos">
-    <h4>Todos</h4>
+<!-- CATEGORIAS COM ROLAGEM HORIZONTAL -->
+<div class="categorias-scroll">
+  <div class="cat-mini" onclick="location.href='index.html'">
+    <img src="https://cdn-icons-png.flaticon.com/512/992/992700.png" alt="Todos"><h4>Todos</h4>
   </div>
-  <div class="cat-card" onclick="location.href='index.acao.html'">
-    <img src="https://cdn-icons-png.flaticon.com/512/808/808484.png" alt="Ação">
-    <h4>Ação</h4>
+  <div class="cat-mini" onclick="location.href='index.acao.html'">
+    <img src="https://cdn-icons-png.flaticon.com/512/808/808484.png" alt="Ação"><h4>Ação</h4>
   </div>
-  <div class="cat-card" onclick="location.href='index.aventura.html'">
-    <img src="https://cdn-icons-png.flaticon.com/512/159/159478.png" alt="Aventura">
-    <h4>Aventura</h4>
+  <div class="cat-mini" onclick="location.href='index.aventura.html'">
+    <img src="https://cdn-icons-png.flaticon.com/512/159/159478.png" alt="Aventura"><h4>Aventura</h4>
   </div>
-  <div class="cat-card" onclick="location.href='index.cassino.html'">
-    <img src="https://cdn-icons-png.flaticon.com/512/942/942748.png" alt="Cassino">
-    <h4>Cassino</h4>
+  <div class="cat-mini" onclick="location.href='index.cassino.html'">
+    <img src="https://cdn-icons-png.flaticon.com/512/942/942748.png" alt="Cassino"><h4>Cassino</h4>
   </div>
-  <div class="cat-card" onclick="location.href='index.quiz.html'">
-    <img src="https://cdn-icons-png.flaticon.com/512/905/905568.png" alt="Quiz">
-    <h4>Quiz</h4>
+  <div class="cat-mini" onclick="location.href='index.quiz.html'">
+    <img src="https://cdn-icons-png.flaticon.com/512/905/905568.png" alt="Quiz"><h4>Quiz</h4>
   </div>
-  <div class="cat-card" onclick="location.href='index.sorte.html'">
-    <img src="https://cdn-icons-png.flaticon.com/512/3468/3468314.png" alt="Sorte">
-    <h4>Sorte</h4>
+  <div class="cat-mini" onclick="location.href='index.sorte.html'">
+    <img src="https://cdn-icons-png.flaticon.com/512/3468/3468314.png" alt="Sorte"><h4>Sorte</h4>
   </div>
-</section>
+</div>
 
 <!-- 🎯 Categoria: Mistério -->
 <div class="categoria-bloco">
@@ -275,7 +272,6 @@ footer{
       <img src="https://github.com/ClenaStore/barreirense/blob/main/paste/Design%20sem%20nome%20(26).png?raw=true" alt="Jogo 2">
       <h3>Rifa</h3>
     </div>
-
     <div class="card" onclick="openGame('index.jogodobicho.html', this)">
       <span class="flag">🎮 JOGUE AGORA</span>
       <img src="https://github.com/ClenaStore/barreirense/blob/main/paste/JOGO%20DO%20BICHO.png?raw=true" alt="Jogo 3">
@@ -296,7 +292,7 @@ setInterval(()=>{
   banners[index].classList.add('active');
 },4000);
 
-// Animação de clique nos cards
+// Animação de clique
 function openGame(url,card){
   card.style.transform='scale(0.97)';
   setTimeout(()=>{window.location.href=url;},250);
