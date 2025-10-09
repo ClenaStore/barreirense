@@ -40,17 +40,15 @@ header{
   backdrop-filter:blur(6px);
 }
 
-/* ===== BANNERS (GIFs e imagens) ===== */
+/* BANNERS */
 .banner-container{
   position:relative;
   width:100%;
-  height:200px;
+  height:180px;
   overflow:hidden;
   border-bottom:1px solid rgba(255,255,255,0.1);
-  background:#000;
 }
-.banner-container img,
-.banner-container video{
+.banner-container img{
   width:100%;
   height:100%;
   object-fit:cover;
@@ -58,9 +56,9 @@ header{
   top:0;left:0;
   opacity:0;
   transition:opacity 1.2s ease;
-  filter:brightness(.9);
+  filter:brightness(.85);
 }
-.banner-container .active{opacity:1}
+.banner-container img.active{opacity:1}
 
 /* GAMES GRID */
 .games{
@@ -87,14 +85,15 @@ header{
   box-shadow:0 0 25px var(--accent);
 }
 
-/* CAPA DO JOGO */
+/* CAPA DO JOGO - sempre colada no topo */
 .card img{
   width:100%;
   height:220px;
   object-fit:cover;
-  object-position:top;
+  object-position:top; /* <<< Mantém o topo visível */
   display:block;
   border-bottom:1px solid rgba(255,255,255,0.05);
+  margin:0; /* <<< Colada no topo */
 }
 
 /* TÍTULO */
@@ -141,7 +140,7 @@ footer{
 /* RESPONSIVIDADE */
 @media(max-width:768px){
   header{font-size:20px;padding:15px;}
-  .banner-container{height:160px;}
+  .banner-container{height:150px;}
   .games{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:16px;}
   .card{height:290px;}
   .card img{height:200px;}
@@ -159,13 +158,11 @@ footer{
 
 <header>🎮 Jogos do Momento</header>
 
-<!-- ===== BANNERS (aceita PNG, JPG e GIF) ===== -->
 <div class="banner-container">
-  <img src="https://github.com/ClenaStore/barreirense/blob/main/paste/banner1.gif?raw=true" class="active" alt="Banner 1">
-  <img src="https://github.com/ClenaStore/barreirense/blob/main/paste/11.png?raw=true" alt="Banner 2">
-  <img src="https://github.com/ClenaStore/barreirense/blob/main/paste/12.gif?raw=true" alt="Banner 3">
-  <img src="https://github.com/ClenaStore/barreirense/blob/main/paste/10.png?raw=true" alt="Banner 4">
-  <img src="https://github.com/ClenaStore/barreirense/blob/main/paste/9.gif?raw=true" alt="Banner 5">
+  <img src="https://github.com/ClenaStore/barreirense/blob/main/paste/11.png?raw=true" class="active" alt="Banner 1">
+  <img src="https://github.com/ClenaStore/barreirense/blob/main/paste/12.png?raw=true" alt="Banner 2">
+  <img src="https://github.com/ClenaStore/barreirense/blob/main/paste/10.png?raw=true" alt="Banner 3">
+    <img src="https://github.com/ClenaStore/barreirense/blob/main/paste/9.png?raw=true" alt="Banner 4">
 </div>
 
 <section class="games">
@@ -180,19 +177,19 @@ footer{
     <img src="https://github.com/ClenaStore/barreirense/blob/main/paste/Design%20sem%20nome%20(26).png?raw=true" alt="Jogo 2">
     <h3>Rifa</h3>
   </div>
-
-  <div class="card" onclick="openGame('index.jogodobicho.html', this)">
+    <div class="card" onclick="openGame('index.jogodobicho.html', this)">
     <span class="flag">🎮 JOGUE AGORA</span>
     <img src="https://github.com/ClenaStore/barreirense/blob/main/paste/JOGO%20DO%20BICHO.png?raw=true" alt="Jogo 3">
     <h3>Jogo do Bicho</h3>
   </div>
+
 </section>
 
 <footer>© 2025 Games Hub</footer>
 
 <script>
-// ===== Banner rotativo com suporte a GIF =====
-const banners = document.querySelectorAll('.banner-container img');
+// Banner rotativo  
+let banners = document.querySelectorAll('.banner-container img');
 let index = 0;
 setInterval(()=>{
   banners[index].classList.remove('active');
@@ -200,7 +197,7 @@ setInterval(()=>{
   banners[index].classList.add('active');
 },4000);
 
-// ===== Efeito clique no card =====
+// Animação de clique
 function openGame(url, card){
   card.style.transform='scale(0.97)';
   setTimeout(()=>{window.location.href=url;},250);
