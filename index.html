@@ -87,7 +87,7 @@ header{
 .cat-mini{
   flex:0 0 auto;
   width:100px;
-  height:70px; /* 🔹 mais estreito na altura */
+  height:70px;
   background:linear-gradient(180deg,#1a1a2a,#0b0b14);
   border-radius:12px;
   text-align:center;
@@ -184,10 +184,18 @@ header{
   50%{filter:brightness(1.5);}
 }
 
+/* CONTEÚDO RESULTADOS */
+#resultados-section{
+  max-width:1000px;
+  margin:0 auto 80px;
+  padding:0 20px;
+  display:none;
+}
+
 /* RESPONSIVO */
 @media(max-width:768px){
   .banner-container{height:150px;}
-  .games{grid-template-columns:repeat(2,1fr);gap:14px;} /* 🔹 2 cards por linha */
+  .games{grid-template-columns:repeat(2,1fr);gap:14px;}
   .card{height:280px;}
   .card img{height:180px;}
 }
@@ -195,7 +203,7 @@ header{
   .cat-mini{width:85px;height:65px;}
   .cat-mini img{width:26px;height:26px;}
   .cat-mini h4{font-size:11px;}
-  .games{grid-template-columns:repeat(2,1fr);gap:12px;} /* 🔹 mantém 2 por linha */
+  .games{grid-template-columns:repeat(2,1fr);gap:12px;}
 }
 footer{
   text-align:center;
@@ -220,12 +228,12 @@ footer{
   <img src="https://github.com/ClenaStore/barreirense/blob/main/paste/9.png?raw=true" alt="Banner 4">
 </div>
 
-<!-- CATEGORIAS COM ROLAGEM HORIZONTAL -->
+<!-- CATEGORIAS -->
 <div class="categorias-scroll" id="categorias">
   <div class="cat-mini active" data-cat="todos"><img src="https://cdn-icons-png.flaticon.com/512/992/992700.png"><h4>Todos</h4></div>
   <div class="cat-mini" data-cat="mistério"><img src="https://cdn-icons-png.flaticon.com/512/808/808484.png"><h4>Mistério</h4></div>
   <div class="cat-mini" data-cat="sorte"><img src="https://cdn-icons-png.flaticon.com/512/3468/3468314.png"><h4>Sorte</h4></div>
-  <div class="cat-mini" data-cat="resultados"><img src="https://github.com/ClenaStore/barreirense/blob/main/paste/Captura%20de%20tela%202025-10-09%20205204.png?raw=true"><h4>Resultados</h4></div>
+  <div class="cat-mini" data-cat="resultados" id="btnResultados"><img src="https://github.com/ClenaStore/barreirense/blob/main/paste/Captura%20de%20tela%202025-10-09%20205204.png?raw=true"><h4>Resultados</h4></div>
 </div>
 
 <!-- JOGOS -->
@@ -247,13 +255,15 @@ footer{
     <img src="https://github.com/ClenaStore/barreirense/blob/main/paste/JOGO%20DO%20BICHO.png?raw=true" alt="Jogo 3">
     <h3>Jogo do Bicho</h3>
   </div>
-
 </section>
+
+<!-- SEÇÃO RESULTADOS (carregada dinamicamente) -->
+<section id="resultados-section"></section>
 
 <footer>© 2025 Games Hub</footer>
 
 <script>
-// Banner rotativo
+// ===== Banner rotativo =====
 let banners=document.querySelectorAll('.banner-container img');
 let index=0;
 setInterval(()=>{
@@ -262,26 +272,49 @@ setInterval(()=>{
   banners[index].classList.add('active');
 },4000);
 
-// Clique com animação
+// ===== Clique animação dos jogos =====
 function openGame(url,card){
   card.style.transform='scale(0.97)';
   setTimeout(()=>{window.location.href=url;},250);
 }
 
-// FILTRO DE CATEGORIAS
+// ===== Filtro de categorias =====
 const categorias=document.querySelectorAll('.cat-mini');
 const jogos=document.querySelectorAll('.games .card');
+const resultadosSection=document.getElementById('resultados-section');
 
 categorias.forEach(cat=>{
   cat.addEventListener('click',()=>{
     categorias.forEach(c=>c.classList.remove('active'));
     cat.classList.add('active');
     const filtro=cat.dataset.cat;
+
+    if(filtro==='resultados'){
+      jogos.forEach(j=>j.style.display='none');
+      carregarResultados();
+      return;
+    }
+
+    resultadosSection.style.display='none';
     jogos.forEach(j=>{
       j.style.display=(filtro==='todos'||j.dataset.cat===filtro)?'flex':'none';
     });
   });
 });
+
+// ===== Carrega o index.resultados.html =====
+async function carregarResultados(){
+  try{
+    const res = await fetch('index.resultados.html');
+    const html = await res.text();
+    resultadosSection.innerHTML = html;
+    resultadosSection.style.display='block';
+    resultadosSection.scrollIntoView({behavior:'smooth'});
+  }catch(e){
+    resultadosSection.innerHTML = "<p style='text-align:center;color:#f87171;margin:20px;'>Erro ao carregar resultados.</p>";
+    resultadosSection.style.display='block';
+  }
+}
 </script>
 
 </body>
