@@ -26,84 +26,26 @@ h1{font-family:Orbitron;color:var(--warn);text-shadow:0 0 10px rgba(245,158,11,.
 .sub{color:var(--muted);font-size:15px}
 
 /* ===== Painel Superior ===== */
-.panel{
-  max-width:950px;
-  margin:14px auto;
-  background:linear-gradient(180deg,var(--panel),#0a0f1f);
-  border:1px solid var(--line);
-  border-radius:16px;
-  padding:14px;
-  display:flex;
-  flex-wrap:wrap;
-  gap:8px;
-  align-items:center;
-  justify-content:space-between;
-  box-shadow:0 0 22px rgba(0,229,255,.07);
-}
-.panel .badges{
-  display:flex;
-  flex-wrap:wrap;
-  gap:6px;
-  align-items:center;
-  justify-content:flex-start;
-  flex:1;
-  min-width:250px;
-}
-.badge{
-  font-size:12px;
-  background:#0b1223;
-  border:1px solid var(--line);
-  padding:6px 10px;
-  border-radius:10px;
-  color:#a7b3c8;
-  white-space:nowrap;
-}
+.panel{max-width:950px;margin:14px auto;background:linear-gradient(180deg,var(--panel),#0a0f1f);
+border:1px solid var(--line);border-radius:16px;padding:14px;display:flex;flex-wrap:wrap;
+gap:8px;align-items:center;justify-content:space-between;box-shadow:0 0 22px rgba(0,229,255,.07)}
+.panel .badges{display:flex;flex-wrap:wrap;gap:6px;align-items:center;flex:1;min-width:250px}
+.badge{font-size:12px;background:#0b1223;border:1px solid var(--line);padding:6px 10px;border-radius:10px;color:#a7b3c8}
 .price{color:var(--warn);font-weight:800}
 .actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end;flex:1}
-.btn{
-  border:none;border-radius:10px;padding:12px 14px;
-  font-weight:800;cursor:pointer;transition:.25s;font-size:14px;
-}
+.btn{border:none;border-radius:10px;padding:12px 14px;font-weight:800;cursor:pointer;transition:.25s;font-size:14px}
 .btn-primary{background:linear-gradient(90deg,var(--accent2),var(--accent));color:#06121a;box-shadow:0 0 12px rgba(0,229,255,.35)}
 .btn-clear{background:#102038;color:#dbe7ff;border:1px solid var(--line)}
 
 /* ===== Grid ===== */
-.grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(150px,1fr));
-  gap:12px;
-  max-width:950px;
-  margin:20px auto 60px;
-  padding:0 14px;
-}
-.card{
-  position:relative;
-  border:1px solid #13213a;
-  border-radius:14px;
-  overflow:hidden;
-  cursor:pointer;
-  transition:.25s;
-  background:#000;
-  height:170px;
-}
-.card:hover{transform:translateY(-3px);box-shadow:0 8px 18px rgba(0,229,255,.18),inset 0 0 0 2px rgba(0,229,255,.18)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;max-width:950px;margin:20px auto 60px;padding:0 14px}
+.card{position:relative;border:1px solid #13213a;border-radius:14px;overflow:hidden;cursor:pointer;transition:.25s;background:#000;height:170px}
+.card:hover{transform:translateY(-3px);box-shadow:0 8px 18px rgba(0,229,255,.18)}
 .card.selected{outline:2px solid var(--accent);box-shadow:0 0 0 4px rgba(0,229,255,.22) inset,0 0 16px rgba(0,229,255,.24)}
 .card.sold{opacity:.6;cursor:not-allowed}
-.card img{
-  position:absolute;inset:0;width:100%;height:100%;
-  object-fit:cover;object-position:center top;
-  filter:brightness(0.85);
-}
-.nums{
-  position:absolute;right:6px;top:6px;
-  text-align:right;font-size:12px;line-height:1.2em;
-  color:var(--warn);font-weight:600;text-shadow:0 0 6px rgba(0,0,0,.7);
-}
-.name{
-  position:absolute;bottom:6px;left:0;right:0;
-  font-weight:700;font-size:15px;color:var(--accent);
-  text-shadow:0 0 8px rgba(0,0,0,.9);
-}
+.card img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:brightness(.85)}
+.nums{position:absolute;right:6px;top:6px;text-align:right;font-size:12px;line-height:1.2em;color:var(--warn);font-weight:600;text-shadow:0 0 6px rgba(0,0,0,.7)}
+.name{position:absolute;bottom:6px;left:0;right:0;font-weight:700;font-size:15px;color:var(--accent);text-shadow:0 0 8px rgba(0,0,0,.9)}
 
 /* ===== Overlay ===== */
 .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9999;align-items:center;justify-content:center;flex-direction:column}
@@ -128,7 +70,7 @@ h1{font-family:Orbitron;color:var(--warn);text-shadow:0 0 10px rgba(245,158,11,.
 .close-drawer{border:none;background:#112036;color:#d7e4ff;border:1px solid #1f2f49;border-radius:8px;padding:10px 12px}
 .total-line{color:#ffd089;font-weight:800;text-align:center;width:100%}
 
-/* ===== Mobile ajustes ===== */
+/* ===== Mobile ===== */
 @media(max-width:700px){
   h1{font-size:24px}
   .panel{flex-direction:column;align-items:flex-start;gap:10px}
@@ -159,7 +101,7 @@ h1{font-family:Orbitron;color:var(--warn);text-shadow:0 0 10px rgba(245,158,11,.
   </div>
 </div>
 
-<div class="grid" id="grid"></div>
+<div id="grid" class="grid"></div>
 
 <!-- Overlay -->
 <div id="overlay" class="overlay">
@@ -201,8 +143,7 @@ h1{font-family:Orbitron;color:var(--warn);text-shadow:0 0 10px rgba(245,158,11,.
 
 <script>
 const SCRIPT_URL="https://script.google.com/macros/s/AKfycbxqUX_W6Jv-yUZ3CcoDBWF5bEO5RgsSOttQUnu3kXX2qqX62Cx59EJgtRJui8R5rQN3kg/exec";
-const PRECO=6;
-const PIX_KEY="711e433b-bb4e-477e-adb7-518eacf2f67e";
+const PRECO=6,PIX_KEY="711e433b-bb4e-477e-adb7-518eacf2f67e";
 
 const bichos=[
 ["Avestruz","01","02","03","04","https://github.com/ClenaStore/barreirense/blob/main/paste/avestruz.png?raw=true"],
@@ -232,46 +173,15 @@ const bichos=[
 ["Vaca","97","98","99","00","https://i.imgur.com/bIMqKu5.png"]
 ];
 
-const grid=document.getElementById("grid");
-const dispEl=document.getElementById("disp"),selCountEl=document.getElementById("selCount"),premioEl=document.getElementById("premio");
-const overlay=document.getElementById("overlay"),popup=document.getElementById("popup");
-const nomeEl=document.getElementById("nome"),emailEl=document.getElementById("email"),telEl=document.getElementById("tel");
-const numsPreview=document.getElementById("numsPreview"),totalPreview=document.getElementById("totalPreview");
-const pixDrawer=document.getElementById("pixDrawer"),pixTotalEl=document.getElementById("pixTotal"),pixKeyBox=document.getElementById("pixKeyBox");
-const copyPix=document.getElementById("copyPix"),closeDrawer=document.getElementById("closeDrawer");
-const btnConfirm=document.getElementById("btnConfirm"),btnClear=document.getElementById("btnClear");
+const grid=document.getElementById("grid"),dispEl=document.getElementById("disp"),
+selCountEl=document.getElementById("selCount"),premioEl=document.getElementById("premio"),
+overlay=document.getElementById("overlay"),popup=document.getElementById("popup"),
+pixDrawer=document.getElementById("pixDrawer"),pixTotalEl=document.getElementById("pixTotal"),
+pixKeyBox=document.getElementById("pixKeyBox"),copyPix=document.getElementById("copyPix"),
+closeDrawer=document.getElementById("closeDrawer"),btnConfirm=document.getElementById("btnConfirm"),
+btnClear=document.getElementById("btnClear");
 
 let vendidos=new Set(),selecionados=new Set(),totalPago=0;
-
-function showOverlay(s){overlay.style.display=s?'flex':'none'}
-function openPopup(){popup.style.display='flex';setTimeout(()=>nomeEl.focus(),50)}
-function closePopup(){popup.style.display='none'}
-function openDrawer(total){pixTotalEl.textContent=`R$ ${total.toFixed(2)}`;pixKeyBox.textContent=PIX_KEY;pixDrawer.style.display="block"}
-function closePixDrawer(){pixDrawer.style.display="none"}
-
-function renderGrid(){
-  grid.innerHTML='';let disponiveis=0;
-  bichos.forEach(([nome,n1,n2,n3,n4,img])=>{
-    const c=document.createElement('div');
-    c.className='card';
-    c.innerHTML=`<img src="${img}" alt="${nome}">
-                 <div class="nums">${n1}<br>${n2}<br>${n3}<br>${n4}</div>
-                 <div class="name">${nome}</div>`;
-    if(vendidos.has(nome)){c.classList.add('sold')}
-    else{
-      disponiveis++;
-      if(selecionados.has(nome))c.classList.add('selected');
-      c.addEventListener('click',()=>{
-        if(selecionados.has(nome))selecionados.delete(nome);
-        else selecionados.add(nome);
-        renderGrid();
-        updatePanel();
-      });
-    }
-    grid.appendChild(c);
-  });
-  dispEl.textContent=disponiveis;
-}
 
 function updatePanel(){
   selCountEl.textContent=selecionados.size;
@@ -280,43 +190,68 @@ function updatePanel(){
   premioEl.textContent=`R$ ${premio}`;
 }
 
+// Renderiza tudo uma vez
+function renderGrid(){
+  grid.innerHTML=bichos.map(([nome,n1,n2,n3,n4,img])=>`
+  <div class="card" data-nome="${nome}">
+    <img loading="lazy" src="${img}" alt="${nome}">
+    <div class="nums">${n1}<br>${n2}<br>${n3}<br>${n4}</div>
+    <div class="name">${nome}</div>
+  </div>`).join('');
+  document.querySelectorAll(".card").forEach(c=>{
+    c.addEventListener("click",()=>{
+      const nome=c.dataset.nome;
+      if(vendidos.has(nome))return;
+      if(selecionados.has(nome)){selecionados.delete(nome);c.classList.remove("selected");}
+      else{selecionados.add(nome);c.classList.add("selected");}
+      updatePanel();
+    });
+  });
+}
+
 async function loadVendidos(){
   try{
-    const r=await fetch(`${SCRIPT_URL}?action=vendidos`);
+    const r=await fetch(`${SCRIPT_URL}?action=vendidos`,{cache:"no-store"});
     const j=await r.json();
     vendidos=new Set(j.vendidos||[]);
     totalPago=j.totalPago||0;
-  }catch(e){vendidos=new Set();totalPago=0;}
+    document.querySelectorAll(".card").forEach(c=>{
+      if(vendidos.has(c.dataset.nome))c.classList.add("sold");
+    });
+    dispEl.textContent=bichos.length-vendidos.size;
+  }catch(e){dispEl.textContent=bichos.length;}
 }
 
-async function init(){await loadVendidos();renderGrid();updatePanel();}
-init();
+renderGrid();
+loadVendidos();
 
-btnClear.addEventListener('click',()=>{selecionados.clear();renderGrid();updatePanel();});
-btnConfirm.addEventListener('click',()=>{
-  const arr=Array.from(selecionados);
-  numsPreview.textContent=arr.join(', ');
-  totalPreview.textContent=`R$ ${(arr.length*PRECO).toFixed(2)}`;
-  openPopup();
-});
-document.getElementById('cancel').addEventListener('click',closePopup);
+btnClear.onclick=()=>{selecionados.clear();document.querySelectorAll(".selected").forEach(c=>c.classList.remove("selected"));updatePanel();};
+btnConfirm.onclick=()=>{
+  const arr=[...selecionados];
+  document.getElementById("numsPreview").textContent=arr.join(", ");
+  document.getElementById("totalPreview").textContent=`R$ ${(arr.length*PRECO).toFixed(2)}`;
+  popup.style.display="flex";
+};
+document.getElementById("cancel").onclick=()=>popup.style.display="none";
 
-document.getElementById('confirm').addEventListener('click',async()=>{
-  const nome=nomeEl.value.trim(),email=emailEl.value.trim(),tel=telEl.value.trim();
-  const arr=Array.from(selecionados);
-  if(!nome||!email||!tel||arr.length===0){alert('Preencha os dados e selecione ao menos 1 bicho.');return;}
-  showOverlay(true);
+document.getElementById("confirm").onclick=async()=>{
+  const nome=document.getElementById("nome").value.trim(),email=document.getElementById("email").value.trim(),tel=document.getElementById("tel").value.trim();
+  const arr=[...selecionados];
+  if(!nome||!email||!tel||arr.length===0){alert("Preencha todos os campos.");return;}
+  overlay.style.display="flex";
   try{
-    const payload={action:"registrar_rifa",nome,email,telefone:tel,bichos:arr,total:arr.length*PRECO,pix:PIX_KEY};
-    const res=await fetch(SCRIPT_URL,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(payload)});
-    const text=await res.text();
-    showOverlay(false);
-    if(/OK/i.test(text)){closePopup();openDrawer(arr.length*PRECO);selecionados.clear();await loadVendidos();renderGrid();updatePanel();}
-    else alert('Erro ao enviar.');
-  }catch(e){showOverlay(false);alert('Falha de conexão.');}
-});
-copyPix.addEventListener('click',async()=>{await navigator.clipboard.writeText(PIX_KEY);copyPix.textContent="Copiado!";setTimeout(()=>copyPix.textContent="Copiar chave PIX",1500);});
-closeDrawer.addEventListener('click',closePixDrawer);
+    const res=await fetch(SCRIPT_URL,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},
+      body:JSON.stringify({action:"registrar_rifa",nome,email,telefone:tel,bichos:arr,total:arr.length*PRECO,pix:PIX_KEY})});
+    const text=await res.text();overlay.style.display="none";
+    if(/OK/i.test(text)){popup.style.display="none";openDrawer(arr.length*PRECO);selecionados.clear();
+      document.querySelectorAll(".selected").forEach(c=>c.classList.remove("selected"));loadVendidos();}
+    else alert("Erro ao enviar.");
+  }catch{overlay.style.display="none";alert("Falha de conexão.");}
+};
+
+function openDrawer(total){pixDrawer.style.display="block";pixTotalEl.textContent=`R$ ${total.toFixed(2)}`;pixKeyBox.textContent=PIX_KEY;}
+copyPix.onclick=async()=>{await navigator.clipboard.writeText(PIX_KEY);copyPix.textContent="Copiado!";setTimeout(()=>copyPix.textContent="Copiar chave PIX",1500);}
+closeDrawer.onclick=()=>pixDrawer.style.display="none";
 </script>
 </body>
 </html>
