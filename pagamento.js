@@ -1,70 +1,98 @@
-// pagamento.js - script comum para todos os jogos
-(function(){
-  const $ = (s, r=document) => r.querySelector(s);
+/* pagamento.js
+   Cliente: envia pedido para /api/create_payment e mostra QR + link.
+   Requisitos: index.jogodobicho.html já inclui <script src="/pagamento.js"></script>
+*/
 
-  function ensureModal(){
-    if ($('#mp-modal')) return;
-    const css = document.createElement('style');
-    css.textContent = `
-      .mp-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;z-index:99999}
-      .mp-box{background:#0f172a;color:#e5f0ff;border:1px solid #243043;border-radius:12px;padding:16px;width:min(92vw,420px);text-align:center;font-family:Inter,system-ui}
-      .mp-qr{width:220px;height:220px;border-radius:8px;display:block;margin:10px auto;background:#081021}
-      .mp-code{background:#0b1528;border:1px dashed #22314b;color:#e5f0ff;padding:8px;border-radius:8px;word-break:break-all;font-size:12px}
-      .mp-btn{flex:1;background:#0b1528;border:1px solid #2a3955;color:#e5f0ff;border-radius:10px;padding:10px;font-weight:700;cursor:pointer}
-      .mp-ok{background:linear-gradient(180deg,#19c37d,#16a34a);border:0;color:#fff}
-    `;
-    document.head.appendChild(css);
-    const wrap = document.createElement('div');
-    wrap.className = 'mp-backdrop';
-    wrap.id = 'mp-modal';
-    wrap.innerHTML = `
-      <div class="mp-box">
-        <h3>Pagamento PIX</h3>
-        <img class="mp-qr" id="mp-qr" alt="QR Code PIX" />
-        <div class="mp-code" id="mp-copia">Carregando...</div>
-        <button class="mp-btn" id="mp-copiar">Copiar código</button>
-        <button class="mp-btn mp-ok" id="mp-fechar">Fechar</button>
-        <div id="mp-status" style="margin-top:8px;font-size:12px;opacity:.8">Aguardando pagamento...</div>
-      </div>`;
-    wrap.addEventListener('click', (e)=>{ if(e.target.id==='mp-modal') wrap.remove(); });
-    document.body.appendChild(wrap);
-    $('#mp-fechar').onclick = ()=> wrap.remove();
-    $('#mp-copiar').onclick = async ()=> {
-      await navigator.clipboard.writeText($('#mp-copia').textContent.trim());
-      $('#mp-status').textContent = "Código copiado!";
-    };
+async function iniciarPagamento(amount, title = "Compra", customerName = "", description = "") {
+  try {
+    // Mostra loading (você pode estilizar um modal próprio — neste exemplo criamos um modal simples)
+    showPagamentoModalLoading();
+
+    const body = { amount: Number(amount), title, description, payer: { name: customerName } };
+    const resp = await fetch('/api/create_payment', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+
+    const data = await resp.json();
+
+    if (!resp.ok) {
+      hidePagamentoModal();
+      alert('Erro ao iniciar pagamento: ' + (data?.error || resp.statusText));
+      return;
+    }
+
+    // data => { init_point, preference, pix_qr, pix_qr_base64, payment }
+    const { init_point, pix_qr, pix_qr_base64 } = data;
+
+    // Exibe modal contendo QR (se tiver base64) e link (init_point)
+    showPagamentoModal({
+      init_point,
+      pix_qr,
+      pix_qr_base64,
+      amount
+    });
+
+  } catch (err) {
+    hidePagamentoModal();
+    console.error(err);
+    alert('Erro de conexão ao iniciar pagamento.');
   }
+}
 
-  async function iniciarPagamento(valor, descricao, idRegistro, aba){
-    ensureModal();
-    const img = $('#mp-qr'), code = $('#mp-copia'), info = $('#mp-status');
-    info.textContent = "Gerando pagamento...";
-    try {
-      const r = await fetch("/api/pagar", {
-        method:"POST",
-        headers:{"Content-Type":"application/json"},
-        body: JSON.stringify({valor, descricao, idRegistro, aba})
-      });
-      const data = await r.json();
-      if (!data?.idPagamento) throw new Error("Falha ao criar pagamento");
-      if (data.qr) img.src = `data:image/png;base64,${data.qr}`;
-      if (data.copiaCola) code.textContent = data.copiaCola;
-      info.textContent = "Aguardando pagamento...";
+/* ------- Simple modal helpers (append DOM elements) ------- */
+function showPagamentoModalLoading() {
+  hidePagamentoModal();
+  const m = document.createElement('div');
+  m.id = '__mp_modal';
+  m.style.position = 'fixed';
+  m.style.inset = '0';
+  m.style.background = 'rgba(0,0,0,.7)';
+  m.style.display = 'flex';
+  m.style.alignItems = 'center';
+  m.style.justifyContent = 'center';
+  m.style.zIndex = 99999;
+  m.innerHTML = `<div style="background:#071226;padding:20px;border-radius:12px;color:#fff;min-width:320px;text-align:center">
+    <div style="font-weight:700;margin-bottom:8px">Gerando pagamento...</div>
+    <div style="opacity:.8">Aguarde</div>
+  </div>`;
+  document.body.appendChild(m);
+}
+function hidePagamentoModal() {
+  const prev = document.getElementById('__mp_modal');
+  if (prev) prev.remove();
+}
+function showPagamentoModal({ init_point, pix_qr, pix_qr_base64, amount }) {
+  hidePagamentoModal();
+  const m = document.createElement('div');
+  m.id = '__mp_modal';
+  m.style.position = 'fixed';
+  m.style.inset = '0';
+  m.style.background = 'rgba(0,0,0,.7)';
+  m.style.display = 'flex';
+  m.style.alignItems = 'center';
+  m.style.justifyContent = 'center';
+  m.style.zIndex = 99999;
 
-      const t0 = Date.now();
-      const timeout = 3*60*1000;
-      while(Date.now() - t0 < timeout){
-        await new Promise(s => setTimeout(s, 5000));
-        const st = await fetch(`/api/status?id=${data.idPagamento}`).then(r=>r.json());
-        if (st?.status === "approved") {
-          info.textContent = "Pagamento aprovado!";
-          setTimeout(()=> $('#mp-modal').remove(), 1500);
-          return;
-        }
-      }
-      info.textContent = "Não houve confirmação ainda. Tente novamente mais tarde.";
-    } catch(e){ info.textContent = "Erro: " + e.message; }
-  }
+  const qrHtml = pix_qr_base64
+    ? `<img src="data:image/png;base64,${pix_qr_base64}" alt="QR PIX" style="max-width:260px;display:block;margin:0 auto 8px;border-radius:8px" />`
+    : (pix_qr ? `<pre style="background:#041226;color:#9fdcff;padding:10px;border-radius:8px;white-space:pre-wrap">${pix_qr}</pre>` : '');
 
-  window.iniciarPagamento = iniciarPagamento;
-})();
+  m.innerHTML = `
+    <div style="background:#071226;padding:18px;border-radius:12px;color:#fff;min-width:320px;max-width:420px;text-align:center">
+      <div style="font-weight:800;font-size:16px;margin-bottom:10px">Pagamento</div>
+      <div style="margin-bottom:8px">Valor: <b>R$ ${Number(amount).toFixed(2)}</b></div>
+      ${qrHtml}
+      <div style="display:flex;gap:8px;margin-top:12px;justify-content:center">
+        ${init_point ? `<a href="${init_point}" target="_blank" style="text-decoration:none">
+           <button style="background:#12b981;border:none;padding:10px 12px;border-radius:8px;font-weight:700;color:#00221a;cursor:pointer">Abrir checkout</button>
+         </a>` : ''}
+        <button id="mp_close" style="background:#22364a;border:none;padding:10px 12px;border-radius:8px;font-weight:700;color:#fff;cursor:pointer">Fechar</button>
+      </div>
+      <div style="margin-top:8px;font-size:12px;color:#99b2c6">Seu jogo será confirmado automaticamente após pagamento (quando houver webhook configurado).</div>
+    </div>
+  `;
+  document.body.appendChild(m);
+  document.getElementById('mp_close').onclick = () => hidePagamentoModal();
+}
