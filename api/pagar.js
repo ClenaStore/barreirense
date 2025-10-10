@@ -1,41 +1,42 @@
-import mercadopago from "mercadopago";
-
-mercadopago.configure({
-  access_token: process.env.MERCADOPAGO_ACCESS_TOKEN
-});
+import fetch from "node-fetch";
 
 export default async function handler(req, res) {
-  if (req.method !== "POST") return res.status(405).end();
+  if (req.method !== "POST") return res.status(405).send("Método não permitido");
 
-  const { nome, email, telefone, qtd, descricao } = req.body;
+  const { valor, descricao, idRegistro } = req.body;
+  const token = process.env.MERCADO_PAGO_ACCESS_TOKEN;
+  const planilha = process.env.GOOGLE_SCRIPT_URL;
 
   try {
-    const preference = await mercadopago.preferences.create({
-      items: [
-        {
-          title: descricao || "Rifa Solidária",
-          quantity: Number(qtd) || 1,
-          currency_id: "BRL",
-          unit_price: 5
-        }
-      ],
-      payer: {
-        name: nome,
-        email,
-        phone: { number: telefone }
+    // 🔹 Cria pagamento PIX via Mercado Pago
+    const mp = await fetch("https://api.mercadopago.com/v1/payments", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "Content-Type": "application/json"
       },
-      back_urls: {
-        success: `${req.headers.origin}/sucesso.html`,
-        failure: `${req.headers.origin}/falha.html`,
-        pending: `${req.headers.origin}/pendente.html`
-      },
-      auto_return: "approved",
-      notification_url: `${req.headers.origin}/api/webhook`
+      body: JSON.stringify({
+        transaction_amount: Number(valor),
+        description: descricao,
+        payment_method_id: "pix",
+        payer: { email: "comprador@exemplo.com" },
+      })
     });
 
-    res.status(200).json({ init_point: preference.body.init_point });
+    const data = await mp.json();
+    if (data.id) {
+      // 🔹 Atualiza status da planilha como “Pago”
+      await fetch(`${planilha}?action=atualizarStatus&id=${encodeURIComponent(idRegistro)}&status=Pago`);
+      res.status(200).json({
+        status: "success",
+        qr: data.point_of_interaction.transaction_data.qr_code_base64,
+        copiaCola: data.point_of_interaction.transaction_data.qr_code,
+        idPagamento: data.id
+      });
+    } else {
+      res.status(400).json({ status: "error", data });
+    }
   } catch (e) {
-    console.error(e);
-    res.status(500).json({ error: "Erro ao criar pagamento" });
+    res.status(500).json({ error: e.message });
   }
 }
