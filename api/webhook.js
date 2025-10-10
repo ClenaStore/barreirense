@@ -1,45 +1,29 @@
-// /api/webhook.js
-// Webhook do Mercado Pago: marca como Pago na planilha quando approved.
 import fetch from "node-fetch";
-
-export const config = { api: { bodyParser: true } };
 
 export default async function handler(req, res) {
   try {
-    const { query, body } = req;
-    let paymentId = query?.id || body?.data?.id;
+    const { secret, id, aba } = req.query;
 
-    if (!paymentId && (query?.topic === "payment" || query?.type === "payment"))
-      paymentId = query?.["data.id"];
+    if (secret !== process.env.MP_WEBHOOK_SECRET)
+      return res.status(403).send("Acesso negado");
 
-    if (!paymentId) {
-      return res.status(200).json({ ok: true, msg: "Sem id de pagamento" });
-    }
+    const event = req.body || {};
 
-    const token = process.env.MERCADO_PAGO_ACCESS_TOKEN;
-    const scriptUrl = process.env.GOOGLE_SCRIPT_URL;
-    if (!token || !scriptUrl)
-      return res.status(500).json({ error: "Variáveis de ambiente ausentes" });
+    if (event.data && event.data.id) {
+      const payId = event.data.id;
 
-    const pr = await fetch(`https://api.mercadopago.com/v1/payments/${paymentId}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    const pdata = await pr.json();
+      const resp = await fetch(`https://api.mercadopago.com/v1/payments/${payId}`, {
+        headers: { "Authorization": `Bearer ${process.env.MERCADO_PAGO_ACCESS_TOKEN}` }
+      });
+      const data = await resp.json();
 
-    if (pdata?.status === "approved") {
-      const ref = (() => {
-        try { return JSON.parse(pdata.external_reference || "{}"); } catch { return {}; }
-      })();
-      const idRegistro = ref.idRegistro || "";
-      const aba = ref.aba || "";
-      if (idRegistro) {
-        const url = `${scriptUrl}?action=atualizarStatus&id=${encodeURIComponent(idRegistro)}&status=Pago${aba ? "&aba=" + encodeURIComponent(aba) : ""}`;
-        await fetch(url);
+      if (data.status === "approved") {
+        await fetch(`${process.env.GOOGLE_SCRIPT_URL}?action=atualizarStatus&id=${id}&aba=${aba}&status=Pago`);
       }
     }
 
-    return res.status(200).json({ ok: true });
+    res.status(200).send("OK");
   } catch (e) {
-    return res.status(200).json({ ok: true, warn: e.message });
+    res.status(500).send("Erro: " + e.message);
   }
 }
