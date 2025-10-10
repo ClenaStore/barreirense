@@ -3,57 +3,61 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
-<title>📊 Resultados • Jogo do Bicho</title>
+<title>Resultados</title>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/pt.js"></script>
+
 <style>
 :root{
-  --bg1:#060818;--bg2:#0a0f2c;
   --panel:#0f172a;--line:#1e2a3f;
+  --bg1:#060818;--bg2:#0a0f2c;
   --text:#eaf2ff;--muted:#a7b3c8;
-  --accent:#00e5ff;--accent2:#7c3aed;
-  --warn:#f59e0b;--ok:#16a34a;
+  --accent:#00e5ff;--warn:#f59e0b;--ok:#16a34a;
 }
 
-/* 🔧 layout perfeito para embutir */
 body{
-  margin:0;
-  padding:0;
-  font-family:Inter,system-ui;
+  background:transparent;
   color:var(--text);
+  font-family:Inter,system-ui;
+  margin:0;padding:0;
   overflow-x:hidden;
-  background:linear-gradient(180deg,var(--bg1),var(--bg2)); /* 🔹 corrige fundo branco */
 }
 
-/* cabeçalho ajustado colado nas categorias */
-header{
+/* === FILTRO === */
+.filtro{
   text-align:center;
-  padding:4px 8px 2px;
-  margin-top:-10px; /* 🔹 aproxima das categorias */
+  margin:10px auto 16px;
 }
-h1{
-  font-family:Orbitron;
-  color:var(--accent);
-  text-shadow:0 0 10px rgba(0,229,255,.6);
-  font-size:22px;
-  margin:0;
+.filtro input{
+  background:#0c1428;
+  border:1px solid #1e2a3f;
+  color:var(--text);
+  border-radius:8px;
+  padding:8px 12px;
+  font-size:14px;
+  width:180px;
+  outline:none;
+  text-align:center;
+  transition:.2s;
 }
-.sub{
-  color:var(--muted);
-  font-size:13px;
-  margin:2px 0 0 0;
+.filtro input:focus{
+  border-color:var(--accent);
+  box-shadow:0 0 8px rgba(0,229,255,.4);
 }
 
-/* container */
+/* === CONTEÚDO === */
 .container{
   max-width:950px;
-  margin:10px auto 50px;
+  margin:0 auto 50px;
   padding:0 12px;
   display:flex;
   flex-direction:column;
   gap:14px;
 }
 
-/* card dos resultados */
+/* === CARD === */
 .card{
   background:linear-gradient(180deg,var(--panel),#0a0f1f);
   border:1px solid var(--line);
@@ -72,7 +76,7 @@ h1{
 .card-body{margin-top:8px;display:none;animation:fade .3s ease}
 @keyframes fade{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
 
-/* info */
+/* === INFO GRID === */
 .info-grid{
   display:grid;
   grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
@@ -85,7 +89,7 @@ h1{
 .info-box b{display:block;font-size:14px;color:var(--accent);margin-bottom:3px}
 .info-box span{font-size:12px;color:var(--muted)}
 
-/* ganhadores */
+/* === GANHADORES === */
 .winners{margin-top:12px}
 .winners h3{color:var(--ok);font-family:Orbitron;font-size:15px;margin-bottom:6px}
 .winner-card{
@@ -99,7 +103,7 @@ h1{
   border-radius:8px;border:1px solid #1f2f49;margin-top:6px;
 }
 
-/* loading */
+/* === LOADING === */
 .loading{text-align:center;margin-top:25px}
 .loader{
   width:50px;height:50px;
@@ -110,19 +114,17 @@ h1{
 @keyframes spin{to{transform:rotate(360deg)}}
 .loading p{margin-top:8px;color:var(--muted);font-size:13px}
 
-/* responsivo */
+/* === RESPONSIVO === */
 @media(max-width:700px){
-  h1{font-size:19px}
   .info-grid{grid-template-columns:repeat(2,1fr)}
 }
 </style>
 </head>
 <body>
 
-<header>
-  <h1>📊 Resultados</h1>
-  <p class="sub">Confira os ganhadores e repasses de cada jogo</p>
-</header>
+<div class="filtro">
+  <input type="text" id="dataFiltro" placeholder="Filtrar por data">
+</div>
 
 <div id="content" class="container">
   <div class="loading">
@@ -133,12 +135,14 @@ h1{
 
 <script>
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz94zCUzLHcv8UdmYVO2RUA26Zlp-rP2lUEybUoiBUaT14-paIlrseiDj_hdoNcz0CU/exec";
+let resultadosOriginais = [];
 
-// === Função principal ===
+// === Carrega os resultados ===
 async function carregarResultados(){
   try{
     const res = await fetch(`${SCRIPT_URL}?action=resultados`, {cache:"no-store"});
     const data = await res.json();
+    resultadosOriginais = data;
     renderResultados(data);
   }catch(e){
     document.getElementById("content").innerHTML =
@@ -146,6 +150,7 @@ async function carregarResultados(){
   }
 }
 
+// === Renderiza os resultados ===
 function renderResultados(lista){
   if(!Array.isArray(lista) || lista.length===0){
     document.getElementById("content").innerHTML =
@@ -192,6 +197,18 @@ function toggleCard(header){
   document.querySelectorAll(".card-body").forEach(b=>b.style.display="none");
   if(!open) body.style.display="block";
 }
+
+// === Filtro de data ===
+flatpickr("#dataFiltro", {
+  locale:"pt",
+  dateFormat:"d/m/Y",
+  onChange: ([date])=>{
+    if(!date){ renderResultados(resultadosOriginais); return; }
+    const filtro = date.toLocaleDateString("pt-BR");
+    const filtrados = resultadosOriginais.filter(j=> (j.data||"").includes(filtro));
+    renderResultados(filtrados);
+  }
+});
 
 // === Início ===
 carregarResultados();
