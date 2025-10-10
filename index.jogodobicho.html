@@ -25,6 +25,44 @@ header{text-align:center;padding:22px 10px 12px}
 h1{font-family:Orbitron;color:var(--warn);text-shadow:0 0 10px rgba(245,158,11,.6);font-size:28px;margin-bottom:4px}
 .sub{color:var(--muted);font-size:15px}
 
+/* ===== Configuração PIX ===== */
+.config{
+  max-width:950px;
+  margin:10px auto;
+  background:linear-gradient(180deg,var(--panel),#0a0f1c);
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:12px;
+}
+.config h3{
+  font-family:Orbitron;
+  font-size:18px;
+  color:var(--accent);
+  margin-bottom:8px;
+  text-align:center;
+}
+.config table{
+  width:100%;
+  border-collapse:collapse;
+  font-size:13px;
+}
+.config th,.config td{
+  border:1px solid #1f2f49;
+  padding:6px 8px;
+  text-align:center;
+  color:var(--muted);
+}
+.config input{
+  width:98%;
+  background:#0b1220;
+  border:none;
+  color:#eaf2ff;
+  padding:6px;
+  border-radius:8px;
+  font-size:12px;
+  text-align:center;
+}
+
 /* ===== Painel Superior ===== */
 .panel{max-width:950px;margin:14px auto;background:linear-gradient(180deg,var(--panel),#0a0f1f);
 border:1px solid var(--line);border-radius:16px;padding:14px;display:flex;flex-wrap:wrap;
@@ -42,38 +80,10 @@ gap:8px;align-items:center;justify-content:space-between;box-shadow:0 0 22px rgb
 .card{position:relative;border:1px solid #13213a;border-radius:14px;overflow:hidden;cursor:pointer;transition:.25s;background:#000;height:170px}
 .card:hover{transform:translateY(-3px);box-shadow:0 8px 18px rgba(0,229,255,.18)}
 .card.selected{outline:2px solid var(--accent);box-shadow:0 0 0 4px rgba(0,229,255,.22) inset,0 0 16px rgba(0,229,255,.24)}
-.card.sold{opacity:.6;cursor:not-allowed}
 .card img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:brightness(.85)}
-.nums{
-  position:absolute;
-  right:6px;
-  top:6px;
-  text-align:right;
-  font-size:12px;
-  line-height:1.3em;
-  font-weight:700;
-  color:var(--warn);
-}
-.nums span{
-  display:inline-block;
-  background:rgba(0,0,0,.6);
-  color:var(--warn);
-  padding:2px 5px;
-  margin-bottom:2px;
-  border-radius:6px;
-  box-shadow:0 0 4px rgba(0,0,0,.5);
-}
+.nums{position:absolute;right:6px;top:6px;text-align:right;font-size:12px;line-height:1.3em;font-weight:700;color:var(--warn);}
+.nums span{display:inline-block;background:rgba(0,0,0,.6);color:var(--warn);padding:2px 5px;margin-bottom:2px;border-radius:6px;box-shadow:0 0 4px rgba(0,0,0,.5);}
 .name{position:absolute;bottom:6px;left:0;right:0;font-weight:700;font-size:15px;color:var(--accent);text-shadow:0 0 8px rgba(0,0,0,.9)}
-
-/* ===== Popup Cadastro ===== */
-.popup{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:10000;align-items:center;justify-content:center}
-.box{width:min(92vw,420px);background:linear-gradient(180deg,var(--panel),#0a0f1c);border:1px solid var(--line);border-radius:14px;padding:16px;box-shadow:0 0 18px rgba(0,229,255,.25)}
-.box h3{margin:0 0 8px;color:var(--warn);font-family:Orbitron;text-align:center}
-.box label{display:block;color:var(--muted);font-size:13px;margin:10px 0 6px}
-.box input{width:100%;background:#0b1220;color:var(--text);border:none;border-radius:10px;padding:12px;font-size:15px}
-.row{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}
-.ok{background:linear-gradient(90deg,var(--warn),#ffb757);color:#111}
-.cancel{background:#112036;color:#c9d6ec;border:1px solid #1f2f49}
 
 /* ===== Overlay PIX ===== */
 .overlay-pix{
@@ -96,44 +106,14 @@ gap:8px;align-items:center;justify-content:space-between;box-shadow:0 0 22px rgb
   max-width:400px;
   box-shadow:0 0 18px rgba(0,229,255,.25);
 }
-.overlay-pix h3{
-  font-family:Orbitron;
-  color:var(--warn);
-  margin-bottom:10px;
-}
+.overlay-pix h3{font-family:Orbitron;color:var(--warn);margin-bottom:10px}
 .overlay-pix p{color:var(--muted);margin:8px 0}
-.overlay-pix .pix-key{
-  background:#16243a;
-  color:#eaf2ff;
-  padding:10px;
-  border-radius:8px;
-  margin:10px 0;
-  font-weight:700;
-  word-break:break-all;
-  border:1px solid #20344f;
-}
-.overlay-pix .btns{
-  display:flex;
-  flex-direction:column;
-  gap:8px;
-  margin-top:10px;
-}
-.overlay-pix button{
-  border:none;
-  border-radius:8px;
-  padding:10px;
-  font-weight:700;
-  cursor:pointer;
-}
-.copyPix{
-  background:linear-gradient(90deg,var(--accent),#5cc7ff);
-  color:#0b1220;
-}
-.closePix{
-  background:#112036;
-  color:#c9d6ec;
-  border:1px solid #1f2f49;
-}
+.overlay-pix .pix-key{background:#16243a;color:#eaf2ff;padding:10px;border-radius:8px;margin:10px 0;font-weight:700;word-break:break-all;border:1px solid #20344f;}
+.overlay-pix img{width:220px;height:220px;margin:10px auto;border-radius:10px;border:2px solid #1f2f49}
+.overlay-pix .btns{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+.overlay-pix button{border:none;border-radius:8px;padding:10px;font-weight:700;cursor:pointer}
+.copyPix{background:linear-gradient(90deg,var(--accent),#5cc7ff);color:#0b1220}
+.closePix{background:#112036;color:#c9d6ec;border:1px solid #1f2f49}
 
 /* ===== Mobile ===== */
 @media(max-width:700px){
@@ -153,6 +133,40 @@ gap:8px;align-items:center;justify-content:space-between;box-shadow:0 0 22px rgb
   <p class="sub">Selecione seus bichos — R$ 6,00 cada</p>
 </header>
 
+<!-- ⚙️ Configuração PIX -->
+<div class="config">
+  <h3>Configuração de PIX por valor</h3>
+<table>
+  <tr><th>Valor Total</th><th>Chave PIX</th><th>QR Code (link da imagem)</th></tr>
+  <tr><td>R$6,00</td><td><input id="pix6" placeholder="Chave para R$6"></td><td><input id="qr6" placeholder="Link imagem QR R$6"></td></tr>
+  <tr><td>R$12,00</td><td><input id="pix12" placeholder="Chave para R$12"></td><td><input id="qr12" placeholder="Link imagem QR R$12"></td></tr>
+  <tr><td>R$18,00</td><td><input id="pix18" placeholder="Chave para R$18"></td><td><input id="qr18" placeholder="Link imagem QR R$18"></td></tr>
+  <tr><td>R$24,00</td><td><input id="pix24" placeholder="Chave para R$24"></td><td><input id="qr24" placeholder="Link imagem QR R$24"></td></tr>
+  <tr><td>R$30,00</td><td><input id="pix30" placeholder="Chave para R$30"></td><td><input id="qr30" placeholder="Link imagem QR R$30"></td></tr>
+  <tr><td>R$36,00</td><td><input id="pix36" placeholder="Chave para R$36"></td><td><input id="qr36" placeholder="Link imagem QR R$36"></td></tr>
+  <tr><td>R$42,00</td><td><input id="pix42" placeholder="Chave para R$42"></td><td><input id="qr42" placeholder="Link imagem QR R$42"></td></tr>
+  <tr><td>R$48,00</td><td><input id="pix48" placeholder="Chave para R$48"></td><td><input id="qr48" placeholder="Link imagem QR R$48"></td></tr>
+  <tr><td>R$54,00</td><td><input id="pix54" placeholder="Chave para R$54"></td><td><input id="qr54" placeholder="Link imagem QR R$54"></td></tr>
+  <tr><td>R$60,00</td><td><input id="pix60" placeholder="Chave para R$60"></td><td><input id="qr60" placeholder="Link imagem QR R$60"></td></tr>
+  <tr><td>R$66,00</td><td><input id="pix66" placeholder="Chave para R$66"></td><td><input id="qr66" placeholder="Link imagem QR R$66"></td></tr>
+  <tr><td>R$72,00</td><td><input id="pix72" placeholder="Chave para R$72"></td><td><input id="qr72" placeholder="Link imagem QR R$72"></td></tr>
+  <tr><td>R$78,00</td><td><input id="pix78" placeholder="Chave para R$78"></td><td><input id="qr78" placeholder="Link imagem QR R$78"></td></tr>
+  <tr><td>R$84,00</td><td><input id="pix84" placeholder="Chave para R$84"></td><td><input id="qr84" placeholder="Link imagem QR R$84"></td></tr>
+  <tr><td>R$90,00</td><td><input id="pix90" placeholder="Chave para R$90"></td><td><input id="qr90" placeholder="Link imagem QR R$90"></td></tr>
+  <tr><td>R$96,00</td><td><input id="pix96" placeholder="Chave para R$96"></td><td><input id="qr96" placeholder="Link imagem QR R$96"></td></tr>
+  <tr><td>R$102,00</td><td><input id="pix102" placeholder="Chave para R$102"></td><td><input id="qr102" placeholder="Link imagem QR R$102"></td></tr>
+  <tr><td>R$108,00</td><td><input id="pix108" placeholder="Chave para R$108"></td><td><input id="qr108" placeholder="Link imagem QR R$108"></td></tr>
+  <tr><td>R$114,00</td><td><input id="pix114" placeholder="Chave para R$114"></td><td><input id="qr114" placeholder="Link imagem QR R$114"></td></tr>
+  <tr><td>R$120,00</td><td><input id="pix120" placeholder="Chave para R$120"></td><td><input id="qr120" placeholder="Link imagem QR R$120"></td></tr>
+  <tr><td>R$126,00</td><td><input id="pix126" placeholder="Chave para R$126"></td><td><input id="qr126" placeholder="Link imagem QR R$126"></td></tr>
+  <tr><td>R$132,00</td><td><input id="pix132" placeholder="Chave para R$132"></td><td><input id="qr132" placeholder="Link imagem QR R$132"></td></tr>
+  <tr><td>R$138,00</td><td><input id="pix138" placeholder="Chave para R$138"></td><td><input id="qr138" placeholder="Link imagem QR R$138"></td></tr>
+  <tr><td>R$144,00</td><td><input id="pix144" placeholder="Chave para R$144"></td><td><input id="qr144" placeholder="Link imagem QR R$144"></td></tr>
+  <tr><td>R$150,00</td><td><input id="pix150" placeholder="Chave para R$150"></td><td><input id="qr150" placeholder="Link imagem QR R$150"></td></tr>
+</table>
+
+</div>
+
 <div class="panel">
   <div class="badges">
     <span class="badge">Disponíveis: <b id="disp">—</b></span>
@@ -168,45 +182,35 @@ gap:8px;align-items:center;justify-content:space-between;box-shadow:0 0 22px rgb
 
 <div id="grid" class="grid"></div>
 
-<!-- Popup de Cadastro -->
-<div id="popup" class="popup">
-  <div class="box">
-    <h3>Confirmar Participação</h3>
-    <div class="badge" style="display:block;text-align:center;margin-bottom:8px">
-      Bichos: <b id="numsPreview"></b> • Total: <b id="totalPreview"></b>
-    </div>
-    <label>Nome completo</label>
-    <input id="nome" type="text" placeholder="Seu nome" required>
-    <label>E-mail</label>
-    <input id="email" type="email" placeholder="seu@email.com" required>
-    <label>Telefone / WhatsApp</label>
-    <input id="tel" type="tel" placeholder="(00) 00000-0000" maxlength="16" required>
-    <div class="row">
-      <button id="confirm" class="btn ok" type="button">Enviar</button>
-      <button id="cancel" class="btn cancel" type="button">Cancelar</button>
-    </div>
-  </div>
-</div>
-
-<!-- Overlay PIX Final -->
+<!-- Overlay PIX -->
 <div id="overlayPix" class="overlay-pix">
   <div class="box">
     <h3>Pagamento via PIX</h3>
     <p>Valor total a pagar: <b id="pixValor"></b></p>
+    <img id="pixImagem" src="" style="display:none">
     <div class="pix-key" id="pixChave"></div>
     <div class="btns">
       <button class="copyPix" id="copiarPix">📋 Copiar chave PIX</button>
       <button class="closePix" id="fecharPix">Fechar</button>
     </div>
-    <p style="margin-top:12px;font-size:14px;color:#ffd089;">
-      ⚠️ Seu jogo será confirmado após o pagamento do valor da aposta.
-    </p>
   </div>
 </div>
 
 <script>
-const SCRIPT_URL="https://script.google.com/macros/s/AKfycbxqUX_W6Jv-yUZ3CcoDBWF5bEO5RgsSOttQUnu3kXX2qqX62Cx59EJgtRJui8R5rQN3kg/exec";
-const PRECO=6,PIX_KEY="711e433b-bb4e-477e-adb7-518eacf2f67e";
+const PRECO=6;
+const grid=document.getElementById("grid"),
+selCountEl=document.getElementById("selCount"),
+premioEl=document.getElementById("premio"),
+overlayPix=document.getElementById("overlayPix"),
+pixValor=document.getElementById("pixValor"),
+pixChave=document.getElementById("pixChave"),
+pixImagem=document.getElementById("pixImagem"),
+copiarPix=document.getElementById("copiarPix"),
+fecharPix=document.getElementById("fecharPix"),
+btnConfirm=document.getElementById("btnConfirm"),
+btnClear=document.getElementById("btnClear");
+
+let selecionados=new Set(),totalPago=0;
 
 const bichos=[
 ["Avestruz","01","02","03","04","https://github.com/ClenaStore/barreirense/blob/main/paste/avestruz.png?raw=true"],
@@ -236,20 +240,6 @@ const bichos=[
 ["Vaca","97","98","99","00","https://github.com/ClenaStore/barreirense/blob/main/paste/VACA.png?raw=true"]
 ];
 
-const grid=document.getElementById("grid"),
-selCountEl=document.getElementById("selCount"),
-premioEl=document.getElementById("premio"),
-popup=document.getElementById("popup"),
-overlayPix=document.getElementById("overlayPix"),
-pixValor=document.getElementById("pixValor"),
-pixChave=document.getElementById("pixChave"),
-copiarPix=document.getElementById("copiarPix"),
-fecharPix=document.getElementById("fecharPix"),
-btnConfirm=document.getElementById("btnConfirm"),
-btnClear=document.getElementById("btnClear");
-
-let vendidos=new Set(),selecionados=new Set(),totalPago=0;
-
 function updatePanel(){
   selCountEl.textContent=selecionados.size;
   btnConfirm.disabled=selecionados.size===0;
@@ -262,18 +252,13 @@ function renderGrid(){
   <div class="card" data-nome="${nome}">
     <img src="${img}" alt="${nome}">
     <div class="nums">
-      <span>${n1}</span><br>
-      <span>${n2}</span><br>
-      <span>${n3}</span><br>
-      <span>${n4}</span>
+      <span>${n1}</span><br><span>${n2}</span><br><span>${n3}</span><br><span>${n4}</span>
     </div>
     <div class="name">${nome}</div>
   </div>`).join('');
-
   document.querySelectorAll(".card").forEach(c=>{
     c.addEventListener("click",()=>{
       const nome=c.dataset.nome;
-      if(vendidos.has(nome))return;
       if(selecionados.has(nome)){selecionados.delete(nome);c.classList.remove("selected");}
       else{selecionados.add(nome);c.classList.add("selected");}
       updatePanel();
@@ -288,49 +273,26 @@ btnClear.onclick=()=>{
 };
 
 btnConfirm.onclick=()=>{
-  const arr=[...selecionados];
-  document.getElementById("numsPreview").textContent=arr.join(", ");
-  document.getElementById("totalPreview").textContent=`R$ ${(arr.length*PRECO).toFixed(2)}`;
-  popup.style.display="flex";
-};
+  const total=selecionados.size*PRECO;
+  const idPix="pix"+total, idQr="qr"+total;
+  const chave=document.getElementById(idPix)?.value.trim()||"";
+  const qr=document.getElementById(idQr)?.value.trim()||"";
 
-document.getElementById("cancel").onclick=()=>popup.style.display="none";
+  if(!chave){alert(`Insira a chave PIX para o valor R$${total.toFixed(2)}`);return;}
 
-document.getElementById("confirm").onclick=async()=>{
-  const nome=document.getElementById("nome").value.trim(),
-        email=document.getElementById("email").value.trim(),
-        tel=document.getElementById("tel").value.trim();
-  const arr=[...selecionados];
-  if(!nome||!email||!tel||arr.length===0){alert("Preencha todos os campos.");return;}
-
-  const total=arr.length*PRECO;
-
-  try{
-    await fetch(SCRIPT_URL,{
-      method:"POST",
-      headers:{"Content-Type":"text/plain;charset=utf-8"},
-      body:JSON.stringify({action:"registrar_rifa",nome,email,telefone:tel,bichos:arr,total,pix:PIX_KEY})
-    });
-
-    popup.style.display="none";
-    abrirPix(total);
-    selecionados.clear();
-    document.querySelectorAll(".selected").forEach(c=>c.classList.remove("selected"));
-    updatePanel();
-
-  }catch(e){
-    alert("Erro ao enviar. Verifique a conexão.");
-  }
-};
-
-// === Overlay PIX Final ===
-function abrirPix(total){
   pixValor.textContent=`R$ ${total.toFixed(2)}`;
-  pixChave.textContent=PIX_KEY;
+  pixChave.textContent=chave;
+  if(qr){
+    pixImagem.src=qr;
+    pixImagem.style.display="block";
+  }else{
+    pixImagem.style.display="none";
+  }
   overlayPix.style.display="flex";
-}
+};
+
 copiarPix.onclick=async()=>{
-  await navigator.clipboard.writeText(PIX_KEY);
+  await navigator.clipboard.writeText(pixChave.textContent);
   copiarPix.textContent="✅ Copiado!";
   setTimeout(()=>copiarPix.textContent="📋 Copiar chave PIX",2000);
 };
