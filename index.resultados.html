@@ -14,39 +14,39 @@
 *{box-sizing:border-box;margin:0;padding:0}
 body{
   font-family:Inter,system-ui;
-  background:transparent; /* transparente para encaixar no index principal */
+  background:radial-gradient(800px 600px at 50% -100px,var(--bg2),#020412 75%);
   color:var(--text);
   min-height:auto;
   overflow-x:hidden;
-  padding-bottom:30px;
+  padding-bottom:40px;
 }
 
 /* ===== Cabeçalho compacto ===== */
 header{
   text-align:center;
-  padding:10px 10px 6px; /* 👈 reduzido */
-  margin-top:8px; /* 👈 pequeno afastamento do topo */
+  padding:10px 10px 6px; /* menor espaçamento superior */
+  margin-top:5px; /* 👈 coladinho nas categorias */
 }
 h1{
   font-family:Orbitron;
   color:var(--accent);
   text-shadow:0 0 10px rgba(0,229,255,.5);
-  font-size:24px; /* 👈 levemente menor */
+  font-size:24px;
   margin-bottom:4px;
 }
 .sub{color:var(--muted);font-size:14px}
 
-/* ===== Container dos resultados ===== */
+/* ===== Container ===== */
 .container{
   max-width:1000px;
-  margin:10px auto 40px; /* 👈 menos espaço antes e depois */
+  margin:12px auto 40px;
   padding:0 14px;
   display:flex;
   flex-direction:column;
   gap:16px;
 }
 
-/* ===== Card do jogo ===== */
+/* ===== Card ===== */
 .card{
   background:linear-gradient(180deg,var(--panel),#0a0f1f);
   border:1px solid var(--line);
