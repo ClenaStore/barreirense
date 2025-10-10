@@ -7,32 +7,34 @@
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&family=Inter:wght@400;600&display=swap" rel="stylesheet">
 <style>
 :root{
+  --bg1:#060818;--bg2:#0a0f2c;
   --panel:#0f172a;--line:#1e2a3f;
   --text:#eaf2ff;--muted:#a7b3c8;
   --accent:#00e5ff;--accent2:#7c3aed;
   --warn:#f59e0b;--ok:#16a34a;
 }
 
-/* 🔧 Layout ajustado para embutir dentro do index */
+/* 🔧 layout perfeito para embutir */
 body{
-  background:transparent;
-  color:var(--text);
+  margin:0;
+  padding:0;
   font-family:Inter,system-ui;
-  margin:0;padding:0;
+  color:var(--text);
   overflow-x:hidden;
+  background:linear-gradient(180deg,var(--bg1),var(--bg2)); /* 🔹 corrige fundo branco */
 }
 
-/* Cabeçalho compacto colado nas categorias */
+/* cabeçalho ajustado colado nas categorias */
 header{
   text-align:center;
-  padding:2px 10px 4px;
-  margin-top:-10px; /* 🔹 coladinho */
+  padding:4px 8px 2px;
+  margin-top:-10px; /* 🔹 aproxima das categorias */
 }
 h1{
   font-family:Orbitron;
   color:var(--accent);
-  text-shadow:0 0 10px rgba(0,229,255,.5);
-  font-size:20px;
+  text-shadow:0 0 10px rgba(0,229,255,.6);
+  font-size:22px;
   margin:0;
 }
 .sub{
@@ -41,17 +43,17 @@ h1{
   margin:2px 0 0 0;
 }
 
-/* Container principal */
+/* container */
 .container{
   max-width:950px;
-  margin:8px auto 40px;
-  padding:0 10px;
+  margin:10px auto 50px;
+  padding:0 12px;
   display:flex;
   flex-direction:column;
   gap:14px;
 }
 
-/* Card dos resultados */
+/* card dos resultados */
 .card{
   background:linear-gradient(180deg,var(--panel),#0a0f1f);
   border:1px solid var(--line);
@@ -70,7 +72,7 @@ h1{
 .card-body{margin-top:8px;display:none;animation:fade .3s ease}
 @keyframes fade{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
 
-/* Info cards */
+/* info */
 .info-grid{
   display:grid;
   grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
@@ -83,7 +85,7 @@ h1{
 .info-box b{display:block;font-size:14px;color:var(--accent);margin-bottom:3px}
 .info-box span{font-size:12px;color:var(--muted)}
 
-/* Ganhadores */
+/* ganhadores */
 .winners{margin-top:12px}
 .winners h3{color:var(--ok);font-family:Orbitron;font-size:15px;margin-bottom:6px}
 .winner-card{
@@ -97,8 +99,8 @@ h1{
   border-radius:8px;border:1px solid #1f2f49;margin-top:6px;
 }
 
-/* Loading */
-.loading{text-align:center;margin-top:20px}
+/* loading */
+.loading{text-align:center;margin-top:25px}
 .loader{
   width:50px;height:50px;
   border:4px solid #23304a;border-top-color:var(--accent);
@@ -108,9 +110,9 @@ h1{
 @keyframes spin{to{transform:rotate(360deg)}}
 .loading p{margin-top:8px;color:var(--muted);font-size:13px}
 
-/* Responsivo */
+/* responsivo */
 @media(max-width:700px){
-  h1{font-size:18px}
+  h1{font-size:19px}
   .info-grid{grid-template-columns:repeat(2,1fr)}
 }
 </style>
