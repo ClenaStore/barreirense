@@ -52,7 +52,7 @@ header h1{
   border-radius:8px;
   padding:8px 12px;
   font-size:14px;
-  width:160px;
+  width:200px;
   text-align:center;
   transition:.3s;
 }
@@ -91,13 +91,6 @@ header h1{
   position:relative;
   overflow:hidden;
 }
-.card::before{
-  content:"";
-  position:absolute;inset:0;
-  border-radius:16px;
-  border:1px solid rgba(0,229,255,.15);
-  pointer-events:none;
-}
 .card:hover{transform:translateY(-3px);box-shadow:0 0 30px rgba(0,229,255,.15);}
 .card-header{
   display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;
@@ -111,10 +104,7 @@ header h1{
   box-shadow:0 0 8px rgba(0,229,255,.4);
 }
 .card-header h2{font-family:Orbitron;font-size:18px;color:var(--warn);margin:0;}
-.card-header .info-mini{
-  display:flex;flex-direction:column;align-items:flex-end;
-  font-size:13px;color:var(--muted);
-}
+.card-header .info-mini{display:flex;flex-direction:column;align-items:flex-end;font-size:13px;color:var(--muted);}
 .info-mini .count{color:var(--ok);font-weight:700;}
 .card-body{display:none;margin-top:10px;animation:fade .3s ease;}
 @keyframes fade{from{opacity:0;transform:translateY(-4px);}to{opacity:1;transform:translateY(0);}}
@@ -130,9 +120,7 @@ header h1{
   border-radius:10px;
   text-align:center;
   padding:10px;
-  transition:.3s;
 }
-.info-box:hover{box-shadow:0 0 10px rgba(0,229,255,.2);}
 .info-box b{display:block;font-size:15px;color:var(--accent);margin-bottom:4px;}
 .info-box span{font-size:13px;color:var(--muted);}
 
@@ -140,9 +128,7 @@ header h1{
 .winners{margin-top:14px;}
 .winners h3{color:var(--ok);font-family:Orbitron;font-size:16px;margin-bottom:8px;}
 .winner-card{
-  background:#0c162a;
-  border:1px solid #1f2f49;
-  border-radius:10px;
+  background:#0c162a;border:1px solid #1f2f49;border-radius:10px;
   padding:10px;margin-bottom:8px;
 }
 .winner-card b{color:var(--warn);display:block;margin-bottom:4px;}
@@ -163,9 +149,9 @@ header h1{
 <body>
 
 <header>
-  <h1>📊 Resultados da Semana</h1>
+  <h1>📊 Resultados por Período</h1>
   <div class="controls">
-    <input type="text" id="dataFiltro" placeholder="Filtrar por data">
+    <input type="text" id="dataFiltro" placeholder="Selecione o período">
     <button id="btnAtualizar">🔄 Atualizar</button>
   </div>
 </header>
@@ -178,8 +164,9 @@ header h1{
 </div>
 
 <script>
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyRM7vx3TWCnl3EhbuT30BsZbL-WTobUbE1bALP7tjTVzHgEQsa_JzrS8WNBXa_AdrS/exec"; // 🔁 Substitua aqui
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyRM7vx3TWCnl3EhbuT30BsZbL-WTobUbE1bALP7tjTVzHgEQsa_JzrS8WNBXa_AdrS/exec"; // 🟦 Substitua aqui
 let resultadosOriginais = [];
+let filtroInicio, filtroFim;
 
 // === Carregar resultados ===
 async function carregarResultados(){
@@ -187,7 +174,7 @@ async function carregarResultados(){
     const res = await fetch(`${SCRIPT_URL}?action=resultados`, {cache:"no-store"});
     const data = await res.json();
     resultadosOriginais = data;
-    renderResultados(data);
+    filtrarPorPeriodo();
   }catch(e){
     document.getElementById("content").innerHTML =
       "<p style='text-align:center;color:#f87171'>❌ Erro ao carregar resultados.</p>";
@@ -198,7 +185,7 @@ async function carregarResultados(){
 function renderResultados(lista){
   const cont = document.getElementById("content");
   if(!Array.isArray(lista)||lista.length===0){
-    cont.innerHTML="<p style='text-align:center;color:#a7b3c8;margin-top:40px'>Nenhum resultado disponível.</p>";
+    cont.innerHTML="<p style='text-align:center;color:#a7b3c8;margin-top:40px'>Nenhum resultado disponível neste período.</p>";
     return;
   }
 
@@ -247,17 +234,42 @@ function toggleCard(header){
   if(!open) body.style.display="block";
 }
 
-// === Filtro por data ===
+// === Filtro Flatpickr: intervalo ===
+const hoje = new Date();
+const semanaPassada = new Date();
+semanaPassada.setDate(hoje.getDate() - 7);
+
 flatpickr("#dataFiltro", {
   locale:"pt",
   dateFormat:"d/m/Y",
-  onChange: ([date])=>{
-    if(!date){renderResultados(resultadosOriginais);return;}
-    const filtro = date.toLocaleDateString("pt-BR");
-    const filtrados = resultadosOriginais.filter(j=> (j.data||"").includes(filtro));
-    renderResultados(filtrados);
+  mode:"range",
+  defaultDate:[semanaPassada,hoje],
+  onChange:(dates)=>{
+    [filtroInicio, filtroFim] = dates;
+    filtrarPorPeriodo();
   }
 });
+
+// === Filtra resultados pelo período selecionado ===
+function filtrarPorPeriodo(){
+  if(!filtroInicio || !filtroFim){
+    filtroInicio = new Date(semanaPassada);
+    filtroFim = new Date(hoje);
+  }
+
+  const inicio = filtroInicio.getTime();
+  const fim = filtroFim.getTime();
+
+  const filtrados = resultadosOriginais.filter(j=>{
+    if(!j.data) return false;
+    const partes = j.data.split("/");
+    const data = new Date(`${partes[2]}-${partes[1]}-${partes[0]}`);
+    const time = data.getTime();
+    return time >= inicio && time <= fim;
+  });
+
+  renderResultados(filtrados);
+}
 
 // === Botão de atualização ===
 document.getElementById("btnAtualizar").addEventListener("click", ()=>{
