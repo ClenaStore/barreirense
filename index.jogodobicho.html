@@ -205,7 +205,7 @@ document.getElementById("confirm").onclick = async () => {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        action: "registrar_jogo",
+        action: "registrar_rifa", // ✅ nome certo da ação
         nome,
         email,
         telefone: tel,
@@ -214,10 +214,11 @@ document.getElementById("confirm").onclick = async () => {
       })
     });
 
-    const data = await res.json();
+    const resposta = await res.text(); // ✅ lê como texto simples
+    console.log("Resposta do servidor:", resposta);
 
-    if (!data.ok) {
-      alert("Erro ao registrar: " + (data.error || "Verifique a planilha."));
+    if (resposta.trim() !== "OK") {
+      alert("Erro ao registrar. Resposta: " + resposta);
       return;
     }
 
@@ -229,11 +230,10 @@ document.getElementById("confirm").onclick = async () => {
     updatePanel();
 
   } catch (err) {
-    alert("Erro ao registrar. Verifique a conexão.");
-    console.error(err);
+    alert("Erro ao registrar. Verifique a conexão ou a planilha.");
+    console.error("Erro de conexão:", err);
   }
 };
-
 
 renderGrid();
 </script>
