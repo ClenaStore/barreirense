@@ -44,7 +44,26 @@ gap:8px;align-items:center;justify-content:space-between;box-shadow:0 0 22px rgb
 .card.selected{outline:2px solid var(--accent);box-shadow:0 0 0 4px rgba(0,229,255,.22) inset,0 0 16px rgba(0,229,255,.24)}
 .card.sold{opacity:.6;cursor:not-allowed}
 .card img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:brightness(.85)}
-.nums{position:absolute;right:6px;top:6px;text-align:right;font-size:12px;line-height:1.2em;color:var(--warn);font-weight:600;text-shadow:0 0 6px rgba(0,0,0,.7)}
+.nums{
+  position:absolute;
+  right:6px;
+  top:6px;
+  text-align:right;
+  font-size:12px;
+  line-height:1.3em;
+  font-weight:700;
+  color:var(--warn);
+}
+.nums span{
+  display:inline-block;
+  background:rgba(0,0,0,.6);
+  color:var(--warn);
+  padding:2px 5px;
+  margin-bottom:2px;
+  border-radius:6px;
+  box-shadow:0 0 4px rgba(0,0,0,.5);
+}
+
 .name{position:absolute;bottom:6px;left:0;right:0;font-weight:700;font-size:15px;color:var(--accent);text-shadow:0 0 8px rgba(0,0,0,.9)}
 
 /* ===== Overlay ===== */
@@ -195,7 +214,13 @@ function renderGrid(){
   grid.innerHTML=bichos.map(([nome,n1,n2,n3,n4,img])=>`
   <div class="card" data-nome="${nome}">
     <img loading="lazy" src="${img}" alt="${nome}">
-    <div class="nums">${n1}<br>${n2}<br>${n3}<br>${n4}</div>
+    <div class="nums">
+  <span>${n1}</span><br>
+  <span>${n2}</span><br>
+  <span>${n3}</span><br>
+  <span>${n4}</span>
+</div>
+
     <div class="name">${nome}</div>
   </div>`).join('');
   document.querySelectorAll(".card").forEach(c=>{
