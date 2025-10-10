@@ -12,29 +12,26 @@ export default async function handler(req, res) {
   try {
     const { amount, payer } = req.body;
 
-    // 🔑 Gera um ID único para o cabeçalho X-Idempotency-Key
+    // 🔑 Cabeçalho obrigatório de idempotência
     const idempotencyKey = `${Date.now()}-${Math.random().toString(36).substring(2, 15)}`;
 
-// dentro de /api/create_payment.js
-const body = {
-  transaction_amount: Number(amount),
-  description: "Aposta - Jogo do Bicho",
-  payment_method_id: "pix",       // força PIX
-  payment_type_id: "pix",         // garante PIX mesmo que a conta tenha cartão habilitado
-  payer: {
-    email: payer?.email || "cliente@teste.com",
-    first_name: payer?.name || "Jogador",
-  },
-  notification_url: `${process.env.SITE_URL}/api/webhook`,
-};
-
+    const body = {
+      transaction_amount: Number(amount),
+      description: "Aposta - Jogo do Bicho",
+      payment_method_id: "pix",
+      payer: {
+        email: payer?.email || "cliente@teste.com",
+        first_name: payer?.name || "Jogador",
+      },
+      notification_url: `${process.env.SITE_URL}/api/webhook`,
+    };
 
     const resp = await fetch("https://api.mercadopago.com/v1/payments", {
       method: "POST",
       headers: {
         Authorization: `Bearer ${MP_TOKEN}`,
         "Content-Type": "application/json",
-        "X-Idempotency-Key": idempotencyKey, // ✅ cabeçalho obrigatório
+        "X-Idempotency-Key": idempotencyKey,
       },
       body: JSON.stringify(body),
     });
@@ -49,14 +46,13 @@ const body = {
       });
     }
 
-    const { qr_code, qr_code_base64, ticket_url } =
-      data.point_of_interaction.transaction_data;
+    const tx = data.point_of_interaction.transaction_data;
 
     return res.status(200).json({
       id: data.id,
-      qr_code,
-      qr_code_base64,
-      ticket_url,
+      qr_code: tx.qr_code,
+      qr_code_base64: tx.qr_code_base64,
+      ticket_url: tx.ticket_url,
     });
   } catch (e) {
     console.error("❌ ERRO INTERNO:", e);
