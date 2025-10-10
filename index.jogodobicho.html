@@ -109,14 +109,13 @@ gap:8px;align-items:center;justify-content:space-between;box-shadow:0 0 22px rgb
   </div>
 </div>
 
-<!-- Modal PIX (automático Mercado Pago) -->
+<!-- Integração PIX (Mercado Pago) -->
 <script src="/pagamento.js"></script>
 
 <script>
 const SCRIPT_URL="https://script.google.com/macros/s/AKfycbxqUX_W6Jv-yUZ3CcoDBWF5bEO5RgsSOttQUnu3kXX2qqX62Cx59EJgtRJui8R5rQN3kg/exec";
 const PRECO=6;
 
-// Lista completa dos bichos
 const bichos=[
 ["Avestruz","01","02","03","04","https://github.com/ClenaStore/barreirense/blob/main/paste/avestruz.png?raw=true"],
 ["Águia","05","06","07","08","https://github.com/ClenaStore/barreirense/blob/main/paste/%C3%A1guia.png?raw=true"],
@@ -163,14 +162,10 @@ function renderGrid(){
   <div class="card" data-nome="${nome}">
     <img src="${img}" alt="${nome}">
     <div class="nums">
-      <span>${n1}</span><br>
-      <span>${n2}</span><br>
-      <span>${n3}</span><br>
-      <span>${n4}</span>
+      <span>${n1}</span><br><span>${n2}</span><br><span>${n3}</span><br><span>${n4}</span>
     </div>
     <div class="name">${nome}</div>
   </div>`).join('');
-
   document.querySelectorAll(".card").forEach(c=>{
     c.addEventListener("click",()=>{
       const nome=c.dataset.nome;
@@ -198,25 +193,23 @@ document.getElementById("confirm").onclick=async()=>{
         tel=document.getElementById("tel").value.trim();
   const arr=[...selecionados];
   if(!nome||!email||!tel||arr.length===0){alert("Preencha todos os campos.");return;}
-
   const total=arr.length*PRECO;
-
   try{
-    // 🔹 Registra a aposta na planilha
-    await fetch(SCRIPT_URL,{
+    const res=await fetch(SCRIPT_URL,{
       method:"POST",
-      headers:{"Content-Type":"text/plain;charset=utf-8"},
+      headers:{"Content-Type":"application/json"},
       body:JSON.stringify({action:"registrar_jogo",nome,email,telefone:tel,bichos:arr,total})
     });
-
-    // 🔹 Abre pagamento Mercado Pago
+    const data=await res.json();
+    if(!res.ok||data.erro)throw new Error(data?.erro||"Erro do servidor");
     popup.style.display="none";
-    iniciarPagamento(total, `Jogo do Bicho - ${nome}`, nome, "Jogo do Bicho");
+    iniciarPagamento(total,`Jogo do Bicho - ${nome}`,nome,"Jogo do Bicho");
     selecionados.clear();
     document.querySelectorAll(".selected").forEach(c=>c.classList.remove("selected"));
     updatePanel();
   }catch(e){
     alert("Erro ao registrar. Verifique a conexão.");
+    console.error("Erro ao registrar:",e);
   }
 };
 
