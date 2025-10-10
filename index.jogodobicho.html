@@ -109,57 +109,28 @@ gap:8px;align-items:center;justify-content:space-between;box-shadow:0 0 22px rgb
   </div>
 </div>
 
-<!-- Modal PIX (automático Mercado Pago) -->
 <script src="/pagamento.js"></script>
 
 <script>
-const SCRIPT_URL="https://script.google.com/macros/s/AKfycbxqUX_W6Jv-yUZ3CcoDBWF5bEO5RgsSOttQUnu3kXX2qqX62Cx59EJgtRJui8R5rQN3kg/exec";
-const PRECO=6;
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxqUX_W6Jv-yUZ3CcoDBWF5bEO5RgsSOttQUnu3kXX2qqX62Cx59EJgtRJui8R5rQN3kg/exec";
+const PRECO = 6;
 
-// Lista completa dos bichos
-const bichos=[
-["Avestruz","01","02","03","04","https://github.com/ClenaStore/barreirense/blob/main/paste/avestruz.png?raw=true"],
-["Águia","05","06","07","08","https://github.com/ClenaStore/barreirense/blob/main/paste/%C3%A1guia.png?raw=true"],
-["Burro","09","10","11","12","https://github.com/ClenaStore/barreirense/blob/main/paste/BURRO.png?raw=true"],
-["Borboleta","13","14","15","16","https://github.com/ClenaStore/barreirense/blob/main/paste/BORBOLETA.png?raw=true"],
-["Cachorro","17","18","19","20","https://github.com/ClenaStore/barreirense/blob/main/paste/CACHORRO.png?raw=true"],
-["Cabra","21","22","23","24","https://github.com/ClenaStore/barreirense/blob/main/paste/CARNEIRO.png?raw=true"],
-["Carneiro","25","26","27","28","https://github.com/ClenaStore/barreirense/blob/main/paste/CARNEIRO%20(2).png?raw=true"],
-["Camelo","29","30","31","32","https://github.com/ClenaStore/barreirense/blob/main/paste/CAMELO.png?raw=true"],
-["Cobra","33","34","35","36","https://github.com/ClenaStore/barreirense/blob/main/paste/COBRA.png?raw=true"],
-["Coelho","37","38","39","40","https://github.com/ClenaStore/barreirense/blob/main/paste/COELHO.png?raw=true"],
-["Cavalo","41","42","43","44","https://github.com/ClenaStore/barreirense/blob/main/paste/CAVALO.png?raw=true"],
-["Elefante","45","46","47","48","https://github.com/ClenaStore/barreirense/blob/main/paste/ELEFANTE.png?raw=true"],
-["Galo","49","50","51","52","https://github.com/ClenaStore/barreirense/blob/main/paste/GALO.png?raw=true"],
-["Gato","53","54","55","56","https://github.com/ClenaStore/barreirense/blob/main/paste/GATO.png?raw=true"],
-["Jacaré","57","58","59","60","https://github.com/ClenaStore/barreirense/blob/main/paste/JACARE.png?raw=true"],
-["Leão","61","62","63","64","https://github.com/ClenaStore/barreirense/blob/main/paste/LEAO.png?raw=true"],
-["Macaco","65","66","67","68","https://github.com/ClenaStore/barreirense/blob/main/paste/MACACO.png?raw=true"],
-["Porco","69","70","71","72","https://github.com/ClenaStore/barreirense/blob/main/paste/PORCO.png?raw=true"],
-["Pavão","73","74","75","76","https://github.com/ClenaStore/barreirense/blob/main/paste/PAV%C3%83O.png?raw=true"],
-["Peru","77","78","79","80","https://github.com/ClenaStore/barreirense/blob/main/paste/PERU.png?raw=true"],
-["Touro","81","82","83","84","https://github.com/ClenaStore/barreirense/blob/main/paste/TOURO.png?raw=true"],
-["Tigre","85","86","87","88","https://github.com/ClenaStore/barreirense/blob/main/paste/TIGRE.png?raw=true"],
-["Urso","89","90","91","92","https://github.com/ClenaStore/barreirense/blob/main/paste/URSO.png?raw=true"],
-["Veado","93","94","95","96","https://github.com/ClenaStore/barreirense/blob/main/paste/VEADO.png?raw=true"],
-["Vaca","97","98","99","00","https://github.com/ClenaStore/barreirense/blob/main/paste/VACA.png?raw=true"]
-];
+// ================== Funções ==================
+const grid = document.getElementById("grid"),
+selCountEl = document.getElementById("selCount"),
+popup = document.getElementById("popup"),
+btnConfirm = document.getElementById("btnConfirm"),
+btnClear = document.getElementById("btnClear");
 
-const grid=document.getElementById("grid"),
-selCountEl=document.getElementById("selCount"),
-popup=document.getElementById("popup"),
-btnConfirm=document.getElementById("btnConfirm"),
-btnClear=document.getElementById("btnClear");
+let selecionados = new Set();
 
-let selecionados=new Set();
-
-function updatePanel(){
-  selCountEl.textContent=selecionados.size;
-  btnConfirm.disabled=selecionados.size===0;
+function updatePanel() {
+  selCountEl.textContent = selecionados.size;
+  btnConfirm.disabled = selecionados.size === 0;
 }
 
-function renderGrid(){
-  grid.innerHTML=bichos.map(([nome,n1,n2,n3,n4,img])=>`
+function renderGrid() {
+  grid.innerHTML = bichos.map(([nome, n1, n2, n3, n4, img]) => `
   <div class="card" data-nome="${nome}">
     <img src="${img}" alt="${nome}">
     <div class="nums">
@@ -171,52 +142,66 @@ function renderGrid(){
     <div class="name">${nome}</div>
   </div>`).join('');
 
-  document.querySelectorAll(".card").forEach(c=>{
-    c.addEventListener("click",()=>{
-      const nome=c.dataset.nome;
-      if(selecionados.has(nome)){selecionados.delete(nome);c.classList.remove("selected");}
-      else{selecionados.add(nome);c.classList.add("selected");}
+  document.querySelectorAll(".card").forEach(c => {
+    c.addEventListener("click", () => {
+      const nome = c.dataset.nome;
+      if (selecionados.has(nome)) {
+        selecionados.delete(nome);
+        c.classList.remove("selected");
+      } else {
+        selecionados.add(nome);
+        c.classList.add("selected");
+      }
       updatePanel();
     });
   });
 }
 
-btnClear.onclick=()=>{selecionados.clear();document.querySelectorAll(".selected").forEach(c=>c.classList.remove("selected"));updatePanel();};
-
-btnConfirm.onclick=()=>{
-  const arr=[...selecionados];
-  document.getElementById("numsPreview").textContent=arr.join(", ");
-  document.getElementById("totalPreview").textContent=`R$ ${(arr.length*PRECO).toFixed(2)}`;
-  popup.style.display="flex";
+btnClear.onclick = () => {
+  selecionados.clear();
+  document.querySelectorAll(".selected").forEach(c => c.classList.remove("selected"));
+  updatePanel();
 };
 
-document.getElementById("cancel").onclick=()=>popup.style.display="none";
+btnConfirm.onclick = () => {
+  const arr = [...selecionados];
+  document.getElementById("numsPreview").textContent = arr.join(", ");
+  document.getElementById("totalPreview").textContent = `R$ ${(arr.length * PRECO).toFixed(2)}`;
+  popup.style.display = "flex";
+};
 
-document.getElementById("confirm").onclick=async()=>{
-  const nome=document.getElementById("nome").value.trim(),
-        email=document.getElementById("email").value.trim(),
-        tel=document.getElementById("tel").value.trim();
-  const arr=[...selecionados];
-  if(!nome||!email||!tel||arr.length===0){alert("Preencha todos os campos.");return;}
+document.getElementById("cancel").onclick = () => popup.style.display = "none";
 
-  const total=arr.length*PRECO;
+document.getElementById("confirm").onclick = async () => {
+  const nome = document.getElementById("nome").value.trim(),
+        email = document.getElementById("email").value.trim(),
+        tel = document.getElementById("tel").value.trim();
+  const arr = [...selecionados];
+  if (!nome || !email || !tel || arr.length === 0) {
+    alert("Preencha todos os campos.");
+    return;
+  }
 
-  try{
-    // 🔹 Registra a aposta na planilha
-    await fetch(SCRIPT_URL,{
-      method:"POST",
-      headers:{"Content-Type":"text/plain;charset=utf-8"},
-      body:JSON.stringify({action:"registrar_jogo",nome,email,telefone:tel,bichos:arr,total})
+  const total = arr.length * PRECO;
+
+  try {
+    const response = await fetch(SCRIPT_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "registrar_jogo", nome, email, telefone: tel, bichos: arr, total })
     });
 
-    // 🔹 Abre pagamento Mercado Pago
-    popup.style.display="none";
+    const data = await response.json();
+    if (!data || data.erro) throw new Error(data?.erro || "Erro ao registrar");
+
+    popup.style.display = "none";
     iniciarPagamento(total, `Jogo do Bicho - ${nome}`, nome, "Jogo do Bicho");
     selecionados.clear();
-    document.querySelectorAll(".selected").forEach(c=>c.classList.remove("selected"));
+    document.querySelectorAll(".selected").forEach(c => c.classList.remove("selected"));
     updatePanel();
-  }catch(e){
+  } catch (e) {
     alert("Erro ao registrar. Verifique a conexão.");
+    console.error(e);
   }
 };
 
