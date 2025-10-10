@@ -7,129 +7,110 @@
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&family=Inter:wght@400;600&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg1:#060818;--bg2:#0a0f2c;--panel:#0f172a;--line:#1e2a3f;
-  --text:#eaf2ff;--muted:#a7b3c8;--accent:#00e5ff;--accent2:#7c3aed;
-  --warn:#f59e0b;--ok:#16a34a;--bad:#ef4444;
-}
-*{box-sizing:border-box;margin:0;padding:0}
-body{
-  font-family:Inter,system-ui;
-  background:radial-gradient(800px 600px at 50% -100px,var(--bg2),#020412 75%);
-  color:var(--text);
-  overflow-x:hidden;
-  padding:0;
-  margin:0;
-  min-height:auto;
-  padding-bottom:40px;
+  --panel:#0f172a;--line:#1e2a3f;
+  --text:#eaf2ff;--muted:#a7b3c8;
+  --accent:#00e5ff;--accent2:#7c3aed;
+  --warn:#f59e0b;--ok:#16a34a;
 }
 
-/* ===== Cabeçalho COLADO ===== */
+/* 🔧 Layout ajustado para embutir dentro do index */
+body{
+  background:transparent;
+  color:var(--text);
+  font-family:Inter,system-ui;
+  margin:0;padding:0;
+  overflow-x:hidden;
+}
+
+/* Cabeçalho compacto colado nas categorias */
 header{
   text-align:center;
-  padding:4px 10px 2px;
-  margin-top:-14px; /* 🔹 Cola o título nas categorias */
+  padding:2px 10px 4px;
+  margin-top:-10px; /* 🔹 coladinho */
 }
 h1{
   font-family:Orbitron;
   color:var(--accent);
   text-shadow:0 0 10px rgba(0,229,255,.5);
-  font-size:22px;
-  margin-bottom:2px;
+  font-size:20px;
+  margin:0;
 }
 .sub{
   color:var(--muted);
   font-size:13px;
-  margin:0;
+  margin:2px 0 0 0;
 }
 
-/* ===== Container dos resultados ===== */
+/* Container principal */
 .container{
-  max-width:1000px;
-  margin:6px auto 40px;
-  padding:0 14px;
+  max-width:950px;
+  margin:8px auto 40px;
+  padding:0 10px;
   display:flex;
   flex-direction:column;
-  gap:16px;
+  gap:14px;
 }
 
-/* ===== Card ===== */
+/* Card dos resultados */
 .card{
   background:linear-gradient(180deg,var(--panel),#0a0f1f);
   border:1px solid var(--line);
   border-radius:14px;
-  padding:14px;
-  box-shadow:0 0 20px rgba(0,229,255,.08);
+  padding:12px;
+  box-shadow:0 0 15px rgba(0,229,255,.05);
   transition:.3s;
 }
-.card:hover{box-shadow:0 0 25px rgba(0,229,255,.2);transform:translateY(-2px)}
+.card:hover{box-shadow:0 0 18px rgba(0,229,255,.18);transform:translateY(-2px)}
 .card-header{
   display:flex;justify-content:space-between;align-items:center;
   cursor:pointer;
 }
-.card-header h2{font-family:Orbitron;font-size:18px;color:var(--warn)}
-.card-header span{font-size:13px;color:var(--muted)}
-.card-body{margin-top:10px;display:none;animation:fade .4s ease}
-@keyframes fade{from{opacity:0;transform:translateY(-5px)}to{opacity:1;transform:translateY(0)}}
+.card-header h2{font-family:Orbitron;font-size:17px;color:var(--warn);margin:0}
+.card-header span{font-size:12px;color:var(--muted)}
+.card-body{margin-top:8px;display:none;animation:fade .3s ease}
+@keyframes fade{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
 
-/* ===== Dados principais ===== */
+/* Info cards */
 .info-grid{
   display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
-  gap:8px;
-  margin-top:8px;
+  grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+  gap:8px;margin-top:6px;
 }
 .info-box{
-  background:#0b1220;
-  border:1px solid #1f2f49;
-  border-radius:10px;
-  padding:10px;
-  text-align:center;
+  background:#0b1220;border:1px solid #1f2f49;border-radius:10px;
+  padding:8px;text-align:center;
 }
-.info-box b{display:block;font-size:15px;color:var(--accent);margin-bottom:4px}
-.info-box span{font-size:13px;color:var(--muted)}
+.info-box b{display:block;font-size:14px;color:var(--accent);margin-bottom:3px}
+.info-box span{font-size:12px;color:var(--muted)}
 
-/* ===== Ganhadores ===== */
-.winners{margin-top:14px}
-.winners h3{
-  color:var(--ok);
-  font-family:Orbitron;
-  font-size:16px;
-  margin-bottom:6px;
-}
+/* Ganhadores */
+.winners{margin-top:12px}
+.winners h3{color:var(--ok);font-family:Orbitron;font-size:15px;margin-bottom:6px}
 .winner-card{
-  background:#0c1428;
-  border:1px solid #1f2f49;
-  border-radius:10px;
-  padding:10px;
-  margin-bottom:8px;
+  background:#0c1428;border:1px solid #1f2f49;border-radius:10px;
+  padding:8px;margin-bottom:8px;
 }
-.winner-card b{color:var(--warn);display:block;margin-bottom:4px}
+.winner-card b{color:var(--warn);display:block;margin-bottom:3px}
 .winner-card small{color:var(--muted)}
 .winner-photo img{
-  width:100%;
-  max-height:220px;
-  object-fit:contain;
-  border-radius:10px;
-  border:1px solid #1f2f49;
-  margin-top:8px;
+  width:100%;max-height:200px;object-fit:contain;
+  border-radius:8px;border:1px solid #1f2f49;margin-top:6px;
 }
 
-/* ===== Loading ===== */
-.loading{text-align:center;margin-top:30px}
+/* Loading */
+.loading{text-align:center;margin-top:20px}
 .loader{
-  width:60px;height:60px;
-  border:4px solid #23304a;
-  border-top-color:var(--accent);
-  border-radius:50%;
-  animation:spin 1s linear infinite;
+  width:50px;height:50px;
+  border:4px solid #23304a;border-top-color:var(--accent);
+  border-radius:50%;animation:spin 1s linear infinite;
   margin:auto;
 }
 @keyframes spin{to{transform:rotate(360deg)}}
-.loading p{margin-top:10px;color:var(--muted)}
+.loading p{margin-top:8px;color:var(--muted);font-size:13px}
 
-/* ===== Responsivo ===== */
+/* Responsivo */
 @media(max-width:700px){
-  h1{font-size:20px}
+  h1{font-size:18px}
   .info-grid{grid-template-columns:repeat(2,1fr)}
 }
 </style>
@@ -158,13 +139,15 @@ async function carregarResultados(){
     const data = await res.json();
     renderResultados(data);
   }catch(e){
-    document.getElementById("content").innerHTML = "<p style='text-align:center;color:#f87171'>Erro ao carregar resultados.</p>";
+    document.getElementById("content").innerHTML =
+      "<p style='text-align:center;color:#f87171'>Erro ao carregar resultados.</p>";
   }
 }
 
 function renderResultados(lista){
   if(!Array.isArray(lista) || lista.length===0){
-    document.getElementById("content").innerHTML = "<p style='text-align:center;color:#a7b3c8'>Nenhum resultado disponível.</p>";
+    document.getElementById("content").innerHTML =
+      "<p style='text-align:center;color:#a7b3c8'>Nenhum resultado disponível.</p>";
     return;
   }
 
