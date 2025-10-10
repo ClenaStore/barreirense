@@ -150,6 +150,35 @@ gap:8px;align-items:center;justify-content:space-between;box-shadow:0 0 22px rgb
   border:1px solid #1f2f49;
 }
 
+/* ===== Overlay de Envio ===== */
+#overlayEnvio{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.85);
+  z-index:12000;
+  align-items:center;
+  justify-content:center;
+  flex-direction:column;
+  text-align:center;
+  font-family:Orbitron;
+}
+#overlayEnvio img{
+  width:80px;
+  animation:girar 1.2s linear infinite;
+  filter:drop-shadow(0 0 10px var(--accent));
+}
+@keyframes girar{
+  from{transform:rotate(0deg)}
+  to{transform:rotate(360deg)}
+}
+#overlayEnvio p{
+  margin-top:20px;
+  color:var(--accent);
+  font-size:18px;
+  text-shadow:0 0 8px var(--accent);
+}
+
 /* ===== Oculta tabela PIX ===== */
 #pixConfig{display:none}
 
@@ -178,8 +207,9 @@ gap:8px;align-items:center;justify-content:space-between;box-shadow:0 0 22px rgb
 <!-- Painel Superior -->
 <div class="panel">
   <div class="badges">
-      <span class="badge">SORTEIRO PELA LOTERIA FEDERAL: 26/11/2025</b></span>
+      <span class="badge">SORTEIO PELA LOTERIA FEDERAL: <b>26/11/2025</b></span>
     <span class="badge">Selecionados: <b id="selCount">0</b></span>
+    <span class="badge">Preço: <b class="price">R$ 6,00</b></span>
   </div>
   <div class="actions">
     <button id="btnClear" class="btn btn-clear">Limpar</button>
@@ -207,6 +237,12 @@ gap:8px;align-items:center;justify-content:space-between;box-shadow:0 0 22px rgb
       <button id="cancel" class="btn cancel" type="button">Cancelar</button>
     </div>
   </div>
+</div>
+
+<!-- Overlay de Envio -->
+<div id="overlayEnvio">
+  <img src="https://cdn-icons-png.flaticon.com/512/103/103085.png">
+  <p>Enviando sua aposta...</p>
 </div>
 
 <!-- Overlay PIX Final -->
@@ -337,6 +373,40 @@ gap:8px;align-items:center;justify-content:space-between;box-shadow:0 0 22px rgb
 const SCRIPT_URL="https://script.google.com/macros/s/AKfycbzF4XLsBOaujxViMPRFnzwvZ2-ItvkYJ4-8-7Cmr0lef_axwn_fME2a3GvUpQSKLBb__w/exec";
 const PRECO=6;
 
+const grid=document.getElementById("grid"),
+selCountEl=document.getElementById("selCount"),
+premioTotal=document.getElementById("premioTotal"),
+popup=document.getElementById("popup"),
+overlayPix=document.getElementById("overlayPix"),
+overlayEnvio=document.getElementById("overlayEnvio"),
+pixValor=document.getElementById("pixValor"),
+pixChave=document.getElementById("pixChave"),
+pixQR=document.getElementById("pixQR"),
+copiarPix=document.getElementById("copiarPix"),
+fecharPix=document.getElementById("fecharPix"),
+btnConfirm=document.getElementById("btnConfirm"),
+btnClear=document.getElementById("btnClear");
+
+let selecionados=new Set(),totalPago=0;
+
+function updatePanel(){
+  selCountEl.textContent=selecionados.size;
+  btnConfirm.disabled=selecionados.size===0;
+}
+
+async function atualizarPremioTotal(){
+  try{
+    const resp=await fetch(SCRIPT_URL+"?action=total_pago");
+    const data=await resp.json();
+    const totalPago=parseFloat(data.total)||0;
+    const premioFinal=(totalPago*0.75).toFixed(2);
+    premioTotal.textContent=`💎 PRÊMIO TOTAL: R$ ${premioFinal}`;
+  }catch(e){
+    premioTotal.textContent="Erro ao carregar prêmio";
+  }
+}
+
+function renderGrid(){
 const bichos=[
 ["Avestruz","01","02","03","04","https://github.com/ClenaStore/barreirense/blob/main/paste/avestruz.png?raw=true"],
 ["Águia","05","06","07","08","https://github.com/ClenaStore/barreirense/blob/main/paste/%C3%A1guia.png?raw=true"],
@@ -364,51 +434,10 @@ const bichos=[
 ["Veado","93","94","95","96","https://github.com/ClenaStore/barreirense/blob/main/paste/VEADO.png?raw=true"],
 ["Vaca","97","98","99","00","https://github.com/ClenaStore/barreirense/blob/main/paste/VACA.png?raw=true"]
 ];
-const grid=document.getElementById("grid"),
-selCountEl=document.getElementById("selCount"),
-premioEl=document.getElementById("premio"),
-premioTotal=document.getElementById("premioTotal"),
-popup=document.getElementById("popup"),
-overlayPix=document.getElementById("overlayPix"),
-pixValor=document.getElementById("pixValor"),
-pixChave=document.getElementById("pixChave"),
-pixQR=document.getElementById("pixQR"),
-copiarPix=document.getElementById("copiarPix"),
-fecharPix=document.getElementById("fecharPix"),
-btnConfirm=document.getElementById("btnConfirm"),
-btnClear=document.getElementById("btnClear");
-
-let selecionados=new Set(),totalPago=0;
-
-function updatePanel(){
-  selCountEl.textContent=selecionados.size;
-  btnConfirm.disabled=selecionados.size===0;
-  const premio=(totalPago*0.6).toFixed(2);
-  premioEl.textContent=`R$ ${premio}`;
-}
-
-async function atualizarPremioTotal(){
-  try{
-    const resp=await fetch(SCRIPT_URL+"?action=total_pago");
-    const data=await resp.json();
-    const totalPago=parseFloat(data.total)||0;
-    const premioFinal=(totalPago*0.75).toFixed(2);
-    premioTotal.textContent=`💎 PRÊMIO TOTAL: R$ ${premioFinal}`;
-  }catch(e){
-    premioTotal.textContent="Erro ao carregar prêmio";
-  }
-}
-
-function renderGrid(){
   grid.innerHTML=bichos.map(([nome,n1,n2,n3,n4,img])=>`
   <div class="card" data-nome="${nome}">
-    <img src="${img}" alt="${nome}">
-    <div class="nums">
-      <span>${n1}</span><br>
-      <span>${n2}</span><br>
-      <span>${n3}</span><br>
-      <span>${n4}</span>
-    </div>
+    <img src="${img}">
+    <div class="nums"><span>${n1}</span><br><span>${n2}</span><br><span>${n3}</span><br><span>${n4}</span></div>
     <div class="name">${nome}</div>
   </div>`).join('');
   document.querySelectorAll(".card").forEach(c=>{
@@ -432,20 +461,25 @@ document.getElementById("confirm").onclick=async()=>{
   const arr=[...selecionados];
   if(!nome||!email||!tel||arr.length===0){alert("Preencha todos os campos.");return;}
   const total=arr.length*PRECO;
+
+  overlayEnvio.style.display="flex"; // mostra overlay de envio
   try{
     await fetch(SCRIPT_URL,{
       method:"POST",
       headers:{"Content-Type":"text/plain;charset=utf-8"},
       body:JSON.stringify({action:"registrar_rifa",nome,email,telefone:tel,bichos:arr,total})
     });
+    overlayEnvio.style.display="none";
     popup.style.display="none";
     abrirPix(total);
     selecionados.clear();
     document.querySelectorAll(".selected").forEach(c=>c.classList.remove("selected"));
     updatePanel();
-  }catch(e){alert("Erro ao enviar. Verifique a conexão.");}
+  }catch(e){
+    overlayEnvio.style.display="none";
+    alert("Erro ao enviar. Verifique a conexão.");
+  }
 };
-
 function abrirPix(total){
   pixValor.textContent=`R$ ${total.toFixed(2)}`;
   const chave=document.getElementById("pix"+total)?.value||"711e433b-bb4e-477e-adb7-518eacf2f67e";
@@ -455,9 +489,16 @@ function abrirPix(total){
   pixQR.style.display=qr?"block":"none";
   overlayPix.style.display="flex";
 }
-copiarPix.onclick=async()=>{await navigator.clipboard.writeText(pixChave.textContent);copiarPix.textContent="✅ Copiado!";setTimeout(()=>copiarPix.textContent="📋 Copiar chave PIX",2000);};
+
+copiarPix.onclick=async()=>{
+  await navigator.clipboard.writeText(pixChave.textContent);
+  copiarPix.textContent="✅ Copiado!";
+  setTimeout(()=>copiarPix.textContent="📋 Copiar chave PIX",2000);
+};
+
 fecharPix.onclick=()=>overlayPix.style.display="none";
 
+/* ===== Inicialização ===== */
 renderGrid();
 atualizarPremioTotal();
 setInterval(atualizarPremioTotal,20000);
