@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>⚽ Apostas de Futebol</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg1:#060818;--bg2:#0a0f2c;--panel:#0f172a;--line:#1e2a3f;
+  --text:#eaf2ff;--muted:#a7b3c8;--accent:#00e5ff;--accent2:#7c3aed;
+  --warn:#f59e0b;--ok:#16a34a;--bad:#ef4444;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:Inter,system-ui;
+  background:radial-gradient(900px 700px at 50% -150px,var(--bg2),#020412 75%);
+  color:var(--text);
+  min-height:100vh;
+  overflow-x:hidden;
+}
+
+/* ===== Cabeçalho ===== */
+header{text-align:center;padding:22px 10px 12px}
+h1{font-family:Orbitron;color:var(--warn);text-shadow:0 0 10px rgba(245,158,11,.6);font-size:28px;margin-bottom:4px}
+.sub{color:var(--muted);font-size:15px}
+
+/* 💎 Total do Prêmio Global */
+#premioTotal{
+  text-align:center;
+  font-family:Orbitron;
+  font-size:34px;
+  margin-top:10px;
+  margin-bottom:5px;
+  color:#00ffe1;
+  text-shadow:0 0 25px #00ffe1,0 0 50px #00ffe1;
+  animation:piscar 1.2s infinite alternate;
+}
+@keyframes piscar{
+  from{opacity:1;transform:scale(1);}
+  to{opacity:.5;transform:scale(1.05);}
+}
+
+/* ===== Painel Superior ===== */
+.panel{max-width:1050px;margin:14px auto;background:linear-gradient(180deg,var(--panel),#0a0f1f);
+border:1px solid var(--line);border-radius:16px;padding:14px;display:flex;flex-wrap:wrap;
+gap:8px;align-items:center;justify-content:space-between;box-shadow:0 0 22px rgba(0,229,255,.07)}
+.panel .badges{display:flex;flex-wrap:wrap;gap:6px;align-items:center;flex:1;min-width:280px}
+.badge{font-size:12px;background:#0b1223;border:1px solid var(--line);padding:6px 10px;border-radius:10px;color:#a7b3c8}
+.price{color:var(--warn);font-weight:800}
+.actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end;flex:1}
+.btn{border:none;border-radius:10px;padding:12px 14px;font-weight:800;cursor:pointer;transition:.25s;font-size:14px}
+.btn-primary{background:linear-gradient(90deg,var(--accent2),var(--accent));color:#06121a;box-shadow:0 0 12px rgba(0,229,255,.35)}
+.btn-clear{background:#102038;color:#dbe7ff;border:1px solid var(--line)}
+.btn-add{background:#0f2448;color:#cfe8ff;border:1px dashed #29508f}
+
+/* ===== Grid de Jogos ===== */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;max-width:1050px;margin:20px auto 80px;padding:0 14px}
+.card{position:relative;border:1px solid #13213a;border-radius:14px;overflow:hidden;transition:.25s;background:#030711;min-height:220px}
+.card:hover{transform:translateY(-3px);box-shadow:0 8px 18px rgba(0,229,255,.18)}
+.league{position:absolute;top:8px;left:8px;background:#0b1223;border:1px solid var(--line);padding:4px 8px;border-radius:8px;font-size:11px;color:#9fb6d9}
+.time{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:12px 12px 0}
+.time .t{display:flex;align-items:center;gap:8px;font-weight:700}
+.time img{width:26px;height:26px;border-radius:50%;object-fit:cover;border:1px solid #1a2b45}
+.vs{font-family:Orbitron;color:#88e3ff;text-shadow:0 0 10px rgba(0,229,255,.35)}
+.datetime{padding:4px 12px;color:#a7b3c8;font-size:12px}
+.score{display:flex;align-items:center;justify-content:center;gap:8px;margin:10px 0}
+.score input{width:54px;text-align:center;background:#0b1220;color:#eaf2ff;border:1px solid #20324f;border-radius:10px;padding:10px;font-size:18px;font-weight:800}
+.addSel{display:block;margin:10px auto 14px}
+.card.selected{outline:2px solid var(--accent);box-shadow:0 0 0 4px rgba(0,229,255,.22) inset,0 0 16px rgba(0,229,255,.24)}
+
+/* ===== Popup Cadastro ===== */
+.popup{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:10000;align-items:center;justify-content:center}
+.box{width:min(92vw,480px);background:linear-gradient(180deg,var(--panel),#0a0f1c);border:1px solid var(--line);border-radius:14px;padding:16px;box-shadow:0 0 18px rgba(0,229,255,.25)}
+.box h3{margin:0 0 8px;color:var(--warn);font-family:Orbitron;text-align:center}
+.box label{display:block;color:var(--muted);font-size:13px;margin:10px 0 6px}
+.box input{width:100%;background:#0b1220;color:var(--text);border:none;border-radius:10px;padding:12px;font-size:15px}
+.row{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}
+.ok{background:linear-gradient(90deg,var(--warn),#ffb757);color:#111}
+.cancel{background:#112036;color:#c9d6ec;border:1px solid #1f2f49}
+
+/* ===== Overlay de Envio ===== */
+#overlayEnvio{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.85);
+  z-index:12000;
+  align-items:center;
+  justify-content:center;
+  flex-direction:column;
+  text-align:center;
+  font-family:Orbitron;
+}
+#overlayEnvio .spinner{
+  width:78px;height:78px;border-radius:50%;
+  border:5px solid rgba(0,229,255,.2);
+  border-top-color:var(--accent);
+  animation:spin 1s linear infinite;
+  box-shadow:0 0 18px rgba(0,229,255,.25);
+}
+#overlayEnvio p{
+  margin-top:16px;color:var(--accent);font-size:18px;text-shadow:0 0 8px var(--accent);
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ===== Overlay PIX ===== */
+.overlay-pix{
+  display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:11000;
+  align-items:center;justify-content:center;flex-direction:column;text-align:center;padding:20px;
+}
+.overlay-pix .box{
+  background:linear-gradient(180deg,var(--panel),#0a0f1c);border:1px solid var(--line);
+  border-radius:14px;padding:22px;max-width:420px;box-shadow:0 0 18px rgba(0,229,255,.25);
+}
+.overlay-pix h3{font-family:Orbitron;color:var(--warn);margin-bottom:10px}
+.overlay-pix p{color:var(--muted);margin:8px 0}
+.overlay-pix .pix-key{background:#16243a;color:#eaf2ff;padding:10px;border-radius:8px;margin:10px 0;font-weight:700;word-break:break-all;border:1px solid #20344f}
+.overlay-pix .btns{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+.overlay-pix button{border:none;border-radius:8px;padding:10px;font-weight:700;cursor:pointer}
+.copyPix{background:linear-gradient(90deg,var(--accent),#5cc7ff);color:#0b1220}
+.closePix{background:#112036;color:#c9d6ec;border:1px solid #1f2f49}
+
+/* ===== Modal Adicionar Jogo ===== */
+#addGame{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:10010;align-items:center;justify-content:center}
+#addGame .box input{margin-bottom:8px}
+
+/* ===== Tabela PIX oculta ===== */
+#pixConfig{display:none}
+
+/* ===== Mobile ===== */
+@media(max-width:700px){
+  h1{font-size:24px}
+  #premioTotal{font-size:26px}
+  .panel{flex-direction:column;align-items:flex-start;gap:10px}
+  .panel .actions{width:100%;justify-content:space-between}
+  .btn{flex:1}
+  .grid{grid-template-columns:repeat(1,1fr);gap:10px}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>⚽ Apostas de Futebol</h1>
+  <p class="sub">Escolha seus palpites de placar — R$ 6,00 cada</p>
+</header>
+
+<!-- 💎 Total do Prêmio -->
+<div id="premioTotal">Carregando prêmio...</div>
+
+<!-- Painel Superior -->
+<div class="panel">
+  <div class="badges">
+    <span class="badge">Jogos abertos: <b id="abertos">0</b></span>
+    <span class="badge">Selecionados: <b id="selCount">0</b></span>
+    <span class="badge">Preço por palpite: <b class="price">R$ 6,00</b></span>
+  </div>
+  <div class="actions">
+    <button id="btnAddGame" class="btn btn-add">+ Adicionar jogo</button>
+    <button id="btnClear" class="btn btn-clear">Limpar</button>
+    <button id="btnConfirm" class="btn btn-primary" disabled>Confirmar</button>
+  </div>
+</div>
+
+<!-- Lista de jogos -->
+<div id="grid" class="grid"></div>
+
+<!-- Popup de Cadastro -->
+<div id="popup" class="popup">
+  <div class="box">
+    <h3>Finalizar Aposta</h3>
+    <div class="badge" style="text-align:center;margin-bottom:8px">
+      Palpites: <b id="resumoPreview"></b> • Total: <b id="totalPreview"></b>
+    </div>
+    <label>Nome completo</label>
+    <input id="nome" type="text" placeholder="Seu nome" required>
+    <label>E-mail</label>
+    <input id="email" type="email" placeholder="seu@email.com" required>
+    <label>Telefone / WhatsApp</label>
+    <input id="tel" type="tel" placeholder="(00) 00000-0000" maxlength="16" required>
+    <div class="row">
+      <button id="confirm" class="btn ok" type="button">Enviar</button>
+      <button id="cancel" class="btn cancel" type="button">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Overlay de Envio -->
+<div id="overlayEnvio">
+  <div class="spinner"></div>
+  <p>Enviando sua aposta...</p>
+</div>
+
+<!-- Overlay PIX Final -->
+<div id="overlayPix" class="overlay-pix">
+  <div class="box">
+    <h3>Pagamento via PIX</h3>
+    <p>Valor total a pagar: <b id="pixValor"></b></p>
+    <img id="pixQR" src="" style="max-width:220px;border-radius:10px;display:none;">
+    <div class="pix-key" id="pixChave"></div>
+    <div class="btns">
+      <button class="copyPix" id="copiarPix">📋 Copiar chave PIX</button>
+      <button class="closePix" id="fecharPix">Fechar</button>
+    </div>
+    <p style="margin-top:12px;font-size:14px;color:#ffd089;">
+      ⚠️ Sua aposta será confirmada após o pagamento.
+    </p>
+  </div>
+</div>
+
+<!-- Modal Adicionar Jogo -->
+<div id="addGame">
+  <div class="box">
+    <h3>Novo Jogo</h3>
+    <label>Time casa</label>
+    <input id="agCasa" type="text" placeholder="Ex: Flamengo">
+    <label>Time fora</label>
+    <input id="agFora" type="text" placeholder="Ex: Palmeiras">
+    <label>Data e hora</label>
+    <input id="agData" type="datetime-local">
+    <label>Competição / Liga</label>
+    <input id="agLiga" type="text" placeholder="Brasileirão Série A">
+    <div class="row">
+      <button id="agSalvar" class="btn ok" type="button">Salvar jogo</button>
+      <button id="agFechar" class="btn cancel" type="button">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<!-- 🔒 Configuração PIX Oculta (a mesma do seu projeto) -->
+<div id="pixConfig" style="display:none;">
+  <table>
+    <tr><th>Valor</th><th>Chave PIX</th><th>QR Code (link da imagem)</th></tr>
+    <tr><td>R$6,00</td>
+      <td><input id="pix6" value="00020126580014BR.GOV.BCB.PIX01366e987ca9-a5f6-4a6f-8cc6-e23e15bcc50c52040000530398654046.005802BR5925CLEVESON DE ARAUJO CAMARA6011CRISTOPOLIS62070503***6304E3BE"></td>
+      <td><input id="qr6" value="https://github.com/ClenaStore/barreirense/blob/main/paste/Imagem%20do%20WhatsApp%20de%202025-10-10%20%C3%A0(s)%2017.02.24_55688db5.jpg?raw=true"></td></tr>
+    <tr><td>R$12,00</td>
+      <td><input id="pix12" value="00020126580014BR.GOV.BCB.PIX01366e987ca9-a5f6-4a6f-8cc6-e23e15bcc50c520400005303986540512.005802BR5925CLEVESON DE ARAUJO CAMARA6011CRISTOPOLIS62070503***630462C2"></td>
+      <td><input id="qr12" value="https://github.com/ClenaStore/barreirense/blob/main/paste/Imagem%20do%20WhatsApp%20de%202025-10-10%20%C3%A0(s)%2017.04.54_3c9ee0bb.jpg?raw=true"></td></tr>
+    <tr><td>R$18,00</td>
+      <td><input id="pix18" value="00020126580014BR.GOV.BCB.PIX01366e987ca9-a5f6-4a6f-8cc6-e23e15bcc50c520400005303986540518.005802BR5925CLEVESON DE ARAUJO CAMARA6011CRISTOPOLIS62070503***6304925B"></td>
+      <td><input id="qr18" value="https://github.com/ClenaStore/barreirense/blob/main/paste/Imagem%20do%20WhatsApp%20de%202025-10-10%20%C3%A0(s)%2017.05.33_b8d50241.jpg?raw=true"></td></tr>
+    <tr><td>R$24,00</td>
+      <td><input id="pix24" value="00020126580014BR.GOV.BCB.PIX01366e987ca9-a5f6-4a6f-8cc6-e23e15bcc50c520400005303986540524.005802BR5925CLEVESON DE ARAUJO CAMARA6011CRISTOPOLIS62070503***6304AC5F"></td>
+      <td><input id="qr24" value="https://github.com/ClenaStore/barreirense/blob/main/paste/Imagem%20do%20WhatsApp%20de%202025-10-10%20%C3%A0(s)%2017.06.30_280e5504.jpg?raw=true"></td></tr>
+    <tr><td>R$30,00</td>
+      <td><input id="pix30" value="00020126580014BR.GOV.BCB.PIX01366e987ca9-a5f6-4a6f-8cc6-e23e15bcc50c520400005303986540530.005802BR5925CLEVESON DE ARAUJO CAMARA6011CRISTOPOLIS62070503***630449BC"></td>
+      <td><input id="qr30" value="https://github.com/ClenaStore/barreirense/blob/main/paste/Imagem%20do%20WhatsApp%20de%202025-10-10%20%C3%A0(s)%2017.08.25_4e2a5655.jpg?raw=true"></td></tr>
+    <tr><td>R$36,00</td>
+      <td><input id="pix36" value="00020126580014BR.GOV.BCB.PIX01366e987ca9-a5f6-4a6f-8cc6-e23e15bcc50c520400005303986540536.005802BR5925CLEVESON DE ARAUJO CAMARA6011CRISTOPOLIS62070503***630419CB"></td>
+      <td><input id="qr36" value="https://github.com/ClenaStore/barreirense/blob/main/paste/Imagem%20do%20WhatsApp%20de%202025-10-10%20%C3%A0(s)%2017.09.16_0fc9346a.jpg?raw=true"></td></tr>
+    <tr><td>R$42,00</td>
+      <td><input id="pix42" value="00020126580014BR.GOV.BCB.PIX01366e987ca9-a5f6-4a6f-8cc6-e23e15bcc50c520400005303986540542.005802BR5925CLEVESON DE ARAUJO CAMARA6011CRISTOPOLIS62070503***6304D1DD"></td>
+      <td><input id="qr42" value="https://github.com/ClenaStore/barreirense/blob/main/paste/Imagem%20do%20WhatsApp%20de%202025-10-10%20%C3%A0(s)%2017.09.53_76f1d024.jpg?raw=true"></td></tr>
+    <!-- ...demais linhas iguais às do seu arquivo original... -->
+    <tr><td>R$150,00</td>
+      <td><input id="pix150" value="chave150@pix.com"></td>
+      <td><input id="qr150" value="https://seusite.com/qr150.png"></td></tr>
+  </table>
+</div>
+
+<script>
+/* ====== CONFIG ====== */
+const SCRIPT_URL="SUA_URL_DO_GAS_AQUI"; // use a sua implantação do Apps Script
+const PRECO=6;
+
+/* ====== ESTADO ====== */
+const grid=document.getElementById("grid"),
+      abertosEl=document.getElementById("abertos"),
+      selCountEl=document.getElementById("selCount"),
+      premioTotal=document.getElementById("premioTotal"),
+      popup=document.getElementById("popup"),
+      overlayPix=document.getElementById("overlayPix"),
+      overlayEnvio=document.getElementById("overlayEnvio"),
+      pixValor=document.getElementById("pixValor"),
+      pixChave=document.getElementById("pixChave"),
+      pixQR=document.getElementById("pixQR"),
+      copiarPix=document.getElementById("copiarPix"),
+      fecharPix=document.getElementById("fecharPix"),
+      btnConfirm=document.getElementById("btnConfirm"),
+      btnClear=document.getElementById("btnClear"),
+      btnAddGame=document.getElementById("btnAddGame"),
+      addGame=document.getElementById("addGame"),
+      agCasa=document.getElementById("agCasa"),
+      agFora=document.getElementById("agFora"),
+      agData=document.getElementById("agData"),
+      agLiga=document.getElementById("agLiga"),
+      agSalvar=document.getElementById("agSalvar"),
+      agFechar=document.getElementById("agFechar");
+
+let selecoes=[]; // {id, casa, fora, liga, dataISO, palpiteCasa, palpiteFora}
+
+/* ====== JOGOS DE EXEMPLO (abertos) ====== */
+let jogos=[
+  { id:genId(), casa:"Flamengo", fora:"Palmeiras", liga:"Brasileirão Série A", dataISO:proxDia(0, "19:00") },
+  { id:genId(), casa:"Grêmio", fora:"Corinthians", liga:"Brasileirão Série A", dataISO:proxDia(1, "16:00") },
+  { id:genId(), casa:"Real Madrid", fora:"Barcelona", liga:"LaLiga", dataISO:proxDia(2, "17:45") },
+  { id:genId(), casa:"Manchester City", fora:"Liverpool", liga:"Premier League", dataISO:proxDia(3, "15:30") }
+];
+
+/* ====== UI: Render ====== */
+function renderJogos(){
+  abertosEl.textContent=jogos.length;
+  grid.innerHTML=jogos.map(j => cardJogo(j)).join('');
+  attachCardEvents();
+}
+
+function cardJogo(j){
+  const dt=new Date(j.dataISO);
+  const dataFmt=dt.toLocaleString('pt-BR',{ timeZone:'America/Bahia', day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' });
+  return `
+  <div class="card" data-id="${j.id}">
+    <div class="league">${j.liga}</div>
+    <div class="time">
+      <div class="t"><img src="https://flagcdn.com/w20/br.png" alt=""><span>${j.casa}</span></div>
+      <div class="vs">x</div>
+      <div class="t"><img src="https://flagcdn.com/w20/br.png" alt=""><span>${j.fora}</span></div>
+    </div>
+    <div class="datetime">⏰ ${dataFmt}</div>
+    <div class="score">
+      <input type="number" min="0" max="20" step="1" class="sc-casa" placeholder="0">
+      <span class="vs">×</span>
+      <input type="number" min="0" max="20" step="1" class="sc-fora" placeholder="0">
+    </div>
+    <button class="btn btn-primary addSel">Adicionar palpite</button>
+  </div>`;
+}
+
+function attachCardEvents(){
+  document.querySelectorAll(".card").forEach(card=>{
+    const id=card.dataset.id;
+    card.querySelector(".addSel").addEventListener("click",()=>{
+      const scCasa = parseInt(card.querySelector(".sc-casa").value,10);
+      const scFora = parseInt(card.querySelector(".sc-fora").value,10);
+      if(Number.isNaN(scCasa) || Number.isNaN(scFora) || scCasa<0 || scFora<0){
+        alert("Informe um placar válido (números inteiros).");return;
+      }
+      const j = jogos.find(x=>x.id===id);
+      const existente = selecoes.find(x=>x.id===id);
+      if(existente){
+        existente.palpiteCasa=scCasa; existente.palpiteFora=scFora;
+      }else{
+        selecoes.push({ id:j.id, casa:j.casa, fora:j.fora, liga:j.liga, dataISO:j.dataISO, palpiteCasa:scCasa, palpiteFora:scFora });
+      }
+      card.classList.add("selected");
+      updatePanel();
+    });
+  });
+}
+
+/* ====== Panel ====== */
+function updatePanel(){
+  selCountEl.textContent=selecoes.length;
+  btnConfirm.disabled = selecoes.length===0;
+}
+
+/* ====== Prêmio total (—25%) via GAS ====== */
+async function atualizarPremioTotal(){
+  try{
+    const resp = await fetch(SCRIPT_URL+"?action=total_pago");
+    const data = await resp.json();
+    const totalPago = parseFloat(data.total)||0;
+    const premioFinal = (totalPago*0.75).toFixed(2);
+    premioTotal.textContent=`💎 PRÊMIO TOTAL: R$ ${premioFinal}`;
+  }catch(e){
+    premioTotal.textContent="Erro ao carregar prêmio";
+  }
+}
+
+/* ====== Ações do topo ====== */
+btnClear.onclick=()=>{ selecoes=[]; document.querySelectorAll(".card.selected").forEach(c=>c.classList.remove("selected")); updatePanel(); };
+btnConfirm.onclick=()=>abrirPopup();
+
+/* ====== Popup ====== */
+function abrirPopup(){
+  const resumo = selecoes.map(s=>{
+    const dt=new Date(s.dataISO);
+    const d=dt.toLocaleString('pt-BR',{ timeZone:'America/Bahia', day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' });
+    return `${s.casa} ${s.palpiteCasa}×${s.palpiteFora} ${s.fora} (${d})`;
+  }).join(" | ");
+  document.getElementById("resumoPreview").textContent = resumo || "—";
+  document.getElementById("totalPreview").textContent = `R$ ${(selecoes.length*PRECO).toFixed(2)}`;
+  popup.style.display="flex";
+}
+document.getElementById("cancel").onclick=()=>popup.style.display="none";
+
+/* ====== Envio ====== */
+document.getElementById("confirm").onclick=async()=>{
+  const nome=document.getElementById("nome").value.trim(),
+        email=document.getElementById("email").value.trim(),
+        tel=document.getElementById("tel").value.trim();
+  if(!nome||!email||!tel||selecoes.length===0){ alert("Preencha os dados e selecione ao menos um palpite."); return; }
+  const total = selecoes.length*PRECO;
+
+  overlayEnvio.style.display="flex";
+  try{
+    await fetch(SCRIPT_URL,{
+      method:"POST",
+      headers:{"Content-Type":"text/plain;charset=utf-8"},
+      body:JSON.stringify({
+        action:"registrar_aposta_futebol",
+        nome,email,telefone:tel,
+        apostas:selecoes, // lista completa de palpites
+        total
+      })
+    });
+    overlayEnvio.style.display="none";
+    popup.style.display="none";
+    abrirPix(total);
+    // reset
+    selecoes=[]; updatePanel();
+    document.querySelectorAll(".card.selected").forEach(c=>c.classList.remove("selected"));
+  }catch(e){
+    overlayEnvio.style.display="none";
+    alert("Erro ao enviar. Verifique a conexão.");
+  }
+};
+
+/* ====== PIX ====== */
+function abrirPix(total){
+  pixValor.textContent=`R$ ${total.toFixed(2)}`;
+  const chave=document.getElementById("pix"+total)?.value||"711e433b-bb4e-477e-adb7-518eacf2f67e";
+  const qr=document.getElementById("qr"+total)?.value||"";
+  pixChave.textContent=chave;
+  pixQR.src=qr;
+  pixQR.style.display=qr?"block":"none";
+  overlayPix.style.display="flex";
+}
+copiarPix.onclick=async()=>{ await navigator.clipboard.writeText(pixChave.textContent); copiarPix.textContent="✅ Copiado!"; setTimeout(()=>copiarPix.textContent="📋 Copiar chave PIX",2000); };
+fecharPix.onclick=()=>overlayPix.style.display="none";
+
+/* ====== Adicionar jogo (admin) ====== */
+btnAddGame.onclick=()=>{ addGame.style.display="flex"; };
+agFechar.onclick=()=>{ addGame.style.display="none"; };
+
+agSalvar.onclick=async()=>{
+  const casa=agCasa.value.trim(), fora=agFora.value.trim(), liga=agLiga.value.trim();
+  const dataISO = agData.value ? new Date(agData.value).toISOString() : "";
+  if(!casa||!fora||!dataISO){ alert("Preencha casa, fora e data/hora."); return; }
+  const novo = { id:genId(), casa, fora, liga: liga||"—", dataISO };
+  jogos.push(novo);
+  renderJogos();
+  addGame.style.display="none";
+  agCasa.value=""; agFora.value=""; agLiga.value=""; agData.value="";
+
+  // opcional: enviar para o GAS para persistir
+  try{
+    await fetch(SCRIPT_URL,{
+      method:"POST",
+      headers:{"Content-Type":"text/plain;charset=utf-8"},
+      body:JSON.stringify({ action:"criar_jogo", jogo:novo })
+    });
+  }catch(e){ /* silencioso */ }
+};
+
+/* ====== Helpers ====== */
+function genId(){ return Math.random().toString(36).slice(2,10); }
+function proxDia(plusDays, hhmm="19:00"){
+  const [h,m]=hhmm.split(":").map(Number);
+  const d=new Date(); d.setDate(d.getDate()+plusDays); d.setHours(h,m||0,0,0);
+  return d.toISOString();
+}
+
+/* ====== Boot ====== */
+renderJogos();
+atualizarPremioTotal();
+setInterval(atualizarPremioTotal, 20000);
+</script>
+</body>
+</html>
