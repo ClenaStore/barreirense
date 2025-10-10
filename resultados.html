@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
-<title>Resultados</title>
+<title>📊 Resultados</title>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&family=Inter:wght@400;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
@@ -17,12 +17,11 @@
   --accent:#00e5ff;--warn:#f59e0b;--ok:#16a34a;
 }
 html,body{
-  margin:0;
-  padding:0;
+  margin:0;padding:0;
   font-family:Inter,system-ui;
   color:var(--text);
   overflow-x:hidden;
-  background:radial-gradient(800px 600px at 50% -100px,var(--bg2),#020412 80%) !important;
+  background:radial-gradient(800px 600px at 50% -100px,var(--bg2),#020412 85%) !important;
 }
 
 /* ===== FILTRO ===== */
@@ -72,9 +71,9 @@ html,body{
   display:flex;
   align-items:center;
   justify-content:space-between;
+  flex-wrap:wrap;
   gap:10px;
   cursor:pointer;
-  flex-wrap:wrap;
 }
 .card-header-left{
   display:flex;
@@ -82,7 +81,7 @@ html,body{
   gap:10px;
 }
 .card-header-left img{
-  width:40px;height:40px;
+  width:45px;height:45px;
   border-radius:8px;
   object-fit:cover;
   border:1px solid var(--line);
@@ -170,7 +169,7 @@ html,body{
 </div>
 
 <script>
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyRM7vx3TWCnl3EhbuT30BsZbL-WTobUbE1bALP7tjTVzHgEQsa_JzrS8WNBXa_AdrS/exec";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyRM7vx3TWCnl3EhbuT30BsZbL-WTobUbE1bALP7tjTVzHgEQsa_JzrS8WNBXa_AdrS/exec"; // 🔁 substitua aqui
 let resultadosOriginais = [];
 
 // === Carrega os resultados da última semana ===
