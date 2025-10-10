@@ -1,129 +1,53 @@
-// api/create_payment.js
-// Vercel Serverless function. Node 18+ -> fetch global disponível.
-
-// Endpoints Mercado Pago usados:
-// - POST https://api.mercadopago.com/checkout/preferences  -> cria preference (link init_point)
-// - POST https://api.mercadopago.com/v1/payments          -> cria pagamento PIX (qr info)
-
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
+    return res.status(405).json({ error: 'Método não permitido' });
   }
 
   const MP_TOKEN = process.env.MP_ACCESS_TOKEN;
   if (!MP_TOKEN) {
-    return res.status(500).json({ error: 'Missing MP_ACCESS_TOKEN in env' });
+    return res.status(500).json({ error: 'MP_ACCESS_TOKEN ausente nas variáveis de ambiente' });
   }
 
   try {
-    const { amount, title = 'Compra', description = '', payer = {} } = req.body;
-    const transactionAmount = Number(amount);
-    if (!transactionAmount || isNaN(transactionAmount)) {
-      return res.status(400).json({ error: 'Invalid amount' });
-    }
+    const { amount, title = 'Jogo do Bicho', description = 'Aposta', payer = {} } = req.body;
 
-    // 1) Criar preference (link de checkout — init_point)
-    const prefBody = {
-      items: [
-        {
-          title,
-          description,
-          quantity: 1,
-          currency_id: 'BRL',
-          unit_price: transactionAmount
-        }
-      ],
+    // Cria pagamento PIX
+    const paymentBody = {
+      transaction_amount: Number(amount),
+      description,
+      payment_method_id: 'pix',
       payer: {
-        name: payer.name || 'Cliente',
+        email: payer.email || 'teste@example.com',
+        first_name: payer.name || 'Jogador'
       },
-      back_urls: {
-        success: '', // opcional
-        failure: '',
-        pending: ''
-      },
-      auto_return: 'approved'
+      notification_url: `${process.env.SITE_URL}/api/webhook`
     };
 
-    const prefResp = await fetch('https://api.mercadopago.com/checkout/preferences', {
+    const resp = await fetch('https://api.mercadopago.com/v1/payments', {
       method: 'POST',
       headers: {
-        Authorization: `Bearer ${MP_TOKEN}`,
+        'Authorization': `Bearer ${MP_TOKEN}`,
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify(prefBody)
+      body: JSON.stringify(paymentBody)
     });
 
-    const prefJson = await prefResp.json();
-    const init_point = prefJson.init_point || null;
+    const data = await resp.json();
 
-    // 2) Criar payment com método PIX para obter QR code (opcional: você pode pular isto se só quer o link)
-    // A criação de pagamento PIX pode retornar qr_code e qr_code_base64 em point_of_interaction.transaction_data
-    let pixData = null;
-    try {
-      const paymentBody = {
-        transaction_amount: transactionAmount,
-        payment_method_id: 'pix',
-        description: description || title,
-        payer: {
-          email: payer.email || 'no-reply@example.com',
-          first_name: payer.name || 'Cliente',
-          phone: {
-            area_code: payer.phone_area_code || '00',
-            number: payer.phone_number || '000000000'
-          }
-        }
-      };
-
-      const payResp = await fetch('https://api.mercadopago.com/v1/payments', {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${MP_TOKEN}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(paymentBody)
+    if (data.point_of_interaction && data.point_of_interaction.transaction_data) {
+      const { qr_code, qr_code_base64 } = data.point_of_interaction.transaction_data;
+      return res.status(200).json({
+        pix_qr: qr_code,
+        pix_qr_base64: qr_code_base64,
+        id: data.id
       });
-
-      const payJson = await payResp.json();
-      // Se sucesso, payJson.point_of_interaction.transaction_data tem qr_code / qr_code_base64
-      const pix_qr = payJson?.point_of_interaction?.transaction_data?.qr_code || null;
-      const pix_qr_base64 = payJson?.point_of_interaction?.transaction_data?.qr_code_base64 || null;
-      pixData = { pix_qr, pix_qr_base64, payment: payJson };
-    } catch (e) {
-      // falha ao criar payment PIX: continuamos devolvendo init_point
-      pixData = { error: 'Erro ao criar pagamento PIX', details: e?.message || String(e) };
+    } else {
+      console.error('Resposta inesperada:', data);
+      return res.status(500).json({ error: 'Resposta inesperada do Mercado Pago', details: data });
     }
 
-    // 3) (Opcional) registrar a tentativa/transação na sua planilha ou DB
-    //    Você já possui SCRIPT_URL. É possível POSTAR aqui para gravar.
-    //    Recomendo gravar a tentativa aqui e atualizar via webhook quando pagamento confirmado.
-    /*
-    try {
-      await fetch(process.env.SCRIPT_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'registrar_pagamento_tentativa',
-          amount: transactionAmount,
-          title,
-          description,
-          payer,
-          preference_id: prefJson?.id,
-          payment_info: pixData?.payment || null
-        })
-      });
-    } catch(e) {
-      console.error('Erro ao registrar tentativa', e);
-    }
-    */
-
-    return res.status(200).json({
-      init_point,
-      preference: prefJson,
-      ...pixData
-    });
-
-  } catch (err) {
-    console.error(err);
-    return res.status(500).json({ error: 'Server error', details: String(err) });
+  } catch (e) {
+    console.error('Erro interno:', e);
+    return res.status(500).json({ error: e.message });
   }
 }
