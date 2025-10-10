@@ -15,16 +15,19 @@ export default async function handler(req, res) {
     // 🔑 Gera um ID único para o cabeçalho X-Idempotency-Key
     const idempotencyKey = `${Date.now()}-${Math.random().toString(36).substring(2, 15)}`;
 
-    const body = {
-      transaction_amount: Number(amount),
-      description: "Aposta - Jogo do Bicho",
-      payment_method_id: "pix",
-      payer: {
-        email: payer?.email || "cliente@teste.com",
-        first_name: payer?.name || "Jogador",
-      },
-      notification_url: `${process.env.SITE_URL}/api/webhook`,
-    };
+// dentro de /api/create_payment.js
+const body = {
+  transaction_amount: Number(amount),
+  description: "Aposta - Jogo do Bicho",
+  payment_method_id: "pix",       // força PIX
+  payment_type_id: "pix",         // garante PIX mesmo que a conta tenha cartão habilitado
+  payer: {
+    email: payer?.email || "cliente@teste.com",
+    first_name: payer?.name || "Jogador",
+  },
+  notification_url: `${process.env.SITE_URL}/api/webhook`,
+};
+
 
     const resp = await fetch("https://api.mercadopago.com/v1/payments", {
       method: "POST",
