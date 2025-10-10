@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
-<title>📊 Resultados</title>
+<title>📊 Resultados dos Jogos</title>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&family=Inter:wght@400;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
@@ -11,156 +11,165 @@
 
 <style>
 :root{
-  --bg1:#060818;--bg2:#0a0f2c;
-  --panel:#0f172a;--line:#1e2a3f;
-  --text:#eaf2ff;--muted:#a7b3c8;
-  --accent:#00e5ff;--warn:#f59e0b;--ok:#16a34a;
+  --bg1:#050711;--bg2:#0b1325;
+  --panel:#101a33;--line:#1f2f49;
+  --text:#eaf2ff;--muted:#9ba7c0;
+  --accent:#00e5ff;--warn:#fbbf24;--ok:#22c55e;
 }
 html,body{
   margin:0;padding:0;
   font-family:Inter,system-ui;
   color:var(--text);
   overflow-x:hidden;
-  background:radial-gradient(800px 600px at 50% -100px,var(--bg2),#020412 85%) !important;
+  background:radial-gradient(900px 700px at 50% -200px,var(--bg2),#020412 80%) fixed;
+  min-height:100vh;
 }
 
-/* ===== FILTRO ===== */
-.filtro{
+/* ===== CABEÇALHO FIXO ===== */
+header{
+  position:sticky;top:0;z-index:100;
+  background:rgba(10,15,30,0.9);
+  backdrop-filter:blur(8px);
+  border-bottom:1px solid rgba(0,229,255,0.15);
   text-align:center;
-  margin:12px auto 18px;
+  padding:12px 10px 14px;
+  box-shadow:0 0 20px rgba(0,229,255,.1);
 }
-.filtro input{
-  background:#0c1428;
-  border:1px solid #1e2a3f;
+header h1{
+  font-family:Orbitron;
+  font-size:22px;
+  color:var(--accent);
+  margin:0 0 6px;
+  text-shadow:0 0 10px rgba(0,229,255,.4);
+}
+.controls{
+  display:flex;justify-content:center;align-items:center;gap:10px;flex-wrap:wrap;
+}
+.controls input{
+  background:#0c162b;
+  border:1px solid var(--line);
   color:var(--text);
   border-radius:8px;
   padding:8px 12px;
   font-size:14px;
-  width:180px;
-  outline:none;
+  width:160px;
   text-align:center;
-  transition:.2s;
+  transition:.3s;
 }
-.filtro input:focus{
-  border-color:var(--accent);
-  box-shadow:0 0 8px rgba(0,229,255,.4);
+.controls input:focus{border-color:var(--accent);box-shadow:0 0 10px rgba(0,229,255,.5);}
+.controls button{
+  background:linear-gradient(90deg,var(--accent),var(--warn));
+  color:#0b1325;
+  border:none;
+  border-radius:8px;
+  padding:8px 14px;
+  font-weight:700;
+  cursor:pointer;
+  font-size:14px;
+  transition:.3s;
 }
+.controls button:hover{transform:scale(1.05);box-shadow:0 0 15px rgba(0,229,255,.4);}
 
 /* ===== CONTAINER ===== */
 .container{
-  max-width:950px;
-  margin:0 auto 50px;
-  padding:0 12px;
+  max-width:960px;
+  margin:20px auto 80px;
+  padding:0 15px;
   display:flex;
   flex-direction:column;
-  gap:14px;
+  gap:18px;
 }
 
 /* ===== CARD ===== */
 .card{
   background:linear-gradient(180deg,var(--panel),#0a0f1f);
   border:1px solid var(--line);
-  border-radius:14px;
-  padding:12px;
-  box-shadow:0 0 15px rgba(0,229,255,.05);
+  border-radius:16px;
+  padding:14px;
+  box-shadow:0 0 25px rgba(0,229,255,.08);
   transition:.3s;
+  position:relative;
+  overflow:hidden;
 }
-.card:hover{box-shadow:0 0 18px rgba(0,229,255,.18);transform:translateY(-2px)}
-
+.card::before{
+  content:"";
+  position:absolute;inset:0;
+  border-radius:16px;
+  border:1px solid rgba(0,229,255,.15);
+  pointer-events:none;
+}
+.card:hover{transform:translateY(-3px);box-shadow:0 0 30px rgba(0,229,255,.15);}
 .card-header{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  flex-wrap:wrap;
-  gap:10px;
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;
   cursor:pointer;
 }
-.card-header-left{
-  display:flex;
-  align-items:center;
-  gap:10px;
-}
+.card-header-left{display:flex;align-items:center;gap:12px;}
 .card-header-left img{
-  width:45px;height:45px;
-  border-radius:8px;
-  object-fit:cover;
+  width:55px;height:55px;
+  border-radius:10px;object-fit:cover;
   border:1px solid var(--line);
-  box-shadow:0 0 6px rgba(0,229,255,.4);
+  box-shadow:0 0 8px rgba(0,229,255,.4);
 }
-.card-header h2{
-  font-family:Orbitron;
-  font-size:17px;
-  color:var(--warn);
-  margin:0;
-}
+.card-header h2{font-family:Orbitron;font-size:18px;color:var(--warn);margin:0;}
 .card-header .info-mini{
-  display:flex;
-  flex-direction:column;
-  align-items:flex-end;
-  font-size:12px;
-  color:var(--muted);
+  display:flex;flex-direction:column;align-items:flex-end;
+  font-size:13px;color:var(--muted);
 }
-.card-header .info-mini .count{
-  color:var(--ok);
-  font-weight:600;
-}
-.card-body{margin-top:8px;display:none;animation:fade .3s ease}
-@keyframes fade{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
+.info-mini .count{color:var(--ok);font-weight:700;}
+.card-body{display:none;margin-top:10px;animation:fade .3s ease;}
+@keyframes fade{from{opacity:0;transform:translateY(-4px);}to{opacity:1;transform:translateY(0);}}
 
 /* ===== INFO GRID ===== */
 .info-grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
-  gap:8px;margin-top:6px;
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+  gap:10px;margin-top:8px;
 }
 .info-box{
-  background:#0b1220;border:1px solid #1f2f49;border-radius:10px;
-  padding:8px;text-align:center;
+  background:#0c1426;
+  border:1px solid #1f2f49;
+  border-radius:10px;
+  text-align:center;
+  padding:10px;
+  transition:.3s;
 }
-.info-box b{display:block;font-size:14px;color:var(--accent);margin-bottom:3px}
-.info-box span{font-size:12px;color:var(--muted)}
+.info-box:hover{box-shadow:0 0 10px rgba(0,229,255,.2);}
+.info-box b{display:block;font-size:15px;color:var(--accent);margin-bottom:4px;}
+.info-box span{font-size:13px;color:var(--muted);}
 
 /* ===== GANHADORES ===== */
-.winners{margin-top:12px}
-.winners h3{color:var(--ok);font-family:Orbitron;font-size:15px;margin-bottom:6px}
+.winners{margin-top:14px;}
+.winners h3{color:var(--ok);font-family:Orbitron;font-size:16px;margin-bottom:8px;}
 .winner-card{
-  background:#0c1428;border:1px solid #1f2f49;border-radius:10px;
-  padding:8px;margin-bottom:8px;
+  background:#0c162a;
+  border:1px solid #1f2f49;
+  border-radius:10px;
+  padding:10px;margin-bottom:8px;
 }
-.winner-card b{color:var(--warn);display:block;margin-bottom:3px}
-.winner-card small{color:var(--muted)}
+.winner-card b{color:var(--warn);display:block;margin-bottom:4px;}
+.winner-card small{color:var(--muted);}
 .winner-photo img{
   width:100%;max-height:200px;object-fit:contain;
-  border-radius:8px;border:1px solid #1f2f49;margin-top:6px;
+  border-radius:8px;border:1px solid #1f2f49;margin-top:8px;
 }
 
 /* ===== LOADING ===== */
-.loading{text-align:center;margin-top:25px}
-.loader{
-  width:50px;height:50px;
-  border:4px solid #23304a;border-top-color:var(--accent);
-  border-radius:50%;animation:spin 1s linear infinite;
-  margin:auto;
-}
+.loading{text-align:center;margin-top:50px;}
+.loader{width:60px;height:60px;border:4px solid #23304a;border-top-color:var(--accent);border-radius:50%;animation:spin 1s linear infinite;margin:auto;}
 @keyframes spin{to{transform:rotate(360deg)}}
-.loading p{margin-top:8px;color:var(--muted);font-size:13px}
-
-/* ===== RESPONSIVO ===== */
-@media(max-width:700px){
-  .info-grid{grid-template-columns:repeat(2,1fr)}
-  .card-header-left img{width:34px;height:34px;}
-  .card-header h2{font-size:15px;}
-}
+.loading p{margin-top:10px;color:var(--muted);font-size:13px;}
+@media(max-width:700px){.card-header-left img{width:40px;height:40px;}.card-header h2{font-size:16px;}}
 </style>
 </head>
 <body>
 
-<!-- 🔍 FILTRO -->
-<div class="filtro">
-  <input type="text" id="dataFiltro" placeholder="Filtrar por data">
-</div>
+<header>
+  <h1>📊 Resultados da Semana</h1>
+  <div class="controls">
+    <input type="text" id="dataFiltro" placeholder="Filtrar por data">
+    <button id="btnAtualizar">🔄 Atualizar</button>
+  </div>
+</header>
 
-<!-- 📊 CONTEÚDO -->
 <div id="content" class="container">
   <div class="loading">
     <div class="loader"></div>
@@ -169,10 +178,10 @@ html,body{
 </div>
 
 <script>
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyRM7vx3TWCnl3EhbuT30BsZbL-WTobUbE1bALP7tjTVzHgEQsa_JzrS8WNBXa_AdrS/exec"; // 🔁 substitua aqui
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyRM7vx3TWCnl3EhbuT30BsZbL-WTobUbE1bALP7tjTVzHgEQsa_JzrS8WNBXa_AdrS/exec"; // 🔁 Substitua aqui
 let resultadosOriginais = [];
 
-// === Carrega os resultados da última semana ===
+// === Carregar resultados ===
 async function carregarResultados(){
   try{
     const res = await fetch(`${SCRIPT_URL}?action=resultados`, {cache:"no-store"});
@@ -181,15 +190,15 @@ async function carregarResultados(){
     renderResultados(data);
   }catch(e){
     document.getElementById("content").innerHTML =
-      "<p style='text-align:center;color:#f87171'>Erro ao carregar resultados.</p>";
+      "<p style='text-align:center;color:#f87171'>❌ Erro ao carregar resultados.</p>";
   }
 }
 
-// === Renderiza ===
+// === Renderizar resultados ===
 function renderResultados(lista){
   const cont = document.getElementById("content");
-  if(!Array.isArray(lista) || lista.length===0){
-    cont.innerHTML = "<p style='text-align:center;color:#a7b3c8'>Nenhum resultado disponível.</p>";
+  if(!Array.isArray(lista)||lista.length===0){
+    cont.innerHTML="<p style='text-align:center;color:#a7b3c8;margin-top:40px'>Nenhum resultado disponível.</p>";
     return;
   }
 
@@ -198,27 +207,23 @@ function renderResultados(lista){
       <div class='winner-card'>
         <b>${g.nome}</b>
         <small>Cotas: ${g.cotas} • Valor investido: R$ ${g.investimento}</small>
-        <div class='winner-photo'>
-          ${g.comprovante ? `<img src='${g.comprovante}' alt='Comprovante de repasse'>` : ""}
-        </div>
-      </div>
-    `).join('');
+        ${g.comprovante?`<div class='winner-photo'><img src='${g.comprovante}' alt='Comprovante'></div>`:""}
+      </div>`).join('');
 
     return `
     <div class="card">
       <div class="card-header" onclick="toggleCard(this)">
         <div class="card-header-left">
-          ${jogo.logo ? `<img src="${jogo.logo}" alt="Logo do jogo">` : ""}
+          ${jogo.logo?`<img src="${jogo.logo}" alt="Logo do jogo">`:""}
           <div>
             <h2>${jogo.titulo||'Jogo sem título'}</h2>
             <small style="color:var(--muted)">${jogo.data||''}</small>
           </div>
         </div>
         <div class="info-mini">
-          <div class="count">🏆 ${jogo.qtdGanhadores||0} ganhadores</div>
+          <div class="count">🏆 ${jogo.qtdGanhadores||0} ganhador${(jogo.qtdGanhadores||0)>1?'es':''}</div>
         </div>
       </div>
-
       <div class="card-body">
         <div class="info-grid">
           <div class="info-box"><b>${jogo.totalCotas||0}</b><span>Total de cotas</span></div>
@@ -234,7 +239,7 @@ function renderResultados(lista){
   }).join('');
 }
 
-// === Expande/Recolhe cards ===
+// === Mostrar/ocultar detalhes ===
 function toggleCard(header){
   const body = header.nextElementSibling;
   const open = body.style.display==="block";
@@ -242,16 +247,22 @@ function toggleCard(header){
   if(!open) body.style.display="block";
 }
 
-// === Filtro de data manual ===
+// === Filtro por data ===
 flatpickr("#dataFiltro", {
   locale:"pt",
   dateFormat:"d/m/Y",
   onChange: ([date])=>{
-    if(!date){ renderResultados(resultadosOriginais); return; }
+    if(!date){renderResultados(resultadosOriginais);return;}
     const filtro = date.toLocaleDateString("pt-BR");
     const filtrados = resultadosOriginais.filter(j=> (j.data||"").includes(filtro));
     renderResultados(filtrados);
   }
+});
+
+// === Botão de atualização ===
+document.getElementById("btnAtualizar").addEventListener("click", ()=>{
+  document.getElementById("content").innerHTML='<div class="loading"><div class="loader"></div><p>Atualizando...</p></div>';
+  carregarResultados();
 });
 
 // === Início ===
