@@ -12,6 +12,9 @@ export default async function handler(req, res) {
   try {
     const { amount, payer } = req.body;
 
+    // 🔑 Gera um ID único para o cabeçalho X-Idempotency-Key
+    const idempotencyKey = `${Date.now()}-${Math.random().toString(36).substring(2, 15)}`;
+
     const body = {
       transaction_amount: Number(amount),
       description: "Aposta - Jogo do Bicho",
@@ -28,6 +31,7 @@ export default async function handler(req, res) {
       headers: {
         Authorization: `Bearer ${MP_TOKEN}`,
         "Content-Type": "application/json",
+        "X-Idempotency-Key": idempotencyKey, // ✅ cabeçalho obrigatório
       },
       body: JSON.stringify(body),
     });
