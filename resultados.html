@@ -16,20 +16,19 @@
   --text:#eaf2ff;--muted:#a7b3c8;
   --accent:#00e5ff;--warn:#f59e0b;--ok:#16a34a;
 }
-
 html,body{
   margin:0;
   padding:0;
   font-family:Inter,system-ui;
   color:var(--text);
   overflow-x:hidden;
-  background:radial-gradient(800px 600px at 50% -100px,var(--bg2),#020412 80%) !important; /* ✅ força o fundo escuro */
+  background:radial-gradient(800px 600px at 50% -100px,var(--bg2),#020412 80%) !important;
 }
 
 /* ===== FILTRO ===== */
 .filtro{
   text-align:center;
-  margin:10px auto 16px;
+  margin:12px auto 18px;
 }
 .filtro input{
   background:#0c1428;
@@ -68,12 +67,44 @@ html,body{
   transition:.3s;
 }
 .card:hover{box-shadow:0 0 18px rgba(0,229,255,.18);transform:translateY(-2px)}
+
 .card-header{
-  display:flex;justify-content:space-between;align-items:center;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
   cursor:pointer;
+  flex-wrap:wrap;
 }
-.card-header h2{font-family:Orbitron;font-size:17px;color:var(--warn);margin:0}
-.card-header span{font-size:12px;color:var(--muted)}
+.card-header-left{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+.card-header-left img{
+  width:40px;height:40px;
+  border-radius:8px;
+  object-fit:cover;
+  border:1px solid var(--line);
+  box-shadow:0 0 6px rgba(0,229,255,.4);
+}
+.card-header h2{
+  font-family:Orbitron;
+  font-size:17px;
+  color:var(--warn);
+  margin:0;
+}
+.card-header .info-mini{
+  display:flex;
+  flex-direction:column;
+  align-items:flex-end;
+  font-size:12px;
+  color:var(--muted);
+}
+.card-header .info-mini .count{
+  color:var(--ok);
+  font-weight:600;
+}
 .card-body{margin-top:8px;display:none;animation:fade .3s ease}
 @keyframes fade{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
 
@@ -118,6 +149,8 @@ html,body{
 /* ===== RESPONSIVO ===== */
 @media(max-width:700px){
   .info-grid{grid-template-columns:repeat(2,1fr)}
+  .card-header-left img{width:34px;height:34px;}
+  .card-header h2{font-size:15px;}
 }
 </style>
 </head>
@@ -137,10 +170,10 @@ html,body{
 </div>
 
 <script>
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx1aL5nmLyt3nWp-gFwB1t2xT2SSwJsK7eMXObR8mhwa3GkWq3dZpSwJ-1u6AaeV0IR/exec";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbych2JMzSsIBJRcBb0xDR2Fz0DfmqB4dVPW2uud5vCGyVt7AHI1ngmhBGFFHNxKLUKa/exec";
 let resultadosOriginais = [];
 
-// === Carrega os resultados ===
+// === Carrega os resultados da última semana ===
 async function carregarResultados(){
   try{
     const res = await fetch(`${SCRIPT_URL}?action=resultados`, {cache:"no-store"});
@@ -153,15 +186,15 @@ async function carregarResultados(){
   }
 }
 
-// === Renderiza os resultados ===
+// === Renderiza ===
 function renderResultados(lista){
+  const cont = document.getElementById("content");
   if(!Array.isArray(lista) || lista.length===0){
-    document.getElementById("content").innerHTML =
-      "<p style='text-align:center;color:#a7b3c8'>Nenhum resultado disponível.</p>";
+    cont.innerHTML = "<p style='text-align:center;color:#a7b3c8'>Nenhum resultado disponível.</p>";
     return;
   }
 
-  document.getElementById("content").innerHTML = lista.map(jogo=>{
+  cont.innerHTML = lista.map(jogo=>{
     const ganhadores = (jogo.ganhadores||[]).map(g=>`
       <div class='winner-card'>
         <b>${g.nome}</b>
@@ -175,9 +208,18 @@ function renderResultados(lista){
     return `
     <div class="card">
       <div class="card-header" onclick="toggleCard(this)">
-        <h2>${jogo.titulo||'Jogo sem título'}</h2>
-        <span>${jogo.data||''}</span>
+        <div class="card-header-left">
+          ${jogo.logo ? `<img src="${jogo.logo}" alt="Logo do jogo">` : ""}
+          <div>
+            <h2>${jogo.titulo||'Jogo sem título'}</h2>
+            <small style="color:var(--muted)">${jogo.data||''}</small>
+          </div>
+        </div>
+        <div class="info-mini">
+          <div class="count">🏆 ${jogo.qtdGanhadores||0} ganhadores</div>
+        </div>
       </div>
+
       <div class="card-body">
         <div class="info-grid">
           <div class="info-box"><b>${jogo.totalCotas||0}</b><span>Total de cotas</span></div>
@@ -201,7 +243,7 @@ function toggleCard(header){
   if(!open) body.style.display="block";
 }
 
-// === Filtro de data ===
+// === Filtro de data manual ===
 flatpickr("#dataFiltro", {
   locale:"pt",
   dateFormat:"d/m/Y",
