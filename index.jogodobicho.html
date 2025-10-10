@@ -44,25 +44,8 @@ gap:8px;align-items:center;justify-content:space-between;box-shadow:0 0 22px rgb
 .card.selected{outline:2px solid var(--accent);box-shadow:0 0 0 4px rgba(0,229,255,.22) inset,0 0 16px rgba(0,229,255,.24)}
 .card.sold{opacity:.6;cursor:not-allowed}
 .card img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:brightness(.85)}
-.nums{
-  position:absolute;
-  right:6px;
-  top:6px;
-  text-align:right;
-  font-size:12px;
-  line-height:1.3em;
-  font-weight:700;
-  color:var(--warn);
-}
-.nums span{
-  display:inline-block;
-  background:rgba(0,0,0,.6);
-  color:var(--warn);
-  padding:2px 5px;
-  margin-bottom:2px;
-  border-radius:6px;
-  box-shadow:0 0 4px rgba(0,0,0,.5);
-}
+.nums{position:absolute;right:6px;top:6px;text-align:right;font-size:12px;font-weight:700;color:var(--warn)}
+.nums span{display:inline-block;background:rgba(0,0,0,.6);color:var(--warn);padding:2px 5px;margin-bottom:2px;border-radius:6px;box-shadow:0 0 4px rgba(0,0,0,.5)}
 .name{position:absolute;bottom:6px;left:0;right:0;font-weight:700;font-size:15px;color:var(--accent);text-shadow:0 0 8px rgba(0,0,0,.9)}
 
 /* ===== Popup Cadastro ===== */
@@ -74,66 +57,6 @@ gap:8px;align-items:center;justify-content:space-between;box-shadow:0 0 22px rgb
 .row{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}
 .ok{background:linear-gradient(90deg,var(--warn),#ffb757);color:#111}
 .cancel{background:#112036;color:#c9d6ec;border:1px solid #1f2f49}
-
-/* ===== Overlay PIX ===== */
-.overlay-pix{
-  display:none;
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.88);
-  z-index:11000;
-  align-items:center;
-  justify-content:center;
-  flex-direction:column;
-  text-align:center;
-  padding:20px;
-}
-.overlay-pix .box{
-  background:linear-gradient(180deg,var(--panel),#0a0f1c);
-  border:1px solid var(--line);
-  border-radius:14px;
-  padding:22px;
-  max-width:400px;
-  box-shadow:0 0 18px rgba(0,229,255,.25);
-}
-.overlay-pix h3{
-  font-family:Orbitron;
-  color:var(--warn);
-  margin-bottom:10px;
-}
-.overlay-pix p{color:var(--muted);margin:8px 0}
-.overlay-pix .pix-key{
-  background:#16243a;
-  color:#eaf2ff;
-  padding:10px;
-  border-radius:8px;
-  margin:10px 0;
-  font-weight:700;
-  word-break:break-all;
-  border:1px solid #20344f;
-}
-.overlay-pix .btns{
-  display:flex;
-  flex-direction:column;
-  gap:8px;
-  margin-top:10px;
-}
-.overlay-pix button{
-  border:none;
-  border-radius:8px;
-  padding:10px;
-  font-weight:700;
-  cursor:pointer;
-}
-.copyPix{
-  background:linear-gradient(90deg,var(--accent),#5cc7ff);
-  color:#0b1220;
-}
-.closePix{
-  background:#112036;
-  color:#c9d6ec;
-  border:1px solid #1f2f49;
-}
 
 /* ===== Mobile ===== */
 @media(max-width:700px){
@@ -155,10 +78,8 @@ gap:8px;align-items:center;justify-content:space-between;box-shadow:0 0 22px rgb
 
 <div class="panel">
   <div class="badges">
-    <span class="badge">Disponíveis: <b id="disp">—</b></span>
     <span class="badge">Selecionados: <b id="selCount">0</b></span>
     <span class="badge">Preço: <b class="price">R$ 6,00</b></span>
-    <span class="badge">💰 Prêmio: <b id="premio">—</b></span>
   </div>
   <div class="actions">
     <button id="btnClear" class="btn btn-clear">Limpar</button>
@@ -188,26 +109,14 @@ gap:8px;align-items:center;justify-content:space-between;box-shadow:0 0 22px rgb
   </div>
 </div>
 
-<!-- Overlay PIX Final -->
-<div id="overlayPix" class="overlay-pix">
-  <div class="box">
-    <h3>Pagamento via PIX</h3>
-    <p>Valor total a pagar: <b id="pixValor"></b></p>
-    <div class="pix-key" id="pixChave"></div>
-    <div class="btns">
-      <button class="copyPix" id="copiarPix">📋 Copiar chave PIX</button>
-      <button class="closePix" id="fecharPix">Fechar</button>
-    </div>
-    <p style="margin-top:12px;font-size:14px;color:#ffd089;">
-      ⚠️ Seu jogo será confirmado após o pagamento do valor da aposta.
-    </p>
-  </div>
-</div>
+<!-- Modal PIX (automático Mercado Pago) -->
+<script src="/pagamento.js"></script>
 
 <script>
 const SCRIPT_URL="https://script.google.com/macros/s/AKfycbxqUX_W6Jv-yUZ3CcoDBWF5bEO5RgsSOttQUnu3kXX2qqX62Cx59EJgtRJui8R5rQN3kg/exec";
-const PRECO=6,PIX_KEY="711e433b-bb4e-477e-adb7-518eacf2f67e";
+const PRECO=6;
 
+// Lista completa dos bichos
 const bichos=[
 ["Avestruz","01","02","03","04","https://github.com/ClenaStore/barreirense/blob/main/paste/avestruz.png?raw=true"],
 ["Águia","05","06","07","08","https://github.com/ClenaStore/barreirense/blob/main/paste/%C3%A1guia.png?raw=true"],
@@ -238,23 +147,15 @@ const bichos=[
 
 const grid=document.getElementById("grid"),
 selCountEl=document.getElementById("selCount"),
-premioEl=document.getElementById("premio"),
 popup=document.getElementById("popup"),
-overlayPix=document.getElementById("overlayPix"),
-pixValor=document.getElementById("pixValor"),
-pixChave=document.getElementById("pixChave"),
-copiarPix=document.getElementById("copiarPix"),
-fecharPix=document.getElementById("fecharPix"),
 btnConfirm=document.getElementById("btnConfirm"),
 btnClear=document.getElementById("btnClear");
 
-let vendidos=new Set(),selecionados=new Set(),totalPago=0;
+let selecionados=new Set();
 
 function updatePanel(){
   selCountEl.textContent=selecionados.size;
   btnConfirm.disabled=selecionados.size===0;
-  const premio=(totalPago*0.6).toFixed(2);
-  premioEl.textContent=`R$ ${premio}`;
 }
 
 function renderGrid(){
@@ -273,7 +174,6 @@ function renderGrid(){
   document.querySelectorAll(".card").forEach(c=>{
     c.addEventListener("click",()=>{
       const nome=c.dataset.nome;
-      if(vendidos.has(nome))return;
       if(selecionados.has(nome)){selecionados.delete(nome);c.classList.remove("selected");}
       else{selecionados.add(nome);c.classList.add("selected");}
       updatePanel();
@@ -281,11 +181,7 @@ function renderGrid(){
   });
 }
 
-btnClear.onclick=()=>{
-  selecionados.clear();
-  document.querySelectorAll(".selected").forEach(c=>c.classList.remove("selected"));
-  updatePanel();
-};
+btnClear.onclick=()=>{selecionados.clear();document.querySelectorAll(".selected").forEach(c=>c.classList.remove("selected"));updatePanel();};
 
 btnConfirm.onclick=()=>{
   const arr=[...selecionados];
@@ -306,35 +202,23 @@ document.getElementById("confirm").onclick=async()=>{
   const total=arr.length*PRECO;
 
   try{
+    // 🔹 Registra a aposta na planilha
     await fetch(SCRIPT_URL,{
       method:"POST",
       headers:{"Content-Type":"text/plain;charset=utf-8"},
-      body:JSON.stringify({action:"registrar_rifa",nome,email,telefone:tel,bichos:arr,total,pix:PIX_KEY})
+      body:JSON.stringify({action:"registrar_jogo",nome,email,telefone:tel,bichos:arr,total})
     });
 
+    // 🔹 Abre pagamento Mercado Pago
     popup.style.display="none";
-    abrirPix(total);
+    iniciarPagamento(total, `Jogo do Bicho - ${nome}`, nome, "Jogo do Bicho");
     selecionados.clear();
     document.querySelectorAll(".selected").forEach(c=>c.classList.remove("selected"));
     updatePanel();
-
   }catch(e){
-    alert("Erro ao enviar. Verifique a conexão.");
+    alert("Erro ao registrar. Verifique a conexão.");
   }
 };
-
-// === Overlay PIX Final ===
-function abrirPix(total){
-  pixValor.textContent=`R$ ${total.toFixed(2)}`;
-  pixChave.textContent=PIX_KEY;
-  overlayPix.style.display="flex";
-}
-copiarPix.onclick=async()=>{
-  await navigator.clipboard.writeText(PIX_KEY);
-  copiarPix.textContent="✅ Copiado!";
-  setTimeout(()=>copiarPix.textContent="📋 Copiar chave PIX",2000);
-};
-fecharPix.onclick=()=>overlayPix.style.display="none";
 
 renderGrid();
 </script>
