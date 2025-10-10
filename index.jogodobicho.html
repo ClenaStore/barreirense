@@ -187,31 +187,53 @@ btnConfirm.onclick=()=>{
 
 document.getElementById("cancel").onclick=()=>popup.style.display="none";
 
-document.getElementById("confirm").onclick=async()=>{
-  const nome=document.getElementById("nome").value.trim(),
-        email=document.getElementById("email").value.trim(),
-        tel=document.getElementById("tel").value.trim();
-  const arr=[...selecionados];
-  if(!nome||!email||!tel||arr.length===0){alert("Preencha todos os campos.");return;}
-  const total=arr.length*PRECO;
-  try{
-    const res=await fetch(SCRIPT_URL,{
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({action:"registrar_jogo",nome,email,telefone:tel,bichos:arr,total})
+document.getElementById("confirm").onclick = async () => {
+  const nome = document.getElementById("nome").value.trim();
+  const email = document.getElementById("email").value.trim();
+  const tel = document.getElementById("tel").value.trim();
+  const arr = [...selecionados];
+
+  if (!nome || !email || !tel || arr.length === 0) {
+    alert("Preencha todos os campos.");
+    return;
+  }
+
+  const total = arr.length * PRECO;
+
+  try {
+    const res = await fetch(SCRIPT_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        action: "registrar_jogo",
+        nome,
+        email,
+        telefone: tel,
+        bichos: arr,
+        total
+      })
     });
-    const data=await res.json();
-    if(!res.ok||data.erro)throw new Error(data?.erro||"Erro do servidor");
-    popup.style.display="none";
-    iniciarPagamento(total,`Jogo do Bicho - ${nome}`,nome,"Jogo do Bicho");
+
+    const data = await res.json();
+
+    if (!data.ok) {
+      alert("Erro ao registrar: " + (data.error || "Verifique a planilha."));
+      return;
+    }
+
+    popup.style.display = "none";
+    iniciarPagamento(total, `Jogo do Bicho - ${nome}`, nome, "Jogo do Bicho");
+
     selecionados.clear();
-    document.querySelectorAll(".selected").forEach(c=>c.classList.remove("selected"));
+    document.querySelectorAll(".selected").forEach(c => c.classList.remove("selected"));
     updatePanel();
-  }catch(e){
+
+  } catch (err) {
     alert("Erro ao registrar. Verifique a conexão.");
-    console.error("Erro ao registrar:",e);
+    console.error(err);
   }
 };
+
 
 renderGrid();
 </script>
