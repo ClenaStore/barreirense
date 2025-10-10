@@ -7,24 +7,23 @@ async function gerarPagamentoPIX(valor, nome, email) {
       body: JSON.stringify({
         amount: valor,
         payer: { name: nome, email },
-        description: "Aposta - Jogo do Bicho",
       }),
     });
 
     const data = await resposta.json();
 
     if (!resposta.ok || data.error) {
-      console.error("Erro:", data);
-      alert(`Erro ao iniciar pagamento: ${data.error || "Falha desconhecida"}`);
+      console.error("❌ Erro:", data);
+      alert(`Erro ao iniciar pagamento: ${data.error}`);
       return;
     }
 
-    // Mostra QR code no popup
     document.getElementById("pixValor").textContent = `R$ ${valor.toFixed(2)}`;
     document.getElementById("pixChave").innerHTML = `
-      <img src="data:image/png;base64,${data.qr_code_base64}" alt="QR PIX" style="width:180px;border-radius:8px;margin:10px auto;">
-      <p style="word-break:break-all;color:#ffc107;">${data.qr_code}</p>
-      <a href="${data.ticket_url}" target="_blank" style="display:inline-block;margin-top:8px;color:#00e5ff;text-decoration:underline;">Abrir no app do banco</a>
+      <img src="data:image/png;base64,${data.qr_code_base64}" 
+           alt="QR PIX" style="width:200px;margin:10px;border-radius:8px;">
+      <p style="color:#ffd54f;word-break:break-all;">${data.qr_code}</p>
+      <a href="${data.ticket_url}" target="_blank" style="color:#00e5ff">Abrir no app do banco</a>
     `;
     document.getElementById("overlayPix").style.display = "flex";
 
