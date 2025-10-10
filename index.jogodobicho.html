@@ -25,6 +25,22 @@ header{text-align:center;padding:22px 10px 12px}
 h1{font-family:Orbitron;color:var(--warn);text-shadow:0 0 10px rgba(245,158,11,.6);font-size:28px;margin-bottom:4px}
 .sub{color:var(--muted);font-size:15px}
 
+/* 💎 Total do Prêmio Global */
+#premioTotal{
+  text-align:center;
+  font-family:Orbitron;
+  font-size:34px;
+  margin-top:10px;
+  margin-bottom:5px;
+  color:#00ffe1;
+  text-shadow:0 0 25px #00ffe1,0 0 50px #00ffe1;
+  animation:piscar 1.2s infinite alternate;
+}
+@keyframes piscar{
+  from{opacity:1;transform:scale(1);}
+  to{opacity:.5;transform:scale(1.05);}
+}
+
 /* ===== Painel Superior ===== */
 .panel{max-width:950px;margin:14px auto;background:linear-gradient(180deg,var(--panel),#0a0f1f);
 border:1px solid var(--line);border-radius:16px;padding:14px;display:flex;flex-wrap:wrap;
@@ -140,6 +156,7 @@ gap:8px;align-items:center;justify-content:space-between;box-shadow:0 0 22px rgb
 /* ===== Mobile ===== */
 @media(max-width:700px){
   h1{font-size:24px}
+  #premioTotal{font-size:26px}
   .panel{flex-direction:column;align-items:flex-start;gap:10px}
   .panel .actions{width:100%;justify-content:space-between}
   .btn{flex:1}
@@ -154,6 +171,9 @@ gap:8px;align-items:center;justify-content:space-between;box-shadow:0 0 22px rgb
   <h1>🎯 Jogo do Bicho</h1>
   <p class="sub">Selecione seus bichos — R$ 6,00 cada</p>
 </header>
+
+<!-- 💎 Total do Prêmio -->
+<div id="premioTotal">Carregando prêmio...</div>
 
 <!-- Painel Superior -->
 <div class="panel">
@@ -208,7 +228,6 @@ gap:8px;align-items:center;justify-content:space-between;box-shadow:0 0 22px rgb
   </div>
 </div>
 
-<!-- Configuração PIX oculta -->
 <!-- 🔒 Configuração PIX Oculta -->
 <div id="pixConfig" style="display:none;">
   <table>
@@ -316,7 +335,6 @@ gap:8px;align-items:center;justify-content:space-between;box-shadow:0 0 22px rgb
   </table>
 </div>
 
-
 <script>
 const SCRIPT_URL="https://script.google.com/macros/s/AKfycbxqUX_W6Jv-yUZ3CcoDBWF5bEO5RgsSOttQUnu3kXX2qqX62Cx59EJgtRJui8R5rQN3kg/exec";
 const PRECO=6;
@@ -348,10 +366,10 @@ const bichos=[
 ["Veado","93","94","95","96","https://github.com/ClenaStore/barreirense/blob/main/paste/VEADO.png?raw=true"],
 ["Vaca","97","98","99","00","https://github.com/ClenaStore/barreirense/blob/main/paste/VACA.png?raw=true"]
 ];
-
 const grid=document.getElementById("grid"),
 selCountEl=document.getElementById("selCount"),
 premioEl=document.getElementById("premio"),
+premioTotal=document.getElementById("premioTotal"),
 popup=document.getElementById("popup"),
 overlayPix=document.getElementById("overlayPix"),
 pixValor=document.getElementById("pixValor"),
@@ -369,6 +387,18 @@ function updatePanel(){
   btnConfirm.disabled=selecionados.size===0;
   const premio=(totalPago*0.6).toFixed(2);
   premioEl.textContent=`R$ ${premio}`;
+}
+
+async function atualizarPremioTotal(){
+  try{
+    const resp=await fetch(SCRIPT_URL+"?action=total_pago");
+    const data=await resp.json();
+    const totalPago=parseFloat(data.total)||0;
+    const premioFinal=(totalPago*0.75).toFixed(2);
+    premioTotal.textContent=`💎 PRÊMIO TOTAL: R$ ${premioFinal}`;
+  }catch(e){
+    premioTotal.textContent="Erro ao carregar prêmio";
+  }
 }
 
 function renderGrid(){
@@ -393,19 +423,8 @@ function renderGrid(){
   });
 }
 
-btnClear.onclick=()=>{
-  selecionados.clear();
-  document.querySelectorAll(".selected").forEach(c=>c.classList.remove("selected"));
-  updatePanel();
-};
-
-btnConfirm.onclick=()=>{
-  const arr=[...selecionados];
-  document.getElementById("numsPreview").textContent=arr.join(", ");
-  document.getElementById("totalPreview").textContent=`R$ ${(arr.length*PRECO).toFixed(2)}`;
-  popup.style.display="flex";
-};
-
+btnClear.onclick=()=>{selecionados.clear();document.querySelectorAll(".selected").forEach(c=>c.classList.remove("selected"));updatePanel();};
+btnConfirm.onclick=()=>{const arr=[...selecionados];document.getElementById("numsPreview").textContent=arr.join(", ");document.getElementById("totalPreview").textContent=`R$ ${(arr.length*PRECO).toFixed(2)}`;popup.style.display="flex";};
 document.getElementById("cancel").onclick=()=>popup.style.display="none";
 
 document.getElementById("confirm").onclick=async()=>{
@@ -414,9 +433,7 @@ document.getElementById("confirm").onclick=async()=>{
         tel=document.getElementById("tel").value.trim();
   const arr=[...selecionados];
   if(!nome||!email||!tel||arr.length===0){alert("Preencha todos os campos.");return;}
-
   const total=arr.length*PRECO;
-
   try{
     await fetch(SCRIPT_URL,{
       method:"POST",
@@ -428,9 +445,7 @@ document.getElementById("confirm").onclick=async()=>{
     selecionados.clear();
     document.querySelectorAll(".selected").forEach(c=>c.classList.remove("selected"));
     updatePanel();
-  }catch(e){
-    alert("Erro ao enviar. Verifique a conexão.");
-  }
+  }catch(e){alert("Erro ao enviar. Verifique a conexão.");}
 };
 
 function abrirPix(total){
@@ -442,16 +457,12 @@ function abrirPix(total){
   pixQR.style.display=qr?"block":"none";
   overlayPix.style.display="flex";
 }
-
-copiarPix.onclick=async()=>{
-  await navigator.clipboard.writeText(pixChave.textContent);
-  copiarPix.textContent="✅ Copiado!";
-  setTimeout(()=>copiarPix.textContent="📋 Copiar chave PIX",2000);
-};
-
+copiarPix.onclick=async()=>{await navigator.clipboard.writeText(pixChave.textContent);copiarPix.textContent="✅ Copiado!";setTimeout(()=>copiarPix.textContent="📋 Copiar chave PIX",2000);};
 fecharPix.onclick=()=>overlayPix.style.display="none";
 
 renderGrid();
+atualizarPremioTotal();
+setInterval(atualizarPremioTotal,20000);
 </script>
 </body>
 </html>
