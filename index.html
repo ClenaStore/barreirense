@@ -1,338 +1,166 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>🎮 Jogos do Momento</title>
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+<meta charset="UTF-8" />
+<title>CMV • Home Premium</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
 :root{
-  --bg1:#06060a;
-  --bg2:#101020;
-  --card:#141424;
-  --accent:#00e5ff;
-  --accent2:#7c3aed;
-  --text:#f5f5f5;
-  --muted:#aaa;
+  --bg:#0b1220; --card:#020617; --grid:#1e293b;
+  --text:#e5e7eb; --muted:#94a3b8;
+  --accent:#22c55e; --danger:#ef4444; --gold:#f59e0b;
+  --radius:18px; --shadow:0 20px 60px rgba(0,0,0,.45);
 }
-*{box-sizing:border-box;margin:0;padding:0;}
+*{box-sizing:border-box}
 body{
-  background:linear-gradient(180deg,var(--bg1),var(--bg2));
-  color:var(--text);
-  font-family:Poppins,system-ui;
-  overflow-x:hidden;
-  min-height:100vh;
+  margin:0; font-family:Inter,sans-serif; color:var(--text);
+  background:radial-gradient(1200px 600px at 10% -10%, #0b1220 0%, #020617 60%);
 }
-
-/* HEADER */
-header{
-  text-align:center;
-  padding:18px;
-  font-size:22px;
-  font-weight:700;
-  color:var(--accent);
-  font-family:'Orbitron',sans-serif;
-  letter-spacing:1px;
-  text-shadow:0 0 10px var(--accent);
-  background:rgba(0,0,0,0.3);
-  border-bottom:1px solid rgba(255,255,255,0.05);
-  backdrop-filter:blur(6px);
-}
-
-/* BANNER */
-.banner-container{
-  position:relative;
-  width:100%;
-  height:180px;
-  overflow:hidden;
-  border-radius:16px;
-  margin:10px auto;
-  box-shadow:0 0 15px rgba(0,229,255,.3);
-  animation:borderGlow 4s linear infinite;
-}
-@keyframes borderGlow{
-  0%{box-shadow:0 0 10px #00e5ff, inset 0 0 10px #7c3aed;}
-  25%{box-shadow:0 0 20px #7c3aed, inset 0 0 20px #00e5ff;}
-  50%{box-shadow:0 0 15px #ff00ff, inset 0 0 15px #00ffff;}
-  75%{box-shadow:0 0 20px #00e5ff, inset 0 0 25px #7c3aed;}
-  100%{box-shadow:0 0 10px #00e5ff, inset 0 0 10px #7c3aed;}
-}
-.banner-container img{
-  width:100%;
-  height:100%;
-  object-fit:cover;
-  position:absolute;
-  top:0;left:0;
-  opacity:0;
-  transition:opacity 1.2s ease;
-  filter:brightness(.88);
-  border-radius:16px;
-}
-.banner-container img.active{opacity:1}
-
-/* CATEGORIAS */
-.categorias-scroll{
-  display:flex;
-  gap:10px;
-  overflow-x:auto;
-  padding:10px 20px 15px;
-  scroll-behavior:smooth;
-}
-.categorias-scroll::-webkit-scrollbar{height:6px;}
-.categorias-scroll::-webkit-scrollbar-thumb{
-  background:linear-gradient(90deg,var(--accent),var(--accent2));
-  border-radius:4px;
-}
-.cat-mini{
-  flex:0 0 auto;
-  width:100px;
-  height:70px;
-  background:linear-gradient(180deg,#1a1a2a,#0b0b14);
-  border-radius:12px;
-  text-align:center;
-  cursor:pointer;
-  transition:transform .3s, box-shadow .3s, background .3s;
-  box-shadow:0 0 6px rgba(0,229,255,.25);
-  border:1px solid rgba(255,255,255,0.1);
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-}
-.cat-mini:hover{
-  transform:scale(1.08);
-  box-shadow:0 0 15px var(--accent);
-}
-.cat-mini.active{
-  background:linear-gradient(180deg,var(--accent2),var(--accent));
-  color:#000;
-  box-shadow:0 0 20px var(--accent);
-}
-.cat-mini img{
-  width:30px;
-  height:30px;
-  object-fit:contain;
-  margin-bottom:4px;
-  filter:drop-shadow(0 0 5px rgba(0,229,255,.6));
-}
-.cat-mini h4{
-  font-size:12px;
-  font-weight:600;
-  color:#fff;
-  text-shadow:0 0 5px rgba(0,229,255,.4);
-}
-
-/* GAMES GRID */
-.games{
-  display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(180px,1fr));
-  gap:20px;
-  padding:25px 20px 60px;
-  max-width:1000px;
-  margin:auto;
-}
-.card{
-  background:linear-gradient(180deg,var(--card),#0a0a14);
-  border-radius:18px;
-  box-shadow:0 0 15px rgba(0,0,0,.5);
-  overflow:hidden;
-  position:relative;
-  transition:transform .3s, box-shadow .3s;
-  cursor:pointer;
-  height:320px;
-  display:flex;
-  flex-direction:column;
-  justify-content:space-between;
-}
-.card:hover{
-  transform:translateY(-5px) scale(1.03);
-  box-shadow:0 0 25px var(--accent);
-}
-.card img{
-  width:100%;
-  height:220px;
-  object-fit:cover;
-  object-position:top;
-  display:block;
-  border-bottom:1px solid rgba(255,255,255,0.05);
-}
-.card h3{
-  padding:12px;
-  font-size:15px;
-  text-align:center;
-  color:var(--text);
-  font-weight:600;
-  text-shadow:0 0 5px rgba(0,229,255,.4);
-}
-.flag{
-  position:absolute;
-  top:10px;
-  right:-38px;
-  background:linear-gradient(135deg,var(--accent2),var(--accent));
-  color:#fff;
-  font-size:11px;
-  font-weight:700;
-  padding:6px 45px;
-  transform:rotate(45deg);
-  text-align:center;
-  box-shadow:0 0 10px var(--accent);
-  animation:glow 1.6s infinite ease-in-out;
-}
-@keyframes glow{
-  0%,100%{filter:brightness(1);}
-  50%{filter:brightness(1.5);}
-}
-
-/* SEÇÃO RESULTADOS (incorporação dinâmica) */
-#resultados-section{
-  max-width:1000px;
-  margin:5px auto 60px;
-  padding:0 15px;
-  display:none;
-  opacity:0;
-  transform:translateY(10px);
-  transition:opacity .5s ease, transform .5s ease;
-}
-#resultados-section.show{
-  display:block;
-  opacity:1;
-  transform:translateY(0);
-}
-#resultados-section iframe{
-  width:100%;
-  border:none;
-  min-height:80vh;
-  background:transparent;
-}
-
-/* RESPONSIVO */
-@media(max-width:768px){
-  .banner-container{height:150px;}
-  .games{grid-template-columns:repeat(2,1fr);gap:14px;}
-  .card{height:280px;}
-  .card img{height:180px;}
-}
-@media(max-width:480px){
-  .cat-mini{width:85px;height:65px;}
-  .cat-mini img{width:26px;height:26px;}
-  .cat-mini h4{font-size:11px;}
-  .games{grid-template-columns:repeat(2,1fr);gap:12px;}
-}
-footer{
-  text-align:center;
-  padding:15px;
-  font-size:12px;
-  color:var(--muted);
-  background:rgba(0,0,0,0.4);
-  border-top:1px solid rgba(255,255,255,0.05);
-  backdrop-filter:blur(6px);
-}
+.header{padding:18px 24px;border-bottom:1px solid var(--grid);background:#020617cc;position:sticky;top:0;z-index:10}
+.container{padding:22px 24px 40px;max-width:1400px;margin:auto}
+.filters{display:flex;gap:10px;margin-bottom:16px}
+.select{background:#020617;color:#fff;border:1px solid var(--grid);border-radius:999px;padding:8px 14px;font-weight:800}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-bottom:26px}
+.card{background:#020617;border:1px solid var(--grid);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow)}
+.card small{color:var(--muted);font-weight:800;font-size:11px;text-transform:uppercase}
+.card b{display:block;margin-top:6px;font-size:32px;font-weight:900;color:var(--accent)}
+.card.warn b{color:var(--gold)} .card.danger b{color:var(--danger)}
+.section{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}
+@media(max-width:900px){.section{grid-template-columns:1fr}}
+.panel{background:#020617;border:1px solid var(--grid);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow)}
+.panel h3{margin:0 0 10px;font-size:14px;font-weight:900;color:#cbd5f5}
+.badge{display:inline-block;padding:6px 12px;border-radius:999px;font-size:12px;font-weight:800;border:1px solid var(--grid);background:#0b1220;margin:4px}
 </style>
 </head>
 <body>
 
-<header>🎮 Jogos do Momento</header>
-
-<!-- BANNER -->
-<div class="banner-container">
-  <img src="https://github.com/ClenaStore/barreirense/blob/main/paste/11.png?raw=true" class="active" alt="Banner 1">
-  <img src="https://github.com/ClenaStore/barreirense/blob/main/paste/12.png?raw=true" alt="Banner 2">
-  <img src="https://github.com/ClenaStore/barreirense/blob/main/paste/10.png?raw=true" alt="Banner 3">
-  <img src="https://github.com/ClenaStore/barreirense/blob/main/paste/9.png?raw=true" alt="Banner 4">
+<div class="header">
+  <small id="atualizadoEm"></small>
 </div>
 
-<!-- CATEGORIAS -->
-<div class="categorias-scroll" id="categorias">
-  <div class="cat-mini active" data-cat="todos"><img src="https://cdn-icons-png.flaticon.com/512/992/992700.png"><h4>Todos</h4></div>
-  <div class="cat-mini" data-cat="mistério"><img src="https://cdn-icons-png.flaticon.com/512/808/808484.png"><h4>Mistério</h4></div>
-  <div class="cat-mini" data-cat="sorte"><img src="https://cdn-icons-png.flaticon.com/512/3468/3468314.png"><h4>Sorte</h4></div>
-  <div class="cat-mini" data-cat="resultados" id="btnResultados"><img src="https://github.com/ClenaStore/barreirense/blob/main/paste/Captura%20de%20tela%202025-10-09%20205204.png?raw=true"><h4>Resultados</h4></div>
+<div class="container">
+
+  <div class="filters">
+    <span class="badge">Filtrar por tipo</span>
+    <select id="filtroTipo" class="select"></select>
+  </div>
+
+  <div class="grid">
+    <div class="card"><small>Fichas</small><b id="kpiFichas">—</b></div>
+    <div class="card"><small>Produtos</small><b id="kpiProdutos">—</b></div>
+    <div class="card warn"><small>Produto Top</small><b id="kpiProdutoTop">—</b></div>
+    <div class="card"><small>CMV Médio</small><b id="kpiCmvMedio">—%</b></div>
+    <div class="card"><small>Preço Médio</small><b id="kpiPrecoMedio">—</b></div>
+    <div class="card"><small>Custo Médio</small><b id="kpiCustoMedio">—</b></div>
+    <div class="card warn"><small>Lucro Total</small><b id="kpiLucroTotal">—</b></div>
+    <div class="card danger"><small>CMV Alto</small><b id="kpiCmvAlto">—</b></div>
+  </div>
+
+  <div class="section">
+    <div class="panel"><h3>📊 CMV por tipo</h3><canvas id="graficoTipo"></canvas></div>
+    <div class="panel"><h3>🥇 Produtos mais usados</h3><canvas id="graficoProdutos"></canvas></div>
+    <div class="panel"><h3>🚨 CMV mais alto</h3><div id="listaCmvAlto"></div></div>
+    <div class="panel"><h3>💎 Mais lucrativos</h3><div id="listaLucro"></div></div>
+  </div>
+
 </div>
-
-<!-- JOGOS -->
-<section class="games" id="games">
-  <div class="card" data-cat="mistério" onclick="openGame('index.odete.html', this)">
-    <span class="flag">🎮 JOGUE AGORA</span>
-    <img src="https://github.com/ClenaStore/barreirense/blob/main/paste/Odete.jpg?raw=true" alt="Jogo 1">
-    <h3>Quem matou Odete Roitman? 🤔</h3>
-  </div>
-
-  <div class="card" data-cat="sorte" onclick="openGame('index.rifa.html', this)">
-    <span class="flag">🎮 JOGUE AGORA</span>
-    <img src="https://github.com/ClenaStore/barreirense/blob/main/paste/Design%20sem%20nome%20(26).png?raw=true" alt="Jogo 2">
-    <h3>Rifa</h3>
-  </div>
-
-  <div class="card" data-cat="sorte" onclick="openGame('index.jogodobicho.html', this)">
-    <span class="flag">🎮 JOGUE AGORA</span>
-    <img src="https://github.com/ClenaStore/barreirense/blob/main/paste/JOGO%20DO%20BICHO.png?raw=true" alt="Jogo 3">
-    <h3>Jogo do Bicho</h3>
-  </div>
-
-    <div class="card" data-cat="sorte" onclick="openGame('index.futebol.html', this)">
-    <span class="flag">🎮 EM BREVE</span>
-    <img src="https://github.com/ClenaStore/barreirense/blob/main/paste/JOGO%20DO%20BICHO.png?raw=true" alt="Jogo 3">
-    <h3>O gool é seu!</h3>
-  </div>
-  
-</section>
-
-<!-- RESULTADOS EMBUTIDO -->
-<section id="resultados-section">
-  <iframe id="iframeResultados" src="" loading="lazy"></iframe>
-</section>
-
-<footer>© 2025 Games Hub</footer>
 
 <script>
-// ===== Banner rotativo =====
-let banners=document.querySelectorAll('.banner-container img');
-let index=0;
-setInterval(()=>{
-  banners[index].classList.remove('active');
-  index=(index+1)%banners.length;
-  banners[index].classList.add('active');
-},4000);
+const sb = supabase.createClient(
+  "https://dxkszikemntfusfyrzos.supabase.co",
+  "sb_publishable_NNFvdfSXgOdGGVcSbphbjQ_brC3_9ed"
+);
 
-// ===== Clique animação =====
-function openGame(url,card){
-  card.style.transform='scale(0.97)';
-  setTimeout(()=>{window.location.href=url;},250);
+const moeda = v => "R$ " + Number(v||0).toLocaleString("pt-BR",{minimumFractionDigits:2});
+let chartTipo, chartProdutos;
+
+async function carregarTipos(){
+  const { data } = await sb.from("buffet").select("tipo");
+  const tipos = [...new Set((data||[]).map(i=>i.tipo).filter(Boolean))].sort();
+  filtroTipo.innerHTML = `<option value="">Todos</option>` + tipos.map(t=>`<option value="${t}">${t}</option>`).join("");
 }
 
-// ===== Filtro de categorias =====
-const categorias=document.querySelectorAll('.cat-mini');
-const jogos=document.querySelectorAll('.games .card');
-const resultadosSection=document.getElementById('resultados-section');
-const iframeResultados=document.getElementById('iframeResultados');
+async function carregarHome(){
+  atualizadoEm.textContent = "Atualizado em " + new Date().toLocaleString("pt-BR");
 
-categorias.forEach(cat=>{
-  cat.addEventListener('click',()=>{
-    categorias.forEach(c=>c.classList.remove('active'));
-    cat.classList.add('active');
-    const filtro=cat.dataset.cat;
+  const tipo = filtroTipo.value;
+  const q = sb.from("buffet").select("*");
+  const { data: buffet } = tipo ? await q.eq("tipo", tipo) : await q;
 
-    if(filtro==='resultados'){
-      jogos.forEach(j=>j.style.display='none');
-      mostrarResultados();
-      return;
-    }
+  const { data: itens } = await sb.from("buffet_itens").select("*");
+  const { data: produtos } = await sb.from("produtos").select("*");
 
-    resultadosSection.classList.remove('show');
-    iframeResultados.src="";
-    jogos.forEach(j=>{
-      j.style.display=(filtro==='todos'||j.dataset.cat===filtro)?'flex':'none';
-    });
+  kpiFichas.textContent = buffet?.length || 0;
+  kpiProdutos.textContent = produtos?.length || 0;
+
+  const custoFicha = {};
+  const usoProdutos = {};
+
+  itens.forEach(i=>{
+    custoFicha[i.buffet_id] = (custoFicha[i.buffet_id]||0) + Number(i.custo_calculado||0);
+    usoProdutos[i.nome] = (usoProdutos[i.nome]||0) + 1;
   });
-});
 
-// ===== Abre resultados.html abaixo =====
-function mostrarResultados(){
-  iframeResultados.src="resultados.html";
-  resultadosSection.classList.add('show');
-  resultadosSection.scrollIntoView({behavior:'smooth'});
+  const topProduto = Object.entries(usoProdutos).sort((a,b)=>b[1]-a[1])[0];
+  if(topProduto) kpiProdutoTop.textContent = topProduto[0];
+
+  let somaCMV=0,qtd=0,precoT=0,custoT=0,lucroT=0,cmvAlto=0;
+  const rankingCmv=[], rankingLucro=[], cmvTipo={}, qtdTipo={};
+
+  buffet.forEach(b=>{
+    const custo = custoFicha[b.id]||0;
+    const preco = Number(b.preco_venda||0);
+    if(preco>0){
+      const cmv = (custo/preco)*100;
+      const lucro = preco - custo;
+      somaCMV+=cmv; qtd++; precoT+=preco; custoT+=custo; lucroT+=lucro;
+      if(cmv>35) cmvAlto++;
+      cmvTipo[b.tipo]=(cmvTipo[b.tipo]||0)+cmv;
+      qtdTipo[b.tipo]=(qtdTipo[b.tipo]||0)+1;
+      rankingCmv.push({nome:b.nome,cmv});
+      rankingLucro.push({nome:b.nome,lucro});
+    }
+  });
+
+  kpiCmvMedio.textContent=(somaCMV/qtd||0).toFixed(1);
+  kpiPrecoMedio.textContent=moeda(precoT/qtd||0);
+  kpiCustoMedio.textContent=moeda(custoT/qtd||0);
+  kpiLucroTotal.textContent=moeda(lucroT);
+  kpiCmvAlto.textContent=cmvAlto;
+
+  chartTipo?.destroy();
+  chartTipo = new Chart(graficoTipo,{
+    type:"bar",
+    data:{labels:Object.keys(cmvTipo),datasets:[{data:Object.keys(cmvTipo).map(k=>(cmvTipo[k]/qtdTipo[k]).toFixed(1))}]},
+    options:{plugins:{legend:{display:false}}}
+  });
+
+  chartProdutos?.destroy();
+  const topProdutos = Object.entries(usoProdutos).sort((a,b)=>b[1]-a[1]).slice(0,5);
+  chartProdutos = new Chart(graficoProdutos,{
+    type:"bar",
+    data:{labels:topProdutos.map(i=>i[0]),datasets:[{data:topProdutos.map(i=>i[1])}]},
+    options:{plugins:{legend:{display:false}}}
+  });
+
+  listaCmvAlto.innerHTML = rankingCmv.sort((a,b)=>b.cmv-a.cmv).slice(0,5)
+    .map(i=>`<span class="badge">${i.nome} — ${i.cmv.toFixed(1)}%</span>`).join("");
+
+  listaLucro.innerHTML = rankingLucro.sort((a,b)=>b.lucro-a.lucro).slice(0,5)
+    .map(i=>`<span class="badge">${i.nome} — ${moeda(i.lucro)}</span>`).join("");
 }
+
+filtroTipo.onchange = carregarHome;
+
+(async ()=>{
+  await carregarTipos();
+  await carregarHome();
+})();
 </script>
 </body>
 </html>
