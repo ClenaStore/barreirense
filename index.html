@@ -2,165 +2,235 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8" />
-<title>CMV • Home Premium</title>
+<title>Grupo DV • Sistemas Profissionais</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
 :root{
   --bg:#0b1220; --card:#020617; --grid:#1e293b;
   --text:#e5e7eb; --muted:#94a3b8;
-  --accent:#22c55e; --danger:#ef4444; --gold:#f59e0b;
-  --radius:18px; --shadow:0 20px 60px rgba(0,0,0,.45);
+  --accent:#22c55e; --gold:#f59e0b; --danger:#ef4444;
+  --radius:22px; --shadow:0 30px 90px rgba(0,0,0,.55);
 }
 *{box-sizing:border-box}
-body{
-  margin:0; font-family:Inter,sans-serif; color:var(--text);
-  background:radial-gradient(1200px 600px at 10% -10%, #0b1220 0%, #020617 60%);
+html,body{margin:0; font-family:Inter,sans-serif; color:var(--text); background:
+  radial-gradient(1200px 600px at 10% -10%, #0b1220 0%, #020617 60%);}
+
+.header{
+  position:sticky; top:0; z-index:10;
+  backdrop-filter: blur(10px);
+  background:#020617cc;
+  border-bottom:1px solid var(--grid);
 }
-.header{padding:18px 24px;border-bottom:1px solid var(--grid);background:#020617cc;position:sticky;top:0;z-index:10}
-.container{padding:22px 24px 40px;max-width:1400px;margin:auto}
-.filters{display:flex;gap:10px;margin-bottom:16px}
-.select{background:#020617;color:#fff;border:1px solid var(--grid);border-radius:999px;padding:8px 14px;font-weight:800}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-bottom:26px}
-.card{background:#020617;border:1px solid var(--grid);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow)}
-.card small{color:var(--muted);font-weight:800;font-size:11px;text-transform:uppercase}
-.card b{display:block;margin-top:6px;font-size:32px;font-weight:900;color:var(--accent)}
-.card.warn b{color:var(--gold)} .card.danger b{color:var(--danger)}
-.section{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}
-@media(max-width:900px){.section{grid-template-columns:1fr}}
-.panel{background:#020617;border:1px solid var(--grid);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow)}
-.panel h3{margin:0 0 10px;font-size:14px;font-weight:900;color:#cbd5f5}
-.badge{display:inline-block;padding:6px 12px;border-radius:999px;font-size:12px;font-weight:800;border:1px solid var(--grid);background:#0b1220;margin:4px}
+.header .wrap{
+  max-width:1400px; margin:auto; padding:16px 22px;
+  display:flex; align-items:center; justify-content:space-between;
+}
+.brand{
+  display:flex; gap:10px; align-items:center; font-weight:900; letter-spacing:.08em;
+}
+.brand .logo{
+  width:36px; height:36px; border-radius:12px;
+  background:linear-gradient(135deg,#22c55e,#16a34a);
+  box-shadow:0 10px 30px rgba(34,197,94,.45);
+}
+.header .cta a{
+  text-decoration:none; color:#022c22; font-weight:900; letter-spacing:.06em;
+  padding:10px 16px; border-radius:999px;
+  background:linear-gradient(135deg,#22c55e,#16a34a);
+  box-shadow:0 16px 44px rgba(34,197,94,.45);
+}
+
+.hero{
+  max-width:1400px; margin:40px auto 10px; padding:0 22px;
+  display:grid; grid-template-columns:1.1fr .9fr; gap:28px; align-items:center;
+}
+.hero h1{
+  margin:0 0 10px; font-size:44px; line-height:1.05; letter-spacing:-.02em;
+}
+.hero p{color:var(--muted); max-width:640px}
+.hero .bullets{
+  margin-top:12px; display:flex; gap:10px; flex-wrap:wrap;
+}
+.badge{
+  display:inline-block; padding:8px 12px; border-radius:999px;
+  border:1px solid var(--grid); background:#0b1220; font-weight:800; font-size:12px;
+}
+
+.showcase{
+  background:linear-gradient(180deg,#0b1220,#020617);
+  border:1px solid var(--grid); border-radius:26px; padding:18px;
+  box-shadow:var(--shadow);
+}
+.showcase .screen{
+  border:1px solid var(--grid); border-radius:18px; padding:14px;
+  background:#020617; min-height:220px;
+  display:grid; grid-template-columns:repeat(3,1fr); gap:10px;
+}
+.kpi{
+  background:#020617; border:1px solid var(--grid); border-radius:14px; padding:12px;
+}
+.kpi small{color:var(--muted); font-weight:800; font-size:11px}
+.kpi b{display:block; margin-top:6px; font-size:20px; font-weight:900; color:var(--accent)}
+
+.container{max-width:1400px; margin:30px auto 60px; padding:0 22px}
+.grid{
+  display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:18px;
+}
+.card{
+  position:relative;
+  background:linear-gradient(180deg,#020617,#020617);
+  border:1px solid var(--grid); border-radius:var(--radius);
+  padding:22px; box-shadow:var(--shadow); overflow:hidden;
+}
+.card .tag{
+  position:absolute; top:16px; right:16px;
+  padding:6px 10px; border-radius:999px; font-size:11px; font-weight:900;
+  border:1px solid var(--grid); background:#0b1220;
+}
+.card h3{margin:0 0 6px; font-size:22px}
+.card p{color:var(--muted); font-size:14px}
+.card ul{margin:12px 0 0; padding-left:18px; color:#cbd5f5}
+.card li{margin:6px 0}
+.card .actions{margin-top:16px; display:flex; gap:10px; flex-wrap:wrap}
+.btn{
+  text-decoration:none; color:#fff; font-weight:900; letter-spacing:.06em;
+  padding:12px 16px; border-radius:999px; border:1px solid var(--grid);
+  background:#0b1220;
+}
+.btn.primary{
+  color:#022c22; border:none;
+  background:linear-gradient(135deg,#22c55e,#16a34a);
+  box-shadow:0 16px 44px rgba(34,197,94,.45);
+}
+.card .accent{
+  position:absolute; inset:auto -60px -60px auto;
+  width:220px; height:220px; border-radius:50%;
+  background:radial-gradient(circle at 30% 30%, rgba(34,197,94,.35), transparent 60%);
+  filter: blur(20px);
+  pointer-events:none;
+}
+
+.footer{
+  border-top:1px solid var(--grid);
+  padding:22px; color:var(--muted);
+}
+.footer .wrap{
+  max-width:1400px; margin:auto; display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap;
+}
+.footer b{color:#e5e7eb}
+
+@media(max-width:900px){
+  .hero{grid-template-columns:1fr}
+  .hero h1{font-size:34px}
+}
 </style>
 </head>
 <body>
 
-<div class="header">
-  <small id="atualizadoEm"></small>
-</div>
+<header class="header">
+  <div class="wrap">
+    <div class="brand">
+      <div class="logo"></div>
+      <span>GRUPO DV • SISTEMAS</span>
+    </div>
+    <div class="cta">
+      <a href="https://wa.me/5599999999999" target="_blank">Falar no WhatsApp</a>
+    </div>
+  </div>
+</header>
 
-<div class="container">
-
-  <div class="filters">
-    <span class="badge">Filtrar por tipo</span>
-    <select id="filtroTipo" class="select"></select>
+<section class="hero">
+  <div>
+    <h1>Sistemas Profissionais para Vendas, Financeiro e Integrações</h1>
+    <p>Plataforma de soluções digitais para negócios: e-commerce/PWA, CMV & Ficha Técnica, painéis financeiros e integrações com PDVs. Tudo sob medida para aumentar eficiência e lucro.</p>
+    <div class="bullets">
+      <span class="badge">PWA instalável</span>
+      <span class="badge">Dashboards em tempo real</span>
+      <span class="badge">Integrações com PDVs</span>
+      <span class="badge">Soluções sob medida</span>
+    </div>
   </div>
 
+  <div class="showcase">
+    <div class="screen">
+      <div class="kpi"><small>Vendas</small><b>+38%</b></div>
+      <div class="kpi"><small>CMV Médio</small><b>28.4%</b></div>
+      <div class="kpi"><small>Lucro</small><b>R$ 42.190</b></div>
+    </div>
+  </div>
+</section>
+
+<main class="container">
   <div class="grid">
-    <div class="card"><small>Fichas</small><b id="kpiFichas">—</b></div>
-    <div class="card"><small>Produtos</small><b id="kpiProdutos">—</b></div>
-    <div class="card warn"><small>Produto Top</small><b id="kpiProdutoTop">—</b></div>
-    <div class="card"><small>CMV Médio</small><b id="kpiCmvMedio">—%</b></div>
-    <div class="card"><small>Preço Médio</small><b id="kpiPrecoMedio">—</b></div>
-    <div class="card"><small>Custo Médio</small><b id="kpiCustoMedio">—</b></div>
-    <div class="card warn"><small>Lucro Total</small><b id="kpiLucroTotal">—</b></div>
-    <div class="card danger"><small>CMV Alto</small><b id="kpiCmvAlto">—</b></div>
+
+    <!-- CLENA STORE -->
+    <article class="card">
+      <span class="tag">PWA • E-commerce</span>
+      <h3>Clena Store</h3>
+      <p>Plataforma de vendas online com PWA, multi-agenda (salões/serviços), catálogo de produtos e pagamentos diretos.</p>
+      <ul>
+        <li>Loja online + PWA instalável</li>
+        <li>Catálogo de produtos e serviços</li>
+        <li>Pagamentos integrados</li>
+        <li>Gestão de pedidos e clientes</li>
+      </ul>
+      <div class="actions">
+        <!-- TROQUE O LINK -->
+        <a class="btn primary" href="COLE_AQUI_O_LINK_DO_CLENA_STORE" target="_blank">Acessar sistema</a>
+        <a class="btn" href="#" onclick="alert('Solicite uma demonstração pelo WhatsApp')">Ver demo</a>
+      </div>
+      <i class="accent"></i>
+    </article>
+
+    <!-- CMV / FICHA TÉCNICA -->
+    <article class="card">
+      <span class="tag">Financeiro • CMV</span>
+      <h3>Sistema de Ficha Técnica & CMV</h3>
+      <p>Controle o custo real dos pratos, CMV automático, margem, lucro e cardápio digital integrado.</p>
+      <ul>
+        <li>Ficha técnica com ingredientes e custos</li>
+        <li>CMV, margem e precificação</li>
+        <li>Dashboard com KPIs</li>
+        <li>Cardápio digital (PWA)</li>
+      </ul>
+      <div class="actions">
+        <!-- TROQUE O LINK -->
+        <a class="btn primary" href="COLE_AQUI_O_LINK_DO_SISTEMA_CMV" target="_blank">Acessar sistema</a>
+        <a class="btn" href="#" onclick="alert('Solicite uma demonstração pelo WhatsApp')">Ver demo</a>
+      </div>
+      <i class="accent"></i>
+    </article>
+
+    <!-- PERSONALIZADOS -->
+    <article class="card">
+      <span class="tag">Sob medida</span>
+      <h3>Sistemas Personalizados & Integrações</h3>
+      <p>Desenvolvimento de painéis financeiros, relatórios e integrações com PDVs e ERPs conforme a sua operação.</p>
+      <ul>
+        <li>Painéis financeiros (DRE, metas, KPIs)</li>
+        <li>Integrações com PDVs</li>
+        <li>Automação de relatórios</li>
+        <li>Projetos sob medida</li>
+      </ul>
+      <div class="actions">
+        <a class="btn primary" href="https://wa.me/5599999999999" target="_blank">Solicitar projeto</a>
+        <a class="btn" href="#" onclick="alert('Conte sua necessidade no WhatsApp')">Orçamento</a>
+      </div>
+      <i class="accent"></i>
+    </article>
+
   </div>
+</main>
 
-  <div class="section">
-    <div class="panel"><h3>📊 CMV por tipo</h3><canvas id="graficoTipo"></canvas></div>
-    <div class="panel"><h3>🥇 Produtos mais usados</h3><canvas id="graficoProdutos"></canvas></div>
-    <div class="panel"><h3>🚨 CMV mais alto</h3><div id="listaCmvAlto"></div></div>
-    <div class="panel"><h3>💎 Mais lucrativos</h3><div id="listaLucro"></div></div>
+<footer class="footer">
+  <div class="wrap">
+    <span>© <b>Grupo DV</b> — Sistemas Profissionais</span>
+    <span>Contato: <b>WhatsApp</b> • E-mail • Site</span>
   </div>
+</footer>
 
-</div>
-
-<script>
-const sb = supabase.createClient(
-  "https://dxkszikemntfusfyrzos.supabase.co",
-  "sb_publishable_NNFvdfSXgOdGGVcSbphbjQ_brC3_9ed"
-);
-
-const moeda = v => "R$ " + Number(v||0).toLocaleString("pt-BR",{minimumFractionDigits:2});
-let chartTipo, chartProdutos;
-
-async function carregarTipos(){
-  const { data } = await sb.from("buffet").select("tipo");
-  const tipos = [...new Set((data||[]).map(i=>i.tipo).filter(Boolean))].sort();
-  filtroTipo.innerHTML = `<option value="">Todos</option>` + tipos.map(t=>`<option value="${t}">${t}</option>`).join("");
-}
-
-async function carregarHome(){
-  atualizadoEm.textContent = "Atualizado em " + new Date().toLocaleString("pt-BR");
-
-  const tipo = filtroTipo.value;
-  const q = sb.from("buffet").select("*");
-  const { data: buffet } = tipo ? await q.eq("tipo", tipo) : await q;
-
-  const { data: itens } = await sb.from("buffet_itens").select("*");
-  const { data: produtos } = await sb.from("produtos").select("*");
-
-  kpiFichas.textContent = buffet?.length || 0;
-  kpiProdutos.textContent = produtos?.length || 0;
-
-  const custoFicha = {};
-  const usoProdutos = {};
-
-  itens.forEach(i=>{
-    custoFicha[i.buffet_id] = (custoFicha[i.buffet_id]||0) + Number(i.custo_calculado||0);
-    usoProdutos[i.nome] = (usoProdutos[i.nome]||0) + 1;
-  });
-
-  const topProduto = Object.entries(usoProdutos).sort((a,b)=>b[1]-a[1])[0];
-  if(topProduto) kpiProdutoTop.textContent = topProduto[0];
-
-  let somaCMV=0,qtd=0,precoT=0,custoT=0,lucroT=0,cmvAlto=0;
-  const rankingCmv=[], rankingLucro=[], cmvTipo={}, qtdTipo={};
-
-  buffet.forEach(b=>{
-    const custo = custoFicha[b.id]||0;
-    const preco = Number(b.preco_venda||0);
-    if(preco>0){
-      const cmv = (custo/preco)*100;
-      const lucro = preco - custo;
-      somaCMV+=cmv; qtd++; precoT+=preco; custoT+=custo; lucroT+=lucro;
-      if(cmv>35) cmvAlto++;
-      cmvTipo[b.tipo]=(cmvTipo[b.tipo]||0)+cmv;
-      qtdTipo[b.tipo]=(qtdTipo[b.tipo]||0)+1;
-      rankingCmv.push({nome:b.nome,cmv});
-      rankingLucro.push({nome:b.nome,lucro});
-    }
-  });
-
-  kpiCmvMedio.textContent=(somaCMV/qtd||0).toFixed(1);
-  kpiPrecoMedio.textContent=moeda(precoT/qtd||0);
-  kpiCustoMedio.textContent=moeda(custoT/qtd||0);
-  kpiLucroTotal.textContent=moeda(lucroT);
-  kpiCmvAlto.textContent=cmvAlto;
-
-  chartTipo?.destroy();
-  chartTipo = new Chart(graficoTipo,{
-    type:"bar",
-    data:{labels:Object.keys(cmvTipo),datasets:[{data:Object.keys(cmvTipo).map(k=>(cmvTipo[k]/qtdTipo[k]).toFixed(1))}]},
-    options:{plugins:{legend:{display:false}}}
-  });
-
-  chartProdutos?.destroy();
-  const topProdutos = Object.entries(usoProdutos).sort((a,b)=>b[1]-a[1]).slice(0,5);
-  chartProdutos = new Chart(graficoProdutos,{
-    type:"bar",
-    data:{labels:topProdutos.map(i=>i[0]),datasets:[{data:topProdutos.map(i=>i[1])}]},
-    options:{plugins:{legend:{display:false}}}
-  });
-
-  listaCmvAlto.innerHTML = rankingCmv.sort((a,b)=>b.cmv-a.cmv).slice(0,5)
-    .map(i=>`<span class="badge">${i.nome} — ${i.cmv.toFixed(1)}%</span>`).join("");
-
-  listaLucro.innerHTML = rankingLucro.sort((a,b)=>b.lucro-a.lucro).slice(0,5)
-    .map(i=>`<span class="badge">${i.nome} — ${moeda(i.lucro)}</span>`).join("");
-}
-
-filtroTipo.onchange = carregarHome;
-
-(async ()=>{
-  await carregarTipos();
-  await carregarHome();
-})();
-</script>
 </body>
 </html>
